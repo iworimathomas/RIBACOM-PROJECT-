@@ -3,55 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>RIBACOM</title>
 
 <style>
-* {
-    box-sizing: border-box;
-}
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f4f8f5;
-    color: #17351f;
-    text-align: center;
+    background: #f4f7f5;
+    color: #173b2a;
 }
 
-.welcome {
-    min-height: 100vh;
-    padding: 50px 20px 30px;
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 25px 20px;
 }
 
 .logo {
-    width: 110px;
-    height: 110px;
-    margin: 0 auto 25px;
+    width: 80px;
+    height: 80px;
+    margin: 10px auto 15px;
     border-radius: 50%;
-    background: #0b6b3a;
+    background: #087f3d;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
+    font-size: 38px;
     font-weight: bold;
-}
-
-.community {
-    font-size: 17px;
-    font-weight: bold;
-    line-height: 1.5;
 }
 
 h1 {
-    margin: 8px 0;
-    font-size: 42px;
-    letter-spacing: 3px;
-    color: #0b6b3a;
+    text-align: center;
+    margin-bottom: 5px;
 }
 
-.motto {
-    font-size: 17px;
+.subtitle {
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    border: 2px solid #ddd;
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+.card p {
+    line-height: 1.5;
+    color: #555;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #087f3d;
+    color: white;
+    font-size: 16px;
     font-weight: bold;
-    letter-spacing: 1px;
-    margin: 10
+    cursor: pointer;
+}
+
+button:hover {
+    background: #05652f;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">R</div>
+
+    <h1>JOIN RIBACOM</h1>
+
+    <div class="subtitle">
+        Choose your membership category
+    </div>
+
+    <div class="card">
+        <h2>① REGULAR MEMBER</h2>
+
+        <p>
+            For persons of Rivers or Bayelsa birth, ancestry,
+            family or community origin.
+        </p>
+    </div>
+
+    <div class="card">
+        <h2>② ASSOCIATE MEMBER</h2>
+
+        <p>
+            For persons who qualify through marriage or who wish
+            to identify with and support the Rivers and Bayelsa
+            community.
+        </p>
+    </div>
+
+    <button>
+        CONTINUE
+    </button>
+
+</div>
+
+</body>
+</html>
