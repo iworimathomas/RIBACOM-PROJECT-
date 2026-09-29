@@ -1,141 +1,456 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>RIBACOM</title>
+    <title>RIBACOM</title>
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f7f5;
-    color: #173b2a;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-.container {
-    max-width: 500px;
-    margin: auto;
-    padding: 25px 20px;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7f5;
+            color: #173b2a;
+        }
 
-.logo {
-    width: 80px;
-    height: 80px;
-    margin: 10px auto 15px;
-    border-radius: 50%;
-    background: #087f3d;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 38px;
-    font-weight: bold;
-}
+        .container {
+            max-width: 520px;
+            margin: auto;
+            padding: 25px 18px 40px;
+        }
 
-h1 {
-    text-align: center;
-    margin-bottom: 5px;
-}
+        .logo {
+            width: 85px;
+            height: 85px;
+            margin: 10px auto 15px;
+            border-radius: 50%;
+            background: #087f3d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+        }
 
-.subtitle {
-    text-align: center;
-    font-size: 14px;
-    margin-bottom: 30px;
-}
+        h1 {
+            text-align: center;
+            margin: 5px 0;
+            font-size: 27px;
+        }
 
-.card {
-    background: white;
-    padding: 20px;
-    margin-bottom: 15px;
-    border-radius: 15px;
-    border: 2px solid #ddd;
-}
+        h2 {
+            margin-top: 0;
+        }
 
-.card h2 {
-    margin-top: 0;
-    font-size: 20px;
-}
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 25px;
+        }
 
-.card p {
-    line-height: 1.5;
-    color: #555;
-}
+        .motto {
+            text-align: center;
+            font-weight: bold;
+            color: #087f3d;
+            margin-bottom: 25px;
+        }
 
-button {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    background: #087f3d;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
+        .screen {
+            display: none;
+        }
 
-button:hover {
-    background: #05652f;
-}
-</style>
+        .screen.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            border-color: #087f3d;
+        }
+
+        .card.selected {
+            border-color: #087f3d;
+            background: #eaf7ef;
+        }
+
+        .card p {
+            line-height: 1.5;
+            color: #555;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #087f3d;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        .back-button {
+            background: #777;
+        }
+
+        .info-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .welcome {
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .small-text {
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container">
 
-    <div class="logo">R</div>
+    <!-- HOME SCREEN -->
+    <section id="homeScreen" class="screen active">
 
-    <h1>JOIN RIBACOM</h1>
+        <div class="logo">R</div>
 
-    <div class="subtitle">
-        Choose your membership category
-    </div>
+        <h1>RIBACOM</h1>
 
-    <div class="card" onclick="selectMembership('Regular Member')">
-    <h2>① REGULAR MEMBER</h2>
+        <div class="subtitle">
+            RIVERS BAYELSA COMMUNITY<br>
+            THE GAMBIA
+        </div>
 
-    <p>
-        For persons of Rivers or Bayelsa birth, ancestry,
-        family or community origin.
-    </p>
-    </div>
-        </p>
-    </div>
+        <div class="motto">
+            TRUTH • UNITY • SERVICE
+        </div>
 
-    <div class="card" onclick="selectMembership('Associate Member')">
-    <h2>② ASSOCIATE MEMBER</h2>
+        <div class="info-box welcome">
+            <h2>Welcome to RIBACOM</h2>
 
-    <p>
-        For persons who qualify through marriage or who wish
-        to identify with and support the Rivers and Bayelsa
-        community.
-    </p>
-    </div>
+            <p>
+                Rivers Bayelsa Community in Diaspora –
+                The Gambia.
+            </p>
+
+            <p>
+                Connecting our people, strengthening our
+                community and serving with unity.
+            </p>
+        </div>
+
+        <button onclick="showScreen('membershipScreen')">
+            JOIN RIBACOM
+        </button>
+
+        <button onclick="alert('Member Login will be added next.')">
+            MEMBER LOGIN
+        </button>
+
+        <button onclick="alert('About RIBACOM will be added next.')">
+            ABOUT RIBACOM
+        </button>
+
+    </section>
+
+
+    <!-- MEMBERSHIP CATEGORY SCREEN -->
+    <section id="membershipScreen" class="screen">
+
+        <div class="logo">R</div>
+
+        <h1>JOIN RIBACOM</h1>
+
+        <div class="subtitle">
+            Choose your membership category
+        </div>
+
+        <div
+            id="regularCard"
+            class="card"
+            onclick="selectMembership('Regular Member')"
+        >
+            <h2>① REGULAR MEMBER</h2>
+
+            <p>
+                For persons of Rivers or Bayelsa birth,
+                ancestry, family or community origin.
+            </p>
+        </div>
+
+
+        <div
+            id="associateCard"
+            class="card"
+            onclick="selectMembership('Associate Member')"
+        >
+            <h2>② ASSOCIATE MEMBER</h2>
+
+            <p>
+                For persons who qualify through marriage
+                or who wish to identify with and support
+                the Rivers and Bayelsa community.
+            </p>
+        </div>
+
+
+        <button
+            id="continueButton"
+            onclick="continueMembership()"
+            disabled
+        >
+            CONTINUE
+        </button>
+
+        <button
+            class="back-button"
+            onclick="showScreen('homeScreen')"
+        >
+            BACK
+        </button>
+
+        <div class="small-text">
+            Please select one membership category.
+        </div>
+
+    </section>
+
+
+    <!-- MEMBERSHIP EXPLANATION SCREEN -->
+    <section id="explanationScreen" class="screen">
+
+        <div class="logo">R</div>
+
+        <h1 id="selectedTitle">
+            Membership
+        </h1>
+
+        <div class="info-box">
+
+            <h2>Membership Information</h2>
+
+            <p id="selectedExplanation">
+                Your membership information will appear here.
+            </p>
+
+            <p>
+                The next step will take you to the full
+                RIBACOM membership application.
+            </p>
+
+        </div>
+
+        <button onclick="startApplication()">
+            CONTINUE TO APPLICATION
+        </button>
+
+        <button
+            class="back-button"
+            onclick="showScreen('membershipScreen')"
+        >
+            BACK
+        </button>
+
+    </section>
+
+
+    <!-- APPLICATION PLACEHOLDER -->
+    <section id="applicationScreen" class="screen">
+
+        <div class="logo">R</div>
+
+        <h1>APPLICATION</h1>
+
+        <div class="subtitle">
+            RIBACOM Membership Application
+        </div>
+
+        <div class="info-box">
+
+            <p>
+                <strong>Membership Category:</strong>
+            </p>
+
+            <p id="applicationCategory">
+                —
+            </p>
+
+            <hr>
+
+            <p>
+                The full membership application form will
+                be added here next.
+            </p>
+
+            <p>
+                It will include your personal information,
+                contact information, Rivers/Bayelsa identity,
+                family information and RIBACOM membership
+                details.
+            </p>
+
+        </div>
+
+        <button onclick="alert('The full application form is coming next.')">
+            START APPLICATION
+        </button>
+
+        <button
+            class="back-button"
+            onclick="showScreen('explanationScreen')"
+        >
+            BACK
+        </button>
+
+    </section>
+
+</div>
+
+
 <script>
-let selectedMembership = "";
 
-function selectMembership(category) {
-    selectedMembership = category;
+    // Current membership selection
+    let selectedMembership = "";
 
-    alert("You selected: " + category);
-}
+
+    // Show a screen
+    function showScreen(screenId) {
+
+        const screens = document.querySelectorAll(".screen");
+
+        screens.forEach(function(screen) {
+            screen.classList.remove("active");
+        });
+
+        document.getElementById(screenId).classList.add("active");
+
+        window.scrollTo(0, 0);
+    }
+
+
+    // Select membership
+    function selectMembership(category) {
+
+        selectedMembership = category;
+
+        const regularCard =
+            document.getElementById("regularCard");
+
+        const associateCard =
+            document.getElementById("associateCard");
+
+        const continueButton =
+            document.getElementById("continueButton");
+
+
+        // Remove previous selection
+        regularCard.classList.remove("selected");
+        associateCard.classList.remove("selected");
+
+
+        // Highlight selected category
+        if (category === "Regular Member") {
+
+            regularCard.classList.add("selected");
+
+        } else {
+
+            associateCard.classList.add("selected");
+
+        }
+
+
+        // Enable Continue
+        continueButton.disabled = false;
+
+        continueButton.innerText =
+            "CONTINUE AS " + category.toUpperCase();
+    }
+
+
+    // Continue after category selection
+    function continueMembership() {
+
+        if (selectedMembership === "") {
+
+            alert("Please select a membership category.");
+
+            return;
+        }
+
+
+        const title =
+            document.getElementById("selectedTitle");
+
+        const explanation =
+            document.getElementById("selectedExplanation");
+
+
+        if (selectedMembership === "Regular Member") {
+
+            title.innerText = "REGULAR MEMBER";
+
+            explanation.innerText =
+                "Regular Membership is for persons of Rivers or Bayelsa birth, ancestry, family or community origin.";
+
+        } else {
+
+            title.innerText = "ASSOCIATE MEMBER";
+
+            explanation.innerText =
+                "Associate Membership is for persons who qualify through marriage or who wish to identify with and support the Rivers and Bayelsa community.";
+
+        }
+
+
+        showScreen("explanationScreen");
+    }
+
+
+    // Start application
+    function startApplication() {
+
+        document.getElementById(
+            "applicationCategory"
+        ).innerText = selectedMembership;
+
+        showScreen("applicationScreen");
+    }
+
 </script>
 
 </body>
 </html>
-        <p>
-        </p>
-    </div>
-
-    <button>
-        CONTINUE
-    </button>
-
-</div>
-
-</body>
-</html>
-<script>
-
