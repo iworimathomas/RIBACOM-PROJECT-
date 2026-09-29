@@ -93,17 +93,26 @@ button:hover {
         Choose your membership category
     </div>
 
-    <div class="card">
-        <h2>① REGULAR MEMBER</h2>
+    <div class="card" onclick="selectMembership('Regular Member')">
+    <h2>① REGULAR MEMBER</h2>
 
-        <p>
-            For persons of Rivers or Bayelsa birth, ancestry,
-            family or community origin.
+    <p>
+        For persons of Rivers or Bayelsa birth, ancestry,
+        family or community origin.
+    </p>
+    </div>
         </p>
     </div>
 
-    <div class="card">
-        <h2>② ASSOCIATE MEMBER</h2>
+    <div class="card" onclick="selectMembership('Associate Member')">
+    <h2>② ASSOCIATE MEMBER</h2>
+
+    <p>
+        For persons who qualify through marriage or who wish
+        to identify with and support the Rivers and Bayelsa
+        community.
+    </p>
+    </div>
 
         <p>
             For persons who qualify through marriage or who wish
@@ -120,3 +129,12 @@ button:hover {
 
 </body>
 </html>
+<script>
+let selectedMembership = "";
+
+function selectMembership(category) {
+    selectedMembership = category;
+
+    alert("You selected: " + category);
+}
+</script>
