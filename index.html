@@ -2,46 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#087443">
+<title>RIBACOM - Rivers Bayelsa Community The Gambia</title>
 
-<title>RIBACOM | Rivers Bayelsa Community The Gambia</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+:root{
+    --green:#087443;
+    --dark:#075b35;
+    --light:#f4faf7;
+    --gold:#d9a441;
+    --red:#b42318;
+    --text:#17211b;
+    --muted:#66756d;
+    --white:#fff;
+    --border:#dce7e1;
+    --shadow:0 5px 18px rgba(0,0,0,.07);
 }
 
+*{box-sizing:border-box}
+
 body{
+    margin:0;
     font-family:Arial,Helvetica,sans-serif;
-    background:#f4f7f6;
-    color:#17221f;
+    background:var(--light);
+    color:var(--text);
+}
+
+button,input,select,textarea{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    max-width:900px;
+    margin:auto;
+    min-height:100vh;
+    background:#fff;
 }
 
 header{
-    background:#075b3a;
-    color:white;
-    padding:16px;
+    background:linear-gradient(135deg,var(--green),var(--dark));
+    color:#fff;
+    padding:22px 18px;
     text-align:center;
-    position:sticky;
-    top:0;
-    z-index:100;
 }
 
 header h1{
-    font-size:21px;
+    margin:0;
+    font-size:22px;
 }
 
 header p{
-    font-size:12px;
-    margin-top:4px;
+    margin:6px 0 0;
+    font-size:13px;
+    opacity:.9;
 }
 
-.container{
-    width:94%;
-    max-width:850px;
-    margin:20px auto 90px;
+main{
+    padding:15px;
+    padding-bottom:90px;
 }
 
 .screen{
@@ -52,30 +77,34 @@ header p{
     display:block;
 }
 
-.card{
-    background:white;
-    border-radius:14px;
-    padding:18px;
-    margin-bottom:15px;
-    box-shadow:0 3px 12px rgba(0,0,0,.07);
-}
-
 .hero{
-    background:#075b3a;
-    color:white;
-    text-align:center;
-    padding:28px 18px;
-    border-radius:18px;
-    margin-bottom:18px;
+    background:linear-gradient(135deg,var(--green),var(--dark));
+    color:#fff;
+    padding:22px;
+    border-radius:16px;
+    margin-bottom:15px;
 }
 
 .hero h2{
-    font-size:25px;
-    margin-bottom:8px;
+    margin:0 0 7px;
 }
 
 .hero p{
-    line-height:1.5;
+    margin:0;
+    opacity:.9;
+}
+
+.card{
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow);
+}
+
+.card h3{
+    margin-top:0;
 }
 
 .grid{
@@ -84,84 +113,90 @@ header p{
     gap:12px;
 }
 
-.menu-card{
+@media(max-width:600px){
+    .grid{
+        grid-template-columns:1fr;
+    }
+}
+
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:11px;
+}
+
+.menu-item{
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:#fff;
+    padding:15px 10px;
+    text-align:center;
+    box-shadow:var(--shadow);
     cursor:pointer;
-    transition:.2s;
 }
 
-.menu-card:active{
-    transform:scale(.98);
+.menu-item .icon{
+    display:block;
+    font-size:27px;
+    margin-bottom:7px;
 }
 
-.menu-icon{
-    font-size:28px;
-    margin-bottom:10px;
-}
-
-.menu-card h3{
-    font-size:16px;
-    margin-bottom:5px;
-}
-
-.menu-card p{
-    font-size:12px;
-    color:#65716d;
-}
-
-button{
-    border:0;
-    border-radius:10px;
-    padding:12px 16px;
-    cursor:pointer;
-    font-weight:bold;
+.menu-item strong{
+    display:block;
     font-size:14px;
 }
 
-.btn-primary{
-    background:#075b3a;
-    color:white;
+.menu-item small{
+    color:var(--muted);
+}
+
+button,
+.btn{
+    border:0;
+    border-radius:10px;
+    padding:11px 15px;
+    background:var(--green);
+    color:#fff;
 }
 
 .btn-secondary{
-    background:#e6eeeb;
-    color:#075b3a;
+    background:#eef5f1;
+    color:var(--green);
+    border:1px solid var(--border);
 }
 
 .btn-danger{
-    background:#b42318;
-    color:white;
-}
-
-.btn-warning{
-    background:#d97706;
-    color:white;
+    background:var(--red);
 }
 
 .btn-success{
-    background:#087f5b;
-    color:white;
+    background:#16834c;
 }
 
-button:disabled{
-    opacity:.6;
-    cursor:not-allowed;
+.btn-gold{
+    background:var(--gold);
+    color:#222;
 }
 
-.full{
+.btn-full{
     width:100%;
 }
 
-input,
-select,
-textarea{
+.action-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+
+input,select,textarea{
     width:100%;
-    padding:12px;
-    border:1px solid #ccd6d2;
+    padding:11px;
+    border:1px solid #cbd8d1;
     border-radius:9px;
-    margin-top:6px;
-    margin-bottom:13px;
-    font-size:14px;
-    background:white;
+    background:#fff;
+    margin-top:5px;
+    margin-bottom:12px;
 }
 
 textarea{
@@ -170,28 +205,14 @@ textarea{
 }
 
 label{
-    font-size:13px;
     font-weight:bold;
-}
-
-.section-title{
-    margin:20px 0 12px;
-    color:#075b3a;
-}
-
-.back{
-    margin-bottom:15px;
-}
-
-.hidden{
-    display:none!important;
+    font-size:13px;
 }
 
 .message{
-    padding:12px;
+    padding:11px;
     border-radius:9px;
-    margin-bottom:15px;
-    font-size:13px;
+    margin-bottom:12px;
     display:none;
 }
 
@@ -199,26 +220,60 @@ label{
     display:block;
 }
 
-.message.error{
-    background:#fde8e7;
-    color:#9b1c1c;
+.message.success{
+    background:#e8f7ee;
+    color:#146b3e;
 }
 
-.message.success{
-    background:#e5f6ed;
-    color:#075b3a;
+.message.error{
+    background:#fdeceb;
+    color:#9c2118;
 }
 
 .message.info{
-    background:#e8f0ff;
-    color:#1e40af;
+    background:#edf5ff;
+    color:#175b9d;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 8px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+    margin:3px 3px 3px 0;
+}
+
+.badge-pending{
+    background:#fff4d6;
+    color:#8a6200;
+}
+
+.badge-approved{
+    background:#e1f5e9;
+    color:#087443;
+}
+
+.badge-rejected{
+    background:#fde4e2;
+    color:#a52117;
+}
+
+.badge-admin{
+    background:#e8e5ff;
+    color:#4a36a8;
+}
+
+.badge-suspended{
+    background:#eee;
+    color:#555;
 }
 
 .stat-grid{
     display:grid;
     grid-template-columns:repeat(2,1fr);
-    gap:12px;
-    margin-bottom:18px;
+    gap:10px;
+    margin-bottom:15px;
 }
 
 .stat{
@@ -228,277 +283,199 @@ label{
 .stat strong{
     display:block;
     font-size:25px;
-    color:#075b3a;
-    margin-bottom:5px;
+    color:var(--green);
 }
 
 .stat span{
     font-size:12px;
-    color:#66736e;
+    color:var(--muted);
 }
 
-.member-card{
-    border:1px solid #dde6e2;
-    border-radius:12px;
-    padding:15px;
-    margin-bottom:12px;
-    background:#fff;
+.member-card,
+.list-item{
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:14px;
+    margin-bottom:10px;
 }
 
 .member-card h3{
-    color:#075b3a;
-    margin-bottom:6px;
+    margin:0 0 5px;
 }
 
-.member-card p{
+.member-card p,
+.list-item p{
+    margin:7px 0;
     font-size:13px;
-    margin:5px 0;
-    color:#4c5a55;
-}
-
-.badge{
-    display:inline-block;
-    padding:5px 9px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:bold;
-    margin:4px 3px 4px 0;
-}
-
-.badge-pending{
-    background:#fff3cd;
-    color:#8a5a00;
-}
-
-.badge-approved{
-    background:#dff7e9;
-    color:#087443;
-}
-
-.badge-rejected{
-    background:#fde4e4;
-    color:#a61b1b;
-}
-
-.badge-suspended{
-    background:#ffe5d0;
-    color:#9a3412;
-}
-
-.badge-admin{
-    background:#e5e7ff;
-    color:#3730a3;
-}
-
-.action-row{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:12px;
-}
-
-.action-row button{
-    flex:1;
-    min-width:110px;
-}
-
-.info-row{
-    padding:10px 0;
-    border-bottom:1px solid #edf1ef;
-    font-size:14px;
-}
-
-.info-row:last-child{
-    border-bottom:0;
-}
-
-.info-row strong{
-    display:inline-block;
-    min-width:145px;
-}
-
-.card-id{
-    background:linear-gradient(135deg,#075b3a,#0a7c50);
-    color:white;
-    border-radius:18px;
-    padding:24px;
-    text-align:center;
-}
-
-.card-id .logo{
-    font-size:42px;
-    margin-bottom:8px;
-}
-
-.card-id h2{
-    margin-bottom:5px;
-}
-
-.card-id .membership-number{
-    font-size:23px;
-    font-weight:bold;
-    margin:20px 0;
-    letter-spacing:1px;
-}
-
-.empty{
-    text-align:center;
-    padding:25px;
-    color:#697570;
-}
-
-footer{
-    text-align:center;
-    color:#78847f;
-    font-size:11px;
-    padding:20px;
-}
-
-nav{
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    background:white;
-    border-top:1px solid #dce4e0;
-    display:flex;
-    justify-content:space-around;
-    padding:9px 4px;
-    z-index:200;
-}
-
-nav button{
-    background:none;
-    color:#56635e;
-    padding:7px;
-    font-size:11px;
-}
-
-nav button.active{
-    color:#075b3a;
-    font-weight:bold;
 }
 
 .loading{
     text-align:center;
-    padding:25px;
-    color:#697570;
-}
-
-.admin-toolbar{
-    display:grid;
-    grid-template-columns:1fr 170px;
-    gap:10px;
-}
-
-.admin-toolbar input,
-.admin-toolbar select{
-    margin-bottom:0;
-}
-
-.member-actions{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:12px;
-}
-
-.member-actions button{
-    flex:1;
-    min-width:100px;
-}
-
-.modal-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.55);
-    z-index:500;
-    display:none;
-    overflow-y:auto;
+    color:var(--muted);
     padding:20px;
 }
 
-.modal-overlay.show{
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:20px;
+}
+
+.profile-photo{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #e1eee8;
     display:block;
+    margin:0 auto 12px;
 }
 
-.modal{
-    background:white;
-    max-width:760px;
-    margin:30px auto;
-    border-radius:16px;
+.id-card{
+    background:linear-gradient(135deg,#087443,#075b35);
+    color:white;
+    border-radius:18px;
     padding:20px;
-    box-shadow:0 10px 35px rgba(0,0,0,.25);
+    position:relative;
+    overflow:hidden;
 }
 
-.modal-header{
+.id-card:after{
+    content:"RIBACOM";
+    position:absolute;
+    right:-20px;
+    bottom:20px;
+    font-size:40px;
+    font-weight:bold;
+    opacity:.07;
+}
+
+.id-card .id-photo{
+    width:80px;
+    height:80px;
+    border-radius:12px;
+    object-fit:cover;
+    border:2px solid rgba(255,255,255,.8);
+}
+
+.id-number{
+    font-size:18px;
+    font-weight:bold;
+    letter-spacing:1px;
+}
+
+.quick-stat{
+    padding:12px;
+    background:#f7faf8;
+    border-radius:10px;
+    margin-bottom:8px;
+}
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(900px,100%);
+    background:#fff;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-around;
+    padding:8px 4px;
+    z-index:100;
+}
+
+.bottom-nav button{
+    background:none;
+    color:var(--muted);
+    padding:5px 7px;
+    font-size:11px;
+}
+
+.bottom-nav button.active{
+    color:var(--green);
+    font-weight:bold;
+}
+
+.top-row{
     display:flex;
     justify-content:space-between;
     align-items:center;
     gap:10px;
-    margin-bottom:15px;
 }
 
-.modal-header h2{
-    color:#075b3a;
-    font-size:21px;
+.top-row h3{
+    margin:0;
 }
 
-.close-btn{
-    background:#edf2ef;
-    color:#075b3a;
-    padding:8px 12px;
+hr{
+    border:0;
+    border-top:1px solid var(--border);
+    margin:15px 0;
 }
 
-.detail-section{
-    margin-top:18px;
+.small{
+    font-size:12px;
+    color:var(--muted);
 }
 
-.detail-section h3{
-    color:#075b3a;
-    margin-bottom:8px;
-    border-bottom:1px solid #e5ebe8;
-    padding-bottom:8px;
+.link{
+    color:var(--green);
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.suspension-box{
-    background:#fff4eb;
-    border:1px solid #ffd6b8;
-    border-radius:10px;
-    padding:12px;
-    margin-top:10px;
+.search-row{
+    display:grid;
+    grid-template-columns:1fr 150px;
+    gap:8px;
 }
 
-@media(max-width:600px){
-
-    .grid{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .hero h2{
-        font-size:21px;
-    }
-
-    .container{
-        width:92%;
-    }
-
-    .admin-toolbar{
+@media(max-width:500px){
+    .search-row{
         grid-template-columns:1fr;
     }
+}
 
-    .modal-overlay{
-        padding:10px;
-    }
+.gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
 
-    .modal{
-        margin:10px auto;
-        padding:16px;
-    }
+.gallery-item{
+    border-radius:12px;
+    overflow:hidden;
+    background:#f4f7f5;
+}
 
-    .info-row strong{
-        display:block;
-        margin-bottom:3px;
+.gallery-item img{
+    width:100%;
+    height:160px;
+    object-fit:cover;
+    display:block;
+}
+
+.gallery-item div{
+    padding:8px;
+    font-size:12px;
+}
+
+.notice{
+    border-left:4px solid var(--green);
+    background:#f2f8f5;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+
+.hide{
+    display:none!important;
+}
+
+@media(min-width:700px){
+    .menu-grid{
+        grid-template-columns:repeat(4,1fr);
     }
 }
 </style>
@@ -506,69 +483,102 @@ nav button.active{
 
 <body>
 
+<div class="app">
+
 <header>
     <h1>RIVERS BAYELSA COMMUNITY THE GAMBIA</h1>
-    <p>RIBACOM • TRUTH • UNITY • SERVICE.</p>
+    <p>RIBACOM • TRUTH • UNITY • SERVICE</p>
 </header>
 
-<div class="container">
+<main>
 
-<!-- HOME -->
+<!-- =========================================================
+     HOME
+     ========================================================= -->
+
 <section id="home" class="screen active">
 
     <div class="hero">
-        <div style="font-size:45px;">🌿</div>
         <h2>Welcome to RIBACOM</h2>
         <p>
-            Rivers Bayelsa Community in Diaspora – The Gambia
+            Rivers Bayelsa Community in Diaspora – The Gambia.
         </p>
     </div>
 
     <div class="card">
-        <h2 class="section-title">Our Community</h2>
+        <h3 id="homeWelcome">Welcome</h3>
         <p>
-            RIBACOM brings together people of Rivers and Bayelsa origin
-            and associates living in The Gambia for truth, unity, service,
-            welfare and community development.
+            This is the official RIBACOM community platform for
+            membership, welfare, activities, announcements and
+            community information.
         </p>
+
+        <div class="action-row">
+            <button onclick="openScreen('membershipInfo')">
+                Become a Member
+            </button>
+
+            <button class="btn-secondary"
+                    onclick="openScreen('login')">
+                Member Login
+            </button>
+        </div>
     </div>
 
-    <div class="grid">
+    <div class="card">
+        <h3>Latest Announcement</h3>
+        <div id="homeAnnouncement" class="small">
+            Loading...
+        </div>
+    </div>
 
-        <div class="card menu-card" onclick="openScreen('membership')">
-            <div class="menu-icon">👥</div>
-            <h3>Membership</h3>
-            <p>Join RIBACOM</p>
+    <div class="card">
+        <h3>Upcoming Event</h3>
+        <div id="homeEvent" class="small">
+            Loading...
+        </div>
+    </div>
+
+    <div class="menu-grid">
+
+        <div class="menu-item" onclick="openScreen('about')">
+            <span class="icon">📜</span>
+            <strong>About RIBACOM</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('events')">
-            <div class="menu-icon">📅</div>
-            <h3>Events</h3>
-            <p>Community events</p>
+        <div class="menu-item" onclick="openScreen('news')">
+            <span class="icon">📰</span>
+            <strong>News</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('announcements')">
-            <div class="menu-icon">📢</div>
-            <h3>Announcements</h3>
-            <p>Community news</p>
+        <div class="menu-item" onclick="openScreen('events')">
+            <span class="icon">📅</span>
+            <strong>Events</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('constitution')">
-            <div class="menu-icon">📖</div>
-            <h3>Constitution</h3>
-            <p>Our governing document</p>
+        <div class="menu-item" onclick="openScreen('gallery')">
+            <span class="icon">📸</span>
+            <strong>Gallery</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('leadership')">
-            <div class="menu-icon">🏛️</div>
-            <h3>Leadership</h3>
-            <p>Community leadership</p>
+        <div class="menu-item" onclick="openScreen('youth')">
+            <span class="icon">🟢</span>
+            <strong>Youth</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('login')">
-            <div class="menu-icon">🔐</div>
-            <h3>Member Login</h3>
-            <p>Access your account</p>
+        <div class="menu-item" onclick="openScreen('women')">
+            <span class="icon">🟣</span>
+            <strong>Women</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('constitution')">
+            <span class="icon">📖</span>
+            <strong>Constitution</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('contact')">
+            <span class="icon">📞</span>
+            <strong>Contact</strong>
         </div>
 
     </div>
@@ -576,114 +586,91 @@ nav button.active{
 </section>
 
 
-<!-- MEMBERSHIP -->
-<section id="membership" class="screen">
+<!-- =========================================================
+     MEMBERSHIP INFO
+     ========================================================= -->
 
-    <button class="btn-secondary back" onclick="openScreen('home')">
-        ← Back
+<section id="membershipInfo" class="screen">
+
+    <button class="btn-secondary" onclick="openScreen('home')">
+        ← Home
     </button>
 
     <div class="hero">
         <h2>RIBACOM Membership</h2>
-        <p>Become part of the Rivers and Bayelsa Community in The Gambia.</p>
+        <p>Join Rivers Bayelsa Community The Gambia.</p>
     </div>
 
     <div class="card">
-        <h3 class="section-title">Membership Categories</h3>
+        <h3>Membership Categories</h3>
 
-        <div class="member-card">
-            <h3>Regular Member</h3>
-            <p>
-                Membership through Rivers or Bayelsa birth, origin or ancestry.
-            </p>
+        <div class="quick-stat">
+            <strong>Regular Member</strong>
+            <br>
+            <span class="small">
+                For eligible Rivers and Bayelsa community members.
+            </span>
         </div>
 
-        <div class="member-card">
-            <h3>Associate Member</h3>
-            <p>
-                Membership through marriage, community affiliation or
-                personal interest in the Rivers/Bayelsa community.
-            </p>
+        <div class="quick-stat">
+            <strong>Associate Member</strong>
+            <br>
+            <span class="small">
+                For eligible persons connected to the community.
+            </span>
         </div>
 
-        <button class="btn-primary full"
-                onclick="openScreen('membershipInfo')">
-            Continue
-        </button>
-    </div>
-
-</section>
-
-
-<!-- MEMBERSHIP INFO -->
-<section id="membershipInfo" class="screen">
-
-    <button class="btn-secondary back" onclick="openScreen('membership')">
-        ← Back
-    </button>
-
-    <div class="card">
-        <h2 class="section-title">Before You Apply</h2>
-
-        <p style="line-height:1.6;">
-            Please provide accurate information during registration.
-            Your application will be reviewed by RIBACOM administration
-            before membership approval.
-        </p>
-
-        <br>
-
-        <button class="btn-primary full"
+        <button class="btn-full"
                 onclick="openScreen('registration')">
-            Apply for Membership
-        </button>
-
-        <br><br>
-
-        <button class="btn-secondary full"
-                onclick="openScreen('login')">
-            Already a Member? Login
+            Start Membership Application
         </button>
     </div>
 
 </section>
 
 
-<!-- REGISTRATION -->
+<!-- =========================================================
+     REGISTRATION
+     ========================================================= -->
+
 <section id="registration" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('membershipInfo')">
+    <button class="btn-secondary"
+            onclick="openScreen('membershipInfo')">
         ← Back
     </button>
 
+    <div class="hero">
+        <h2>Membership Application</h2>
+        <p>Complete the form below.</p>
+    </div>
+
+    <div id="registrationMessage" class="message"></div>
+
     <div class="card">
-
-        <h2 class="section-title">Membership Application</h2>
-
-        <div id="registrationMessage" class="message"></div>
 
         <form id="registrationForm">
 
-            <h3 class="section-title">A. Personal Information</h3>
+            <h3>Personal Information</h3>
 
             <label>Full Name *</label>
             <input id="regFullName" required>
 
-            <label>Gender *</label>
-            <select id="regGender" required>
+            <label>Gender</label>
+            <select id="regGender">
                 <option value="">Select</option>
                 <option>Male</option>
                 <option>Female</option>
             </select>
 
-            <label>Date of Birth *</label>
-            <input type="date" id="regDob" required>
+            <label>Date of Birth</label>
+            <input type="date" id="regDob">
 
-            <label>Nationality *</label>
-            <input id="regNationality" value="Nigerian" required>
+            <label>Nationality</label>
+            <input id="regNationality" value="Nigerian">
 
-            <label>Marital Status *</label>
-            <select id="regMaritalStatus" required>
+            <label>Marital Status</label>
+            <select id="regMaritalStatus">
                 <option value="">Select</option>
                 <option>Single</option>
                 <option>Married</option>
@@ -692,9 +679,9 @@ nav button.active{
             </select>
 
             <label>Passport / National ID</label>
-            <input id="regPassportId">
+            <input id="regPassport">
 
-            <h3 class="section-title">B. Contact Information</h3>
+            <h3>Contact</h3>
 
             <label>Phone *</label>
             <input id="regPhone" required>
@@ -705,85 +692,68 @@ nav button.active{
             <label>Email *</label>
             <input type="email" id="regEmail" required>
 
-            <label>Current Address in The Gambia *</label>
-            <input id="regAddress" required>
+            <label>Current Address</label>
+            <textarea id="regAddress"></textarea>
 
-            <label>Town / Area *</label>
-            <input id="regTownArea" required>
+            <label>Town / Area</label>
+            <input id="regTown">
 
-            <label>Emergency Contact *</label>
-            <input id="regEmergencyContact" required>
+            <h3>Rivers / Bayelsa Information</h3>
 
-            <label>Emergency Phone *</label>
-            <input id="regEmergencyPhone" required>
+            <label>State of Origin</label>
+            <input id="regStateOrigin">
 
-            <h3 class="section-title">C. Rivers / Bayelsa Identity</h3>
+            <label>LGA</label>
+            <input id="regLga">
 
-            <label>State of Origin *</label>
-            <select id="regStateOfOrigin" required>
-                <option value="">Select</option>
-                <option>Rivers</option>
-                <option>Bayelsa</option>
-            </select>
-
-            <label>Local Government Area *</label>
-            <input id="regLga" required>
-
-            <label>Community / Town / Village *</label>
-            <input id="regCommunityVillage" required>
+            <label>Community / Town / Village</label>
+            <input id="regCommunity">
 
             <label>Clan / Family</label>
-            <input id="regClanFamily">
+            <input id="regClan">
 
             <label>Other Community Information</label>
             <textarea id="regOtherCommunity"></textarea>
 
-            <h3 class="section-title">D. Family Information</h3>
+            <h3>Family & Emergency</h3>
 
-            <label>Spouse Name</label>
+            <label>Spouse</label>
             <input id="regSpouse">
 
             <label>Number of Children</label>
             <input type="number" id="regChildren" min="0" value="0">
 
-            <label>Next of Kin *</label>
-            <input id="regNextOfKin" required>
+            <label>Next of Kin</label>
+            <input id="regNextKin">
 
-            <label>Next of Kin Phone *</label>
-            <input id="regNextOfKinPhone" required>
+            <label>Next of Kin Phone</label>
+            <input id="regNextKinPhone">
 
-            <h3 class="section-title">E. Membership</h3>
+            <label>Emergency Contact</label>
+            <input id="regEmergency">
 
-            <label>Membership Category *</label>
-            <select id="regCategory" required onchange="toggleAssociateFields()">
-                <option value="">Select</option>
-                <option value="Regular Member">Regular Member</option>
-                <option value="Associate Member">Associate Member</option>
+            <label>Emergency Phone</label>
+            <input id="regEmergencyPhone">
+
+            <h3>Membership</h3>
+
+            <label>Membership Category</label>
+            <select id="regCategory">
+                <option value="Regular">Regular</option>
+                <option value="Associate">Associate</option>
             </select>
 
-            <div id="associateFields" class="hidden">
+            <label>Associate Basis</label>
+            <input id="regBasis">
 
-                <label>Basis of Association *</label>
-                <select id="regAssociationBasis">
-                    <option value="">Select</option>
-                    <option>Marriage</option>
-                    <option>Community affiliation</option>
-                    <option>Other interest</option>
-                </select>
-
-                <label>Details</label>
-                <textarea id="regAssociationDetails"></textarea>
-
-            </div>
+            <label>Associate Details</label>
+            <textarea id="regBasisDetails"></textarea>
 
             <label>Previous Membership</label>
-            <input id="regPreviousMembership">
-
-            <label>Application Date *</label>
-            <input type="date" id="regApplicationDate" required>
+            <textarea id="regPrevious"></textarea>
 
             <label>Payment Method</label>
-            <select id="regPaymentMethod">
+            <select id="regPayment">
                 <option value="">Select</option>
                 <option>Cash</option>
                 <option>Bank Transfer</option>
@@ -791,46 +761,58 @@ nav button.active{
                 <option>Other</option>
             </select>
 
-            <label style="display:flex;gap:8px;align-items:flex-start;font-weight:normal;">
-                <input type="checkbox"
-                       id="regConstitution"
-                       style="width:auto;margin:2px 0;"
-                       required>
-                I accept and agree to abide by the RIBACOM Constitution.
-            </label>
-
-            <h3 class="section-title">F. Account Security</h3>
-
             <label>Password *</label>
-            <input type="password" id="regPassword" minlength="6" required>
+            <input type="password"
+                   id="regPassword"
+                   minlength="6"
+                   required>
 
             <label>Confirm Password *</label>
-            <input type="password" id="regConfirmPassword" minlength="6" required>
+            <input type="password"
+                   id="regConfirmPassword"
+                   minlength="6"
+                   required>
 
-            <button type="submit"
-                    id="registerButton"
-                    class="btn-primary full">
-                Submit Application
+            <label>
+                <input type="checkbox"
+                       id="regAccepted"
+                       required
+                       style="width:auto;margin-right:6px">
+                I accept the RIBACOM Constitution.
+            </label>
+
+            <br><br>
+
+            <button class="btn-full" type="submit">
+                Submit Membership Application
             </button>
 
         </form>
+
     </div>
 
 </section>
 
 
-<!-- LOGIN -->
+<!-- =========================================================
+     LOGIN
+     ========================================================= -->
+
 <section id="login" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('home')">
-        ← Back
+    <button class="btn-secondary"
+            onclick="openScreen('home')">
+        ← Home
     </button>
 
+    <div class="hero">
+        <h2>Member Login</h2>
+        <p>Access your RIBACOM account.</p>
+    </div>
+
+    <div id="loginMessage" class="message"></div>
+
     <div class="card">
-
-        <h2 class="section-title">Member Login</h2>
-
-        <div id="loginMessage" class="message"></div>
 
         <form id="loginForm">
 
@@ -840,9 +822,7 @@ nav button.active{
             <label>Password</label>
             <input type="password" id="loginPassword" required>
 
-            <button type="submit"
-                    id="loginButton"
-                    class="btn-primary full">
+            <button class="btn-full" type="submit">
                 Login
             </button>
 
@@ -850,7 +830,7 @@ nav button.active{
 
         <br>
 
-        <button class="btn-secondary full"
+        <button class="btn-secondary btn-full"
                 onclick="openScreen('registration')">
             Create Membership Account
         </button>
@@ -860,66 +840,101 @@ nav button.active{
 </section>
 
 
-<!-- DASHBOARD -->
+<!-- =========================================================
+     DASHBOARD
+     ========================================================= -->
+
 <section id="dashboard" class="screen">
 
     <div class="hero">
-        <h2 id="welcomeName">Welcome</h2>
-        <p id="memberStatusText">Member Dashboard</p>
+        <h2 id="dashboardName">RIBACOM Member</h2>
+        <p id="dashboardStatus">Member Dashboard</p>
     </div>
 
     <div id="dashboardMessage" class="message"></div>
 
-    <div class="grid">
+    <div class="menu-grid">
 
-        <div class="card menu-card" onclick="openScreen('profile')">
-            <div class="menu-icon">👤</div>
-            <h3>My Profile</h3>
-            <p>View your information</p>
+        <div class="menu-item" onclick="openScreen('profile')">
+            <span class="icon">👤</span>
+            <strong>My Profile</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('digitalCard')">
-            <div class="menu-icon">🪪</div>
-            <h3>Digital Card</h3>
-            <p>Membership card</p>
+        <div class="menu-item" onclick="openScreen('digitalCard')">
+            <span class="icon">🪪</span>
+            <strong>Digital ID</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('dues')">
-            <div class="menu-icon">💰</div>
-            <h3>Dues</h3>
-            <p>Membership contributions</p>
+        <div class="menu-item" onclick="openScreen('dues')">
+            <span class="icon">💰</span>
+            <strong>Dues</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('welfare')">
-            <div class="menu-icon">❤️</div>
-            <h3>Welfare</h3>
-            <p>Submit welfare request</p>
+        <div class="menu-item" onclick="openScreen('welfare')">
+            <span class="icon">❤️</span>
+            <strong>Welfare</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('events')">
-            <div class="menu-icon">📅</div>
-            <h3>Events</h3>
-            <p>Community events</p>
+        <div class="menu-item" onclick="openScreen('events')">
+            <span class="icon">📅</span>
+            <strong>Events</strong>
         </div>
 
-        <div class="card menu-card" onclick="openScreen('announcements')">
-            <div class="menu-icon">📢</div>
-            <h3>Announcements</h3>
-            <p>Community updates</p>
+        <div class="menu-item" onclick="openScreen('announcements')">
+            <span class="icon">📢</span>
+            <strong>Announcements</strong>
         </div>
 
-        <div id="adminMenu"
-             class="card menu-card hidden"
+        <div class="menu-item" onclick="openScreen('notifications')">
+            <span class="icon">🔔</span>
+            <strong>Notifications</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('youth')">
+            <span class="icon">🟢</span>
+            <strong>Youth</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('women')">
+            <span class="icon">🟣</span>
+            <strong>Women</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('gallery')">
+            <span class="icon">📸</span>
+            <strong>Gallery</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('news')">
+            <span class="icon">📰</span>
+            <strong>News</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('constitution')">
+            <span class="icon">📖</span>
+            <strong>Constitution</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('contact')">
+            <span class="icon">📞</span>
+            <strong>Contact</strong>
+        </div>
+
+        <div class="menu-item" onclick="openScreen('about')">
+            <span class="icon">ℹ️</span>
+            <strong>About</strong>
+        </div>
+
+        <div class="menu-item"
+             id="adminMenu"
              onclick="openScreen('admin')">
-            <div class="menu-icon">⚙️</div>
-            <h3>RIBACOM Admin</h3>
-            <p>Manage members and applications</p>
+            <span class="icon">🛠️</span>
+            <strong>Admin</strong>
         </div>
 
-        <div class="card menu-card" onclick="logout()">
-            <div class="menu-icon">🚪</div>
-            <h3>Logout</h3>
-            <p>Sign out</p>
+        <div class="menu-item" onclick="openScreen('settings')">
+            <span class="icon">⚙️</span>
+            <strong>Settings</strong>
         </div>
 
     </div>
@@ -927,116 +942,330 @@ nav button.active{
 </section>
 
 
-<!-- DIGITAL CARD -->
+<!-- =========================================================
+     PROFILE
+     ========================================================= -->
+
+<section id="profile" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Dashboard
+    </button>
+
+    <div class="hero">
+        <h2>My Profile</h2>
+        <p>Your RIBACOM membership information.</p>
+    </div>
+
+    <div id="profileMessage" class="message"></div>
+
+    <div class="card">
+
+        <img id="profilePhoto"
+             class="profile-photo"
+             src=""
+             alt="Profile photo">
+
+        <div style="text-align:center">
+            <strong id="profileName">Member</strong>
+            <br>
+            <span id="profileMembership"
+                  class="small">
+                Membership number
+            </span>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Personal Information</h3>
+
+        <div class="quick-stat">
+            <strong>Gender</strong>
+            <div id="profileGender"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Date of Birth</strong>
+            <div id="profileDob"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Nationality</strong>
+            <div id="profileNationality"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Marital Status</strong>
+            <div id="profileMarital"></div>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Contact</h3>
+
+        <div class="quick-stat">
+            <strong>Phone</strong>
+            <div id="profilePhone"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>WhatsApp</strong>
+            <div id="profileWhatsapp"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Email</strong>
+            <div id="profileEmail"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Address</strong>
+            <div id="profileAddress"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Town / Area</strong>
+            <div id="profileTown"></div>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Rivers / Bayelsa Information</h3>
+
+        <div class="quick-stat">
+            <strong>State of Origin</strong>
+            <div id="profileState"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>LGA</strong>
+            <div id="profileLga"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Community</strong>
+            <div id="profileCommunity"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Clan / Family</strong>
+            <div id="profileClan"></div>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Family & Emergency</h3>
+
+        <div class="quick-stat">
+            <strong>Spouse</strong>
+            <div id="profileSpouse"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Children</strong>
+            <div id="profileChildren"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Next of Kin</strong>
+            <div id="profileNextKin"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Emergency Contact</strong>
+            <div id="profileEmergency"></div>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Membership</h3>
+
+        <div class="quick-stat">
+            <strong>Membership Number</strong>
+            <div id="profileMembership2"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Category</strong>
+            <div id="profileCategory"></div>
+        </div>
+
+        <div class="quick-stat">
+            <strong>Status</strong>
+            <div id="profileStatus"></div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     DIGITAL ID
+     ========================================================= -->
+
 <section id="digitalCard" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('dashboard')">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Dashboard
     </button>
 
-    <div class="card">
-
-        <div id="digitalCardContent">
-
-            <div class="card-id">
-
-                <div class="logo">🌿</div>
-
-                <h2>RIBACOM</h2>
-
-                <p>Rivers Bayelsa Community The Gambia</p>
-
-                <div class="membership-number"
-                     id="cardMembershipNumber">
-                    Pending
-                </div>
-
-                <h3 id="cardMemberName">Member</h3>
-
-                <p id="cardCategory"></p>
-
-                <br>
-
-                <p>
-                    TRUTH • UNITY • SERVICE.
-                </p>
-
-            </div>
-
-        </div>
-
+    <div class="hero">
+        <h2>Digital RIBACOM ID</h2>
+        <p>Your digital membership identification.</p>
     </div>
+
+    <div id="digitalCardArea"></div>
 
 </section>
 
 
-<!-- DUES -->
+<!-- =========================================================
+     DUES
+     ========================================================= -->
+
 <section id="dues" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('dashboard')">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Dashboard
     </button>
 
-    <div class="card">
+    <div class="hero">
+        <h2>Dues & Payments</h2>
+        <p>Membership dues and welfare levy.</p>
+    </div>
 
-        <h2 class="section-title">Membership Dues</h2>
+    <div class="grid">
 
-        <p style="line-height:1.6;">
-            RIBACOM membership dues and contributions can be recorded
-            through the community administration.
-        </p>
-
-        <br>
-
-        <div class="member-card">
-            <h3>Membership Dues</h3>
-            <p>Current member contribution: D50</p>
+        <div class="card">
+            <strong>Membership Dues</strong>
+            <h2>D50</h2>
         </div>
 
-        <div id="duesMessage" class="message"></div>
+        <div class="card">
+            <strong>Welfare Levy</strong>
+            <h2>D200</h2>
+        </div>
 
-        <button class="btn-primary full"
-                onclick="showMessage('duesMessage','Contribution recording will be connected to the payment system in the next development phase.','info')">
-            Record Contribution
-        </button>
+    </div>
+
+    <div id="duesMessage" class="message"></div>
+
+    <div class="card">
+
+        <h3>Submit Payment</h3>
+
+        <form id="paymentForm">
+
+            <label>Payment Type</label>
+
+            <select id="paymentType" required>
+                <option value="membership_dues">
+                    Membership Dues
+                </option>
+                <option value="welfare_levy">
+                    Welfare Levy
+                </option>
+                <option value="other">
+                    Other
+                </option>
+            </select>
+
+            <label>Amount</label>
+            <input type="number"
+                   id="paymentAmount"
+                   min="0"
+                   step="0.01"
+                   required>
+
+            <label>Payment Method</label>
+            <select id="paymentMethod">
+                <option>Cash</option>
+                <option>Bank Transfer</option>
+                <option>Mobile Money</option>
+                <option>Other</option>
+            </select>
+
+            <label>Payment Reference</label>
+            <input id="paymentReference">
+
+            <button class="btn-full">
+                Submit Payment
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h3>Payment History</h3>
+
+        <div id="paymentHistory"
+             class="loading">
+            Loading...
+        </div>
 
     </div>
 
 </section>
 
 
-<!-- WELFARE -->
+<!-- =========================================================
+     WELFARE
+     ========================================================= -->
+
 <section id="welfare" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('dashboard')">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Dashboard
     </button>
 
+    <div class="hero">
+        <h2>Welfare</h2>
+        <p>Submit and monitor your welfare requests.</p>
+    </div>
+
+    <div id="welfareMessage" class="message"></div>
+
     <div class="card">
 
-        <h2 class="section-title">Welfare Request</h2>
-
-        <div id="welfareMessage" class="message"></div>
+        <h3>Submit Welfare Request</h3>
 
         <form id="welfareForm">
 
-            <label>Request Type *</label>
+            <label>Request Type</label>
 
             <select id="welfareType" required>
                 <option value="">Select</option>
                 <option>Wedding</option>
                 <option>Birth</option>
-                <option>Loss of Parent</option>
-                <option>Loss of Spouse</option>
-                <option>Loss of Child</option>
+                <option>Parent Bereavement</option>
+                <option>Spouse Bereavement</option>
+                <option>Child Bereavement</option>
                 <option>Other</option>
             </select>
 
-            <label>Description *</label>
+            <label>Description</label>
 
-            <textarea id="welfareDescription" required></textarea>
+            <textarea id="welfareDescription"
+                      required></textarea>
 
-            <button class="btn-primary full">
+            <button class="btn-full">
                 Submit Welfare Request
             </button>
 
@@ -1044,151 +1273,139 @@ nav button.active{
 
     </div>
 
+    <div class="card">
+
+        <h3>My Welfare Requests</h3>
+
+        <div id="welfareHistory"
+             class="loading">
+            Loading...
+        </div>
+
+    </div>
+
 </section>
 
 
-<!-- EVENTS -->
+<!-- =========================================================
+     EVENTS
+     ========================================================= -->
+
 <section id="events" class="screen">
 
-    <button class="btn-secondary back" onclick="goBack()">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Back
     </button>
 
-    <div class="card">
+    <div class="hero">
+        <h2>RIBACOM Events</h2>
+        <p>Upcoming community events and activities.</p>
+    </div>
 
-        <h2 class="section-title">Community Events</h2>
-
-        <div id="eventsList" class="loading">
-            Loading events...
-        </div>
-
+    <div id="eventsList"
+         class="loading">
+        Loading events...
     </div>
 
 </section>
 
 
-<!-- ANNOUNCEMENTS -->
+<!-- =========================================================
+     ANNOUNCEMENTS
+     ========================================================= -->
+
 <section id="announcements" class="screen">
 
-    <button class="btn-secondary back" onclick="goBack()">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Back
     </button>
 
-    <div class="card">
+    <div class="hero">
+        <h2>Announcements</h2>
+        <p>Official RIBACOM notices.</p>
+    </div>
 
-        <h2 class="section-title">Announcements</h2>
-
-        <div id="announcementsList" class="loading">
-            Loading announcements...
-        </div>
-
+    <div id="announcementsList"
+         class="loading">
+        Loading announcements...
     </div>
 
 </section>
 
 
-<!-- CONSTITUTION -->
-<section id="constitution" class="screen">
+<!-- =========================================================
+     NOTIFICATIONS
+     ========================================================= -->
 
-    <button class="btn-secondary back" onclick="openScreen('home')">
-        ← Back
-    </button>
-
-    <div class="card">
-
-        <h2 class="section-title">RIBACOM Constitution</h2>
-
-        <p style="line-height:1.7;">
-            The RIBACOM Constitution provides the framework for the
-            administration, membership, leadership, welfare and development
-            of Rivers Bayelsa Community in Diaspora – The Gambia.
-        </p>
-
-        <br>
-
-        <p>
-            The official Master Constitution contains 13 Chapters and
-            97 Articles.
-        </p>
-
-        <br>
-
-        <button class="btn-primary full"
-                onclick="showMessage('constitutionMessage','The complete Constitution document will be added to the app document section.','info')">
-            View Constitution
-        </button>
-
-        <div id="constitutionMessage" class="message"></div>
-
-    </div>
-
-</section>
-
-
-<!-- LEADERSHIP -->
-<section id="leadership" class="screen">
-
-    <button class="btn-secondary back" onclick="openScreen('home')">
-        ← Back
-    </button>
-
-    <div class="card">
-
-        <h2 class="section-title">RIBACOM Leadership</h2>
-
-        <div class="member-card">
-            <h3>Chairman</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-        <div class="member-card">
-            <h3>Vice-Chairman</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-        <div class="member-card">
-            <h3>Secretary General</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-        <div class="member-card">
-            <h3>Assistant Secretary General</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-        <div class="member-card">
-            <h3>Treasurer</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-        <div class="member-card">
-            <h3>PRO</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-        <div class="member-card">
-            <h3>Welfare Officer / Provost</h3>
-            <p>RIBACOM Executive</p>
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- NOTIFICATIONS -->
 <section id="notifications" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('dashboard')">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Dashboard
     </button>
 
+    <div class="hero">
+        <h2>Notifications</h2>
+        <p>Your RIBACOM updates.</p>
+    </div>
+
+    <div id="notificationsList"
+         class="loading">
+        Loading notifications...
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     YOUTH
+     ========================================================= -->
+
+<section id="youth" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Back
+    </button>
+
+    <div class="hero">
+        <h2>Rivers Bayelsa Youth</h2>
+        <p>Youth activities, events and opportunities.</p>
+    </div>
+
+    <div class="menu-grid">
+
+        <div class="menu-item">
+            <span class="icon">👥</span>
+            <strong>Youth Leadership</strong>
+        </div>
+
+        <div class="menu-item">
+            <span class="icon">🎯</span>
+            <strong>Youth Activities</strong>
+        </div>
+
+        <div class="menu-item">
+            <span class="icon">📅</span>
+            <strong>Youth Events</strong>
+        </div>
+
+        <div class="menu-item">
+            <span class="icon">💼</span>
+            <strong>Opportunities</strong>
+        </div>
+
+    </div>
+
     <div class="card">
 
-        <h2 class="section-title">Notifications</h2>
+        <h3>Youth Activities</h3>
 
-        <div class="empty">
-            No new notifications.
+        <div id="youthActivities"
+             class="loading">
+            Loading...
         </div>
 
     </div>
@@ -1196,19 +1413,53 @@ nav button.active{
 </section>
 
 
-<!-- PROFILE -->
-<section id="profile" class="screen">
+<!-- =========================================================
+     WOMEN
+     ========================================================= -->
 
-    <button class="btn-secondary back" onclick="openScreen('dashboard')">
-        ← Dashboard
+<section id="women" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Back
     </button>
+
+    <div class="hero">
+        <h2>Rivers Bayelsa Women</h2>
+        <p>Women’s activities, events and opportunities.</p>
+    </div>
+
+    <div class="menu-grid">
+
+        <div class="menu-item">
+            <span class="icon">👥</span>
+            <strong>Women’s Leadership</strong>
+        </div>
+
+        <div class="menu-item">
+            <span class="icon">🎯</span>
+            <strong>Activities</strong>
+        </div>
+
+        <div class="menu-item">
+            <span class="icon">📅</span>
+            <strong>Events</strong>
+        </div>
+
+        <div class="menu-item">
+            <span class="icon">💼</span>
+            <strong>Opportunities</strong>
+        </div>
+
+    </div>
 
     <div class="card">
 
-        <h2 class="section-title">My Profile</h2>
+        <h3>Women’s Activities</h3>
 
-        <div id="profileContent" class="loading">
-            Loading profile...
+        <div id="womenActivities"
+             class="loading">
+            Loading...
         </div>
 
     </div>
@@ -1216,19 +1467,278 @@ nav button.active{
 </section>
 
 
-<!-- ADMIN -->
+<!-- =========================================================
+     GALLERY
+     ========================================================= -->
+
+<section id="gallery" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Back
+    </button>
+
+    <div class="hero">
+        <h2>RIBACOM Gallery</h2>
+        <p>Community memories and activities.</p>
+    </div>
+
+    <div id="galleryList"
+         class="gallery-grid">
+        Loading...
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     NEWS
+     ========================================================= -->
+
+<section id="news" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Back
+    </button>
+
+    <div class="hero">
+        <h2>RIBACOM News</h2>
+        <p>Community news and achievements.</p>
+    </div>
+
+    <div id="newsList"
+         class="loading">
+        Loading...
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ABOUT
+     ========================================================= -->
+
+<section id="about" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('home')">
+        ← Home
+    </button>
+
+    <div class="hero">
+        <h2>About RIBACOM</h2>
+        <p>Rivers Bayelsa Community in Diaspora – The Gambia.</p>
+    </div>
+
+    <div class="card">
+
+        <h3>Who We Are</h3>
+
+        <p>
+            Rivers Bayelsa Community in Diaspora – The Gambia
+            (RIBACOM) is a community platform bringing together
+            members of Rivers and Bayelsa origin in The Gambia.
+        </p>
+
+        <h3>Our Purpose</h3>
+
+        <p>
+            To promote unity, mutual support, community development,
+            cultural identity and peaceful coexistence among our
+            members.
+        </p>
+
+        <h3>Our Mission</h3>
+
+        <p>
+            To build a united and supportive Rivers and Bayelsa
+            community through service, cooperation and responsible
+            community participation.
+        </p>
+
+        <h3>Our Values</h3>
+
+        <p>
+            Truth • Unity • Service
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CONSTITUTION
+     ========================================================= -->
+
+<section id="constitution" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Back
+    </button>
+
+    <div class="hero">
+        <h2>RIBACOM Constitution</h2>
+        <p>13 Chapters • 97 Articles</p>
+    </div>
+
+    <div class="card">
+
+        <p>
+            The RIBACOM Constitution is the governing document
+            of the Rivers Bayelsa Community in Diaspora – The Gambia.
+        </p>
+
+        <p>
+            The full constitutional text can be published here
+            chapter by chapter for members to read.
+        </p>
+
+        <div class="notice">
+            Official constitutional content should be inserted
+            from the approved Master Constitution.
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CONTACT
+     ========================================================= -->
+
+<section id="contact" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('home')">
+        ← Home
+    </button>
+
+    <div class="hero">
+        <h2>Contact RIBACOM</h2>
+        <p>Reach the community.</p>
+    </div>
+
+    <div class="card">
+
+        <h3>RIBACOM</h3>
+
+        <p>
+            <strong>Email:</strong><br>
+            ribacom_gambia@gmail.com
+        </p>
+
+        <div class="action-row">
+
+            <a href="mailto:ribacom_gambia@gmail.com"
+               style="text-decoration:none">
+                <button>📧 Email</button>
+            </a>
+
+            <a href="https://wa.me/"
+               target="_blank"
+               style="text-decoration:none">
+                <button class="btn-success">
+                    WhatsApp
+                </button>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     SETTINGS
+     ========================================================= -->
+
+<section id="settings" class="screen">
+
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
+        ← Dashboard
+    </button>
+
+    <div class="hero">
+        <h2>Account & Settings</h2>
+        <p>Manage your account.</p>
+    </div>
+
+    <div class="card">
+
+        <button class="btn-secondary btn-full"
+                onclick="openScreen('profile')">
+            👤 My Profile
+        </button>
+
+        <br><br>
+
+        <button class="btn-secondary btn-full"
+                onclick="showChangePassword()">
+            🔐 Change Password
+        </button>
+
+        <br><br>
+
+        <button class="btn-secondary btn-full"
+                onclick="openScreen('notifications')">
+            🔔 Notifications
+        </button>
+
+        <br><br>
+
+        <button class="btn-danger btn-full"
+                onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+    <div id="passwordBox"
+         class="card hide">
+
+        <h3>Change Password</h3>
+
+        <div id="passwordMessage"
+             class="message"></div>
+
+        <input type="password"
+               id="newPassword"
+               placeholder="New password">
+
+        <button class="btn-full"
+                onclick="changePassword()">
+            Update Password
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     ADMIN
+     ========================================================= -->
+
 <section id="admin" class="screen">
 
-    <button class="btn-secondary back" onclick="openScreen('dashboard')">
+    <button class="btn-secondary"
+            onclick="openScreen('dashboard')">
         ← Dashboard
     </button>
 
     <div class="hero">
         <h2>RIBACOM Admin</h2>
-        <p>Membership Administration</p>
+        <p>Community administration.</p>
     </div>
 
-    <div id="adminMessage" class="message"></div>
+    <div id="adminMessage"
+         class="message"></div>
 
     <div class="stat-grid">
 
@@ -1252,32 +1762,32 @@ nav button.active{
             <span>Rejected</span>
         </div>
 
-        <div class="card stat">
-            <strong id="adminSuspended">0</strong>
-            <span>Suspended</span>
-        </div>
-
     </div>
+
+
+    <!-- MEMBER MANAGEMENT -->
 
     <div class="card">
 
-        <h3 style="margin-bottom:12px;">
-            Member Management
-        </h3>
+        <div class="top-row">
+            <h3>Members</h3>
 
-        <div class="admin-toolbar">
+            <button class="btn-secondary"
+                    onclick="loadAdminMembers()">
+                🔄 Refresh
+            </button>
+        </div>
 
-            <input
-                id="memberSearch"
-                type="search"
-                placeholder="🔎 Search name, email, phone or membership no."
-                oninput="applyMemberFilters()">
+        <div class="search-row">
 
-            <select
-                id="memberStatusFilter"
-                onchange="applyMemberFilters()">
+            <input id="adminSearch"
+                   placeholder="Search members..."
+                   oninput="renderAdminMembers()">
 
-                <option value="all">All Statuses</option>
+            <select id="adminStatusFilter"
+                    onchange="renderAdminMembers()">
+
+                <option value="all">All Status</option>
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
@@ -1287,97 +1797,217 @@ nav button.active{
 
         </div>
 
+        <button class="btn-secondary"
+                onclick="clearAdminFilters()">
+            Clear Filters
+        </button>
+
+        <p id="adminResultCount"
+           class="small"></p>
+
+        <div id="adminMembersList"
+             class="loading">
+            Loading members...
+        </div>
+
     </div>
+
+
+    <!-- ADMIN CONTENT -->
 
     <div class="card">
 
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <h3>Publish Announcement</h3>
 
-            <h3>Members & Applications</h3>
+        <input id="adminAnnouncementTitle"
+               placeholder="Announcement title">
 
-            <button class="btn-secondary"
-                    onclick="loadAdminMembers()">
-                🔄 Refresh
-            </button>
+        <textarea id="adminAnnouncementMessage"
+                  placeholder="Announcement message"></textarea>
 
+        <button onclick="adminPublishAnnouncement()">
+            Publish Announcement
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Publish News</h3>
+
+        <input id="adminNewsTitle"
+               placeholder="News title">
+
+        <textarea id="adminNewsContent"
+                  placeholder="News content"></textarea>
+
+        <input id="adminNewsImage"
+               placeholder="Image URL (optional)">
+
+        <button onclick="adminPublishNews()">
+            Publish News
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Create Event</h3>
+
+        <input id="adminEventTitle"
+               placeholder="Event title">
+
+        <textarea id="adminEventDescription"
+                  placeholder="Description"></textarea>
+
+        <input id="adminEventVenue"
+               placeholder="Venue">
+
+        <input type="datetime-local"
+               id="adminEventDate">
+
+        <button onclick="adminCreateEvent()">
+            Create Event
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Add Gallery Photo</h3>
+
+        <input id="adminGalleryTitle"
+               placeholder="Title">
+
+        <input id="adminGalleryImage"
+               placeholder="Image URL">
+
+        <input id="adminGalleryCaption"
+               placeholder="Caption">
+
+        <button onclick="adminAddGallery()">
+            Add Photo
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Youth Activity</h3>
+
+        <input id="adminYouthTitle"
+               placeholder="Activity title">
+
+        <textarea id="adminYouthDescription"
+                  placeholder="Description"></textarea>
+
+        <input id="adminYouthVenue"
+               placeholder="Venue">
+
+        <input type="datetime-local"
+               id="adminYouthDate">
+
+        <button onclick="adminCreateYouthActivity()">
+            Publish Youth Activity
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Women Activity</h3>
+
+        <input id="adminWomenTitle"
+               placeholder="Activity title">
+
+        <textarea id="adminWomenDescription"
+                  placeholder="Description"></textarea>
+
+        <input id="adminWomenVenue"
+               placeholder="Venue">
+
+        <input type="datetime-local"
+               id="adminWomenDate">
+
+        <button onclick="adminCreateWomenActivity()">
+            Publish Women Activity
+        </button>
+
+    </div>
+
+
+    <!-- PAYMENT ADMIN -->
+
+    <div class="card">
+
+        <h3>Pending Payments</h3>
+
+        <div id="adminPayments"
+             class="loading">
+            Loading...
         </div>
 
-        <br>
+    </div>
 
-        <div id="adminMembersList" class="loading">
-            Loading members...
+
+    <!-- WELFARE ADMIN -->
+
+    <div class="card">
+
+        <h3>Welfare Requests</h3>
+
+        <div id="adminWelfare"
+             class="loading">
+            Loading...
         </div>
 
     </div>
 
 </section>
 
-</div>
+</main>
 
 
-<footer>
-    RIBACOM • Rivers Bayelsa Community The Gambia
-    <br>
-    TRUTH • UNITY • SERVICE.
-</footer>
+<!-- =========================================================
+     BOTTOM NAVIGATION
+     ========================================================= -->
 
+<nav class="bottom-nav">
 
-<nav id="bottomNav" class="hidden">
-
-    <button onclick="openScreen('dashboard')">
+    <button onclick="openScreen('home')">
         🏠<br>Home
     </button>
 
-    <button onclick="openScreen('profile')">
-        👤<br>Profile
+    <button id="bottomDashboard"
+            onclick="openScreen('dashboard')">
+        👤<br>Account
     </button>
 
-    <button onclick="openScreen('notifications')">
-        🔔<br>Alerts
+    <button onclick="openScreen('events')">
+        📅<br>Events
     </button>
 
-    <button onclick="logout()">
-        🚪<br>Logout
+    <button onclick="openScreen('announcements')">
+        📢<br>News
+    </button>
+
+    <button onclick="openScreen('contact')">
+        📞<br>Contact
     </button>
 
 </nav>
 
 
-<!-- MEMBER DETAILS MODAL -->
-<div id="memberModal" class="modal-overlay">
-
-    <div class="modal">
-
-        <div class="modal-header">
-
-            <h2 id="modalMemberName">
-                Member Details
-            </h2>
-
-            <button class="close-btn"
-                    onclick="closeMemberModal()">
-                ✕
-            </button>
-
-        </div>
-
-        <div id="memberModalContent">
-            Loading member information...
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 
-/* =========================================================
-   RIBACOM SUPABASE CONFIGURATION
-   ========================================================= */
+/* ============================================================
+   SUPABASE
+   ============================================================ */
 
 const SUPABASE_URL =
     "https://ugxszhbdcnfcnkwapgnd.supabase.co";
@@ -1392,25 +2022,25 @@ const supabaseClient =
     );
 
 
-/* =========================================================
-   GLOBAL VARIABLES
-   ========================================================= */
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
 
 let currentUser = null;
 let currentMember = null;
-let previousScreen = "home";
-
-let adminMembers = [];
+let adminMembersCache = [];
 
 
-/* =========================================================
-   SECURITY / HTML ESCAPING
-   ========================================================= */
+/* ============================================================
+   HELPERS
+   ============================================================ */
 
 function safe(value){
 
-    if(value === null || value === undefined){
-        return "";
+    if(value === null ||
+       value === undefined ||
+       value === ""){
+        return "Not provided";
     }
 
     return String(value)
@@ -1422,49 +2052,84 @@ function safe(value){
 }
 
 
-/* =========================================================
-   MESSAGE FUNCTION
-   ========================================================= */
+function showMessage(
+    id,
+    text,
+    type="info"
+){
 
-function showMessage(elementId,text,type="info"){
+    const el =
+        document.getElementById(id);
 
-    const element =
-        document.getElementById(elementId);
+    if(!el) return;
 
-    if(!element) return;
-
-    element.className =
+    el.className =
         "message show " + type;
 
-    element.textContent = text;
+    el.textContent = text;
 }
 
 
-/* =========================================================
+function clearMessage(id){
+
+    const el =
+        document.getElementById(id);
+
+    if(!el) return;
+
+    el.className = "message";
+    el.textContent = "";
+}
+
+
+function formatDate(value){
+
+    if(!value) return "Not provided";
+
+    try{
+
+        return new Date(value)
+            .toLocaleDateString();
+
+    }catch(e){
+
+        return value;
+    }
+}
+
+
+function formatDateTime(value){
+
+    if(!value) return "Not provided";
+
+    try{
+
+        return new Date(value)
+            .toLocaleString();
+
+    }catch(e){
+
+        return value;
+    }
+}
+
+
+/* ============================================================
    NAVIGATION
-   ========================================================= */
+   ============================================================ */
 
-function openScreen(screenId){
+function openScreen(id){
 
-    const target =
-        document.getElementById(screenId);
-
-    if(!target){
-        console.error("Screen not found:",screenId);
-        return;
-    }
-
-    const active =
-        document.querySelector(".screen.active");
-
-    if(active && active.id !== screenId){
-        previousScreen = active.id;
-    }
-
-    document.querySelectorAll(".screen")
+    document
+        .querySelectorAll(".screen")
         .forEach(screen =>
             screen.classList.remove("active")
         );
+
+    const target =
+        document.getElementById(id);
+
+    if(!target) return;
 
     target.classList.add("active");
 
@@ -1474,744 +2139,685 @@ function openScreen(screenId){
     });
 
 
-    if(screenId === "dashboard"){
-        updateDashboard();
-    }
-
-    if(screenId === "profile"){
-        loadProfile();
-    }
-
-    if(screenId === "digitalCard"){
-        updateDigitalCard();
-    }
-
-    if(screenId === "events"){
+    if(id === "events")
         loadEvents();
-    }
 
-    if(screenId === "announcements"){
+    if(id === "announcements")
         loadAnnouncements();
-    }
 
-    if(screenId === "admin"){
-        openAdminPanel();
-    }
-}
+    if(id === "news")
+        loadNews();
 
+    if(id === "gallery")
+        loadGallery();
 
-function goBack(){
+    if(id === "youth")
+        loadYouthActivities();
 
-    if(currentUser){
-        openScreen("dashboard");
-    }else{
-        openScreen("home");
-    }
-}
+    if(id === "women")
+        loadWomenActivities();
 
+    if(id === "profile")
+        renderProfile();
 
-/* =========================================================
-   SESSION CHECK
-   ========================================================= */
+    if(id === "digitalCard")
+        renderDigitalCard();
 
-async function checkSession(){
+    if(id === "dues")
+        loadPayments();
 
-    try{
+    if(id === "welfare")
+        loadWelfare();
 
-        const {
-            data,
-            error
-        } = await supabaseClient.auth.getSession();
+    if(id === "notifications")
+        loadNotifications();
 
-        if(error){
-            console.error(error);
-            return;
-        }
-
-        if(data.session){
-
-            currentUser =
-                data.session.user;
-
-            await loadCurrentMember();
-
-            showLoggedInState();
-
-        }else{
-
-            showLoggedOutState();
-
-        }
-
-    }catch(error){
-
-        console.error(
-            "Session error:",
-            error
-        );
-
-    }
+    if(id === "admin")
+        loadAdmin();
 
 }
 
 
-/* =========================================================
-   LOAD CURRENT MEMBER
-   ========================================================= */
+/* ============================================================
+   AUTH SESSION
+   ============================================================ */
 
-async function loadCurrentMember(){
-
-    if(!currentUser){
-        return null;
-    }
+async function initializeApp(){
 
     const {
         data,
         error
-    } = await supabaseClient
-        .from("members")
-        .select("*")
-        .eq("id",currentUser.id)
-        .maybeSingle();
+    } =
+        await supabaseClient.auth.getSession();
 
     if(error){
 
-        console.error(
-            "Member profile error:",
-            error
+        console.error(error);
+        return;
+    }
+
+    currentUser =
+        data.session
+        ? data.session.user
+        : null;
+
+    if(currentUser){
+
+        await loadCurrentMember();
+
+    }else{
+
+        document
+            .getElementById("adminMenu")
+            ?.classList.add("hide");
+
+        openScreen("home");
+    }
+
+
+    supabaseClient.auth
+        .onAuthStateChange(
+            async(event,session) => {
+
+                currentUser =
+                    session
+                    ? session.user
+                    : null;
+
+                if(currentUser){
+
+                    await loadCurrentMember();
+
+                }else{
+
+                    currentMember = null;
+
+                    openScreen("home");
+                }
+
+            }
         );
+}
 
-        currentMember = null;
 
-        return null;
+/* ============================================================
+   LOAD MEMBER
+   ============================================================ */
+
+async function loadCurrentMember(){
+
+    if(!currentUser) return;
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("members")
+            .select("*")
+            .eq("id",currentUser.id)
+            .maybeSingle();
+
+    if(error){
+
+        console.error(error);
+        return;
     }
 
     currentMember = data;
 
-    return data;
-}
+    if(currentMember){
 
+        updateDashboard();
 
-/* =========================================================
-   LOGGED IN / LOGGED OUT STATE
-   ========================================================= */
+        const admin =
+            String(currentMember.role || "")
+                .toLowerCase() === "admin";
 
-function showLoggedInState(){
+        document
+            .getElementById("adminMenu")
+            ?.classList.toggle(
+                "hide",
+                !admin
+            );
 
-    document
-        .getElementById("bottomNav")
-        .classList.remove("hidden");
+        openScreen("dashboard");
 
-    updateDashboard();
-
-}
-
-
-function showLoggedOutState(){
-
-    document
-        .getElementById("bottomNav")
-        .classList.add("hidden");
+    }
 
 }
 
 
-/* =========================================================
+/* ============================================================
    DASHBOARD
-   ========================================================= */
+   ============================================================ */
 
 function updateDashboard(){
 
-    if(!currentUser || !currentMember){
+    if(!currentMember) return;
 
-        openScreen("login");
-        return;
-    }
-
-    const name =
+    document
+        .getElementById("dashboardName")
+        .textContent =
         currentMember.full_name ||
-        currentUser.email ||
-        "Member";
+        "RIBACOM Member";
 
     document
-        .getElementById("welcomeName")
+        .getElementById("dashboardStatus")
         .textContent =
-        "Welcome, " + name;
+        "Status: " +
+        String(
+            currentMember.status ||
+            "pending"
+        ).toUpperCase();
 
-
-    const status =
-        currentMember.status ||
-        "pending";
-
-    document
-        .getElementById("memberStatusText")
-        .textContent =
-        "Membership status: " +
-        status.toUpperCase();
-
-
-    const adminMenu =
-        document.getElementById("adminMenu");
-
-    const isAdmin =
-        String(currentMember.role || "")
-            .toLowerCase()
-            .trim() === "admin";
-
-    if(isAdmin){
-
-        adminMenu.classList.remove("hidden");
-
-    }else{
-
-        adminMenu.classList.add("hidden");
-
-    }
 }
 
 
-/* =========================================================
+/* ============================================================
    REGISTRATION
-   ========================================================= */
-
-function toggleAssociateFields(){
-
-    const category =
-        document.getElementById("regCategory").value;
-
-    const fields =
-        document.getElementById("associateFields");
-
-    if(category === "Associate Member"){
-
-        fields.classList.remove("hidden");
-
-    }else{
-
-        fields.classList.add("hidden");
-
-    }
-}
-
+   ============================================================ */
 
 document
-.getElementById("registrationForm")
-.addEventListener("submit",async function(event){
+    .getElementById("registrationForm")
+    .addEventListener(
+        "submit",
+        async function(event){
 
-    event.preventDefault();
+            event.preventDefault();
 
-    const button =
-        document.getElementById("registerButton");
-
-    const message =
-        "registrationMessage";
-
-
-    const password =
-        document.getElementById("regPassword").value;
-
-    const confirmPassword =
-        document.getElementById("regConfirmPassword").value;
-
-
-    if(password !== confirmPassword){
-
-        showMessage(
-            message,
-            "Passwords do not match.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const category =
-        document.getElementById("regCategory").value;
-
-
-    if(category === "Associate Member"){
-
-        const basis =
-            document.getElementById(
-                "regAssociationBasis"
-            ).value;
-
-        if(!basis){
-
-            showMessage(
-                message,
-                "Please select the basis of association.",
-                "error"
+            clearMessage(
+                "registrationMessage"
             );
 
-            return;
-        }
-    }
+            const password =
+                document
+                    .getElementById("regPassword")
+                    .value;
 
+            const confirmPassword =
+                document
+                    .getElementById(
+                        "regConfirmPassword"
+                    )
+                    .value;
 
-    button.disabled = true;
-    button.textContent = "Submitting...";
+            if(password !== confirmPassword){
 
+                showMessage(
+                    "registrationMessage",
+                    "Passwords do not match.",
+                    "error"
+                );
 
-    try{
-
-        const email =
-            document.getElementById("regEmail").value
-                .trim()
-                .toLowerCase();
-
-
-        const metadata = {
-
-            full_name:
-                document.getElementById("regFullName").value.trim(),
-
-            phone:
-                document.getElementById("regPhone").value.trim(),
-
-            state:
-                document.getElementById("regStateOfOrigin").value,
-
-            community:
-                document.getElementById("regCommunityVillage").value.trim(),
-
-            gender:
-                document.getElementById("regGender").value,
-
-            date_of_birth:
-                document.getElementById("regDob").value,
-
-            nationality:
-                document.getElementById("regNationality").value.trim(),
-
-            marital_status:
-                document.getElementById("regMaritalStatus").value,
-
-            passport_id:
-                document.getElementById("regPassportId").value.trim(),
-
-            whatsapp:
-                document.getElementById("regWhatsapp").value.trim(),
-
-            address:
-                document.getElementById("regAddress").value.trim(),
-
-            town_area:
-                document.getElementById("regTownArea").value.trim(),
-
-            emergency_contact:
-                document.getElementById("regEmergencyContact").value.trim(),
-
-            emergency_phone:
-                document.getElementById("regEmergencyPhone").value.trim(),
-
-            state_of_origin:
-                document.getElementById("regStateOfOrigin").value,
-
-            local_government:
-                document.getElementById("regLga").value.trim(),
-
-            community_village:
-                document.getElementById("regCommunityVillage").value.trim(),
-
-            clan_family:
-                document.getElementById("regClanFamily").value.trim(),
-
-            other_community_info:
-                document.getElementById("regOtherCommunity").value.trim(),
-
-            spouse_name:
-                document.getElementById("regSpouse").value.trim(),
-
-            number_of_children:
-                Number(
-                    document.getElementById("regChildren").value || 0
-                ),
-
-            next_of_kin:
-                document.getElementById("regNextOfKin").value.trim(),
-
-            next_of_kin_phone:
-                document.getElementById("regNextOfKinPhone").value.trim(),
-
-            membership_category:
-                category,
-
-            previous_membership:
-                document.getElementById("regPreviousMembership").value.trim(),
-
-            application_date:
-                document.getElementById("regApplicationDate").value,
-
-            payment_method:
-                document.getElementById("regPaymentMethod").value,
-
-            constitution_accepted:
-                document.getElementById("regConstitution").checked,
-
-            association_basis:
-                document.getElementById("regAssociationBasis").value,
-
-            association_details:
-                document.getElementById("regAssociationDetails").value.trim()
-
-        };
-
-
-        const {
-            data,
-            error
-        } = await supabaseClient.auth.signUp({
-
-            email:email,
-
-            password:password,
-
-            options:{
-                data:metadata
+                return;
             }
 
-        });
 
+            const email =
+                document
+                    .getElementById("regEmail")
+                    .value
+                    .trim();
 
-        if(error){
-            throw error;
-        }
+            const fullName =
+                document
+                    .getElementById("regFullName")
+                    .value
+                    .trim();
 
-
-        if(data.user){
-
-            currentUser =
-                data.user;
-
-
-            await new Promise(
-                resolve =>
-                setTimeout(resolve,800)
-            );
-
-
-            await syncMemberProfile(metadata);
+            const phone =
+                document
+                    .getElementById("regPhone")
+                    .value
+                    .trim();
 
 
             showMessage(
-                message,
-                "Registration submitted successfully. Your application is pending administrative approval.",
+                "registrationMessage",
+                "Creating your account...",
+                "info"
+            );
+
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient.auth.signUp({
+
+                    email,
+
+                    password,
+
+                    options:{
+                        data:{
+                            full_name:fullName,
+                            phone:phone,
+                            state:
+                                document
+                                    .getElementById(
+                                        "regStateOrigin"
+                                    ).value,
+
+                            community:
+                                document
+                                    .getElementById(
+                                        "regCommunity"
+                                    ).value
+                        }
+                    }
+
+                });
+
+
+            if(error){
+
+                showMessage(
+                    "registrationMessage",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            if(!data.user){
+
+                showMessage(
+                    "registrationMessage",
+                    "Account created. Please check your email to continue.",
+                    "success"
+                );
+
+                return;
+            }
+
+
+            const memberUpdate = {
+
+                full_name:fullName,
+
+                gender:
+                    document
+                        .getElementById(
+                            "regGender"
+                        ).value,
+
+                date_of_birth:
+                    document
+                        .getElementById(
+                            "regDob"
+                        ).value || null,
+
+                nationality:
+                    document
+                        .getElementById(
+                            "regNationality"
+                        ).value,
+
+                marital_status:
+                    document
+                        .getElementById(
+                            "regMaritalStatus"
+                        ).value,
+
+                passport_id:
+                    document
+                        .getElementById(
+                            "regPassport"
+                        ).value,
+
+                phone,
+
+                whatsapp:
+                    document
+                        .getElementById(
+                            "regWhatsapp"
+                        ).value,
+
+                email,
+
+                address:
+                    document
+                        .getElementById(
+                            "regAddress"
+                        ).value,
+
+                town_area:
+                    document
+                        .getElementById(
+                            "regTown"
+                        ).value,
+
+                emergency_contact:
+                    document
+                        .getElementById(
+                            "regEmergency"
+                        ).value,
+
+                emergency_phone:
+                    document
+                        .getElementById(
+                            "regEmergencyPhone"
+                        ).value,
+
+                state_of_origin:
+                    document
+                        .getElementById(
+                            "regStateOrigin"
+                        ).value,
+
+                local_government:
+                    document
+                        .getElementById(
+                            "regLga"
+                        ).value,
+
+                community_village:
+                    document
+                        .getElementById(
+                            "regCommunity"
+                        ).value,
+
+                clan_family:
+                    document
+                        .getElementById(
+                            "regClan"
+                        ).value,
+
+                other_community_info:
+                    document
+                        .getElementById(
+                            "regOtherCommunity"
+                        ).value,
+
+                spouse_name:
+                    document
+                        .getElementById(
+                            "regSpouse"
+                        ).value,
+
+                number_of_children:
+                    Number(
+                        document
+                            .getElementById(
+                                "regChildren"
+                            ).value || 0
+                    ),
+
+                next_of_kin:
+                    document
+                        .getElementById(
+                            "regNextKin"
+                        ).value,
+
+                next_of_kin_phone:
+                    document
+                        .getElementById(
+                            "regNextKinPhone"
+                        ).value,
+
+                membership_category:
+                    document
+                        .getElementById(
+                            "regCategory"
+                        ).value,
+
+                association_basis:
+                    document
+                        .getElementById(
+                            "regBasis"
+                        ).value,
+
+                association_details:
+                    document
+                        .getElementById(
+                            "regBasisDetails"
+                        ).value,
+
+                previous_membership:
+                    document
+                        .getElementById(
+                            "regPrevious"
+                        ).value,
+
+                application_date:
+                    new Date()
+                        .toISOString()
+                        .slice(0,10),
+
+                payment_method:
+                    document
+                        .getElementById(
+                            "regPayment"
+                        ).value,
+
+                constitution_accepted:
+                    document
+                        .getElementById(
+                            "regAccepted"
+                        ).checked
+
+            };
+
+
+            const {
+                error:updateError
+            } =
+                await supabaseClient
+                    .from("members")
+                    .update(memberUpdate)
+                    .eq("id",data.user.id);
+
+
+            if(updateError){
+
+                console.error(updateError);
+
+                showMessage(
+                    "registrationMessage",
+                    "Account created, but some profile information could not be saved. Please contact RIBACOM administration.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showMessage(
+                "registrationMessage",
+                "Membership application submitted successfully. Your application is now pending administrative review.",
                 "success"
             );
 
 
             document
-                .getElementById("registrationForm")
+                .getElementById(
+                    "registrationForm"
+                )
                 .reset();
 
-
-            setTimeout(
-                () => openScreen("login"),
-                2500
-            );
-
         }
-
-
-    }catch(error){
-
-        console.error(
-            "Registration error:",
-            error
-        );
-
-
-        showMessage(
-            message,
-            error.message ||
-            "Registration failed. Please try again.",
-            "error"
-        );
-
-
-    }finally{
-
-        button.disabled = false;
-        button.textContent = "Submit Application";
-
-    }
-
-});
-
-
-/* =========================================================
-   SYNC MEMBER PROFILE
-   ========================================================= */
-
-async function syncMemberProfile(profile){
-
-    if(!currentUser){
-        return;
-    }
-
-
-    const {
-        association_basis,
-        association_details,
-        ...cleanProfile
-    } = profile;
-
-
-    const {
-        error
-    } = await supabaseClient
-        .from("members")
-        .update(cleanProfile)
-        .eq("id",currentUser.id);
-
-
-    if(error){
-
-        console.error(
-            "Profile update error:",
-            error
-        );
-
-        return;
-    }
-
-
-    const {
-        error:associationError
-    } = await supabaseClient
-        .from("members")
-        .update({
-            association_basis:
-                association_basis || null,
-
-            association_details:
-                association_details || null
-        })
-        .eq("id",currentUser.id);
-
-
-    if(associationError){
-
-        console.error(
-            "Association update error:",
-            associationError
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   LOGIN
-   ========================================================= */
-
-document
-.getElementById("loginForm")
-.addEventListener("submit",async function(event){
-
-    event.preventDefault();
-
-    const button =
-        document.getElementById("loginButton");
-
-    const message =
-        "loginMessage";
-
-
-    const email =
-        document.getElementById("loginEmail")
-            .value
-            .trim()
-            .toLowerCase();
-
-    const password =
-        document.getElementById("loginPassword")
-            .value;
-
-
-    button.disabled = true;
-    button.textContent = "Logging in...";
-
-
-    showMessage(
-        message,
-        "Signing in...",
-        "info"
     );
 
 
-    try{
+/* ============================================================
+   LOGIN
+   ============================================================ */
 
-        const {
-            data,
-            error
-        } = await supabaseClient.auth
-            .signInWithPassword({
-                email,
-                password
-            });
+document
+    .getElementById("loginForm")
+    .addEventListener(
+        "submit",
+        async function(event){
 
+            event.preventDefault();
 
-        if(error){
-            throw error;
-        }
+            const email =
+                document
+                    .getElementById(
+                        "loginEmail"
+                    )
+                    .value
+                    .trim();
 
+            const password =
+                document
+                    .getElementById(
+                        "loginPassword"
+                    )
+                    .value;
 
-        if(!data.session){
-
-            throw new Error(
-                "Login succeeded but no active session was returned."
-            );
-
-        }
-
-
-        currentUser =
-            data.user;
-
-
-        await loadCurrentMember();
-
-
-        if(!currentMember){
 
             showMessage(
-                message,
-                "Your account exists, but your RIBACOM member profile could not be found. Please contact the administrator.",
-                "error"
+                "loginMessage",
+                "Signing in...",
+                "info"
             );
 
-            return;
+
+            const {
+                error
+            } =
+                await supabaseClient.auth
+                    .signInWithPassword({
+                        email,
+                        password
+                    });
+
+
+            if(error){
+
+                showMessage(
+                    "loginMessage",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            clearMessage("loginMessage");
+
         }
+    );
 
 
-        showMessage(
-            message,
-            "Login successful.",
-            "success"
-        );
-
-
-        document
-            .getElementById("loginForm")
-            .reset();
-
-
-        setTimeout(
-            () => openScreen("dashboard"),
-            500
-        );
-
-
-    }catch(error){
-
-        console.error(
-            "Login error:",
-            error
-        );
-
-
-        showMessage(
-            message,
-            error.message ||
-            "Login failed. Please check your email and password.",
-            "error"
-        );
-
-
-    }finally{
-
-        button.disabled = false;
-        button.textContent = "Login";
-
-    }
-
-});
-
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
-async function logout(){
-
-    try{
-
-        await supabaseClient.auth.signOut();
-
-    }catch(error){
-
-        console.error(
-            "Logout error:",
-            error
-        );
-
-    }
-
-
-    currentUser = null;
-    currentMember = null;
-
-
-    document
-        .getElementById("bottomNav")
-        .classList.add("hidden");
-
-
-    openScreen("home");
-
-}
-
-
-/* =========================================================
-   DIGITAL MEMBERSHIP CARD
-   ========================================================= */
-
-function updateDigitalCard(){
-
-    if(!currentMember){
-        return;
-    }
-
-
-    document
-        .getElementById("cardMemberName")
-        .textContent =
-        currentMember.full_name ||
-        "Member";
-
-
-    document
-        .getElementById("cardMembershipNumber")
-        .textContent =
-        currentMember.membership_number ||
-        "PENDING APPROVAL";
-
-
-    document
-        .getElementById("cardCategory")
-        .textContent =
-        currentMember.membership_category ||
-        "RIBACOM Member";
-
-}
-
-
-/* =========================================================
+/* ============================================================
    PROFILE
-   ========================================================= */
+   ============================================================ */
 
-async function loadProfile(){
+function renderProfile(){
+
+    if(!currentMember) return;
+
+    const m = currentMember;
+
+    const photo =
+        m.photo_url ||
+        "https://placehold.co/200x200?text=RIBACOM";
+
+    document
+        .getElementById("profilePhoto")
+        .src = photo;
+
+    document
+        .getElementById("profileName")
+        .textContent =
+        m.full_name || "Member";
+
+    document
+        .getElementById("profileMembership")
+        .textContent =
+        m.membership_number ||
+        "Membership number pending";
+
+    const fields = {
+
+        profileGender:m.gender,
+
+        profileDob:formatDate(m.date_of_birth),
+
+        profileNationality:m.nationality,
+
+        profileMarital:m.marital_status,
+
+        profilePhone:m.phone,
+
+        profileWhatsapp:m.whatsapp,
+
+        profileEmail:m.email,
+
+        profileAddress:m.address,
+
+        profileTown:m.town_area,
+
+        profileState:
+            m.state_of_origin || m.state,
+
+        profileLga:m.local_government,
+
+        profileCommunity:
+            m.community_village ||
+            m.community,
+
+        profileClan:m.clan_family,
+
+        profileSpouse:m.spouse_name,
+
+        profileChildren:m.number_of_children,
+
+        profileNextKin:m.next_of_kin,
+
+        profileEmergency:m.emergency_contact,
+
+        profileMembership2:
+            m.membership_number ||
+            "Not assigned",
+
+        profileCategory:
+            m.membership_category,
+
+        profileStatus:
+            m.status
+
+    };
+
+
+    Object.entries(fields)
+        .forEach(([id,value]) => {
+
+            const el =
+                document.getElementById(id);
+
+            if(el)
+                el.textContent =
+                    value ??
+                    "Not provided";
+
+        });
+
+}
+
+
+/* ============================================================
+   DIGITAL CARD
+   ============================================================ */
+
+function renderDigitalCard(){
+
+    const area =
+        document.getElementById(
+            "digitalCardArea"
+        );
 
     if(!currentMember){
 
-        document
-            .getElementById("profileContent")
-            .innerHTML =
-            "<div class='empty'>Please log in.</div>";
+        area.innerHTML =
+            '<div class="card">Please log in.</div>';
 
         return;
     }
@@ -2219,511 +2825,1272 @@ async function loadProfile(){
 
     const m = currentMember;
 
+    const photo =
+        m.photo_url ||
+        "https://placehold.co/200x200?text=RIBACOM";
 
-    document
-        .getElementById("profileContent")
-        .innerHTML = `
 
-        <div class="info-row">
-            <strong>Name:</strong>
-            ${safe(m.full_name)}
+    const verificationText =
+        encodeURIComponent(
+            "RIBACOM Member: " +
+            (m.membership_number || "Pending")
+        );
+
+
+    area.innerHTML = `
+
+        <div class="id-card">
+
+            <div style="display:flex;gap:15px;align-items:center">
+
+                <img
+                    class="id-photo"
+                    src="${safe(photo)}"
+                    alt="Member photo">
+
+                <div>
+                    <div style="font-size:11px">
+                        RIVERS BAYELSA COMMUNITY
+                    </div>
+
+                    <div style="font-size:11px">
+                        THE GAMBIA
+                    </div>
+
+                    <div class="id-number">
+                        ${safe(
+                            m.membership_number ||
+                            "PENDING"
+                        )}
+                    </div>
+                </div>
+
+            </div>
+
+            <hr style="border-color:rgba(255,255,255,.2)">
+
+            <h2>
+                ${safe(m.full_name)}
+            </h2>
+
+            <p>
+                Category:
+                ${safe(
+                    m.membership_category ||
+                    "Member"
+                )}
+            </p>
+
+            <p>
+                Origin:
+                ${safe(
+                    m.state_of_origin ||
+                    m.state
+                )}
+            </p>
+
+            <p>
+                LGA:
+                ${safe(
+                    m.local_government
+                )}
+            </p>
+
+            <p>
+                Status:
+                ${safe(
+                    String(
+                        m.status ||
+                        "pending"
+                    ).toUpperCase()
+                )}
+            </p>
+
         </div>
 
-        <div class="info-row">
-            <strong>Email:</strong>
-            ${safe(m.email)}
-        </div>
+        <div class="card"
+             style="text-align:center">
 
-        <div class="info-row">
-            <strong>Phone:</strong>
-            ${safe(m.phone)}
-        </div>
+            <h3>Member Verification</h3>
 
-        <div class="info-row">
-            <strong>WhatsApp:</strong>
-            ${safe(m.whatsapp)}
-        </div>
+            <p class="small">
+                Membership number:
+                ${safe(
+                    m.membership_number ||
+                    "Pending"
+                )}
+            </p>
 
-        <div class="info-row">
-            <strong>State:</strong>
-            ${safe(m.state_of_origin || m.state)}
-        </div>
+            <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${verificationText}"
+                width="180"
+                height="180"
+                alt="QR">
 
-        <div class="info-row">
-            <strong>LGA:</strong>
-            ${safe(m.local_government)}
-        </div>
+            <p class="small">
+                QR verification will be connected
+                to the official RIBACOM verification
+                page in a later enhancement.
+            </p>
 
-        <div class="info-row">
-            <strong>Community:</strong>
-            ${safe(m.community_village || m.community)}
         </div>
-
-        <div class="info-row">
-            <strong>Category:</strong>
-            ${safe(m.membership_category)}
-        </div>
-
-        <div class="info-row">
-            <strong>Status:</strong>
-            ${safe(m.status)}
-        </div>
-
-        <div class="info-row">
-            <strong>Membership No.:</strong>
-            ${safe(m.membership_number || "Pending")}
-        </div>
-
-        `;
+    `;
 
 }
 
 
-/* =========================================================
-   WELFARE
-   ========================================================= */
+/* ============================================================
+   PAYMENTS
+   ============================================================ */
 
-document
-.getElementById("welfareForm")
-.addEventListener("submit",async function(event){
+async function loadPayments(){
 
-    event.preventDefault();
+    if(!currentUser) return;
 
-
-    if(!currentUser){
-
-        showMessage(
-            "welfareMessage",
-            "Please log in first.",
-            "error"
+    const list =
+        document.getElementById(
+            "paymentHistory"
         );
+
+    list.innerHTML =
+        "Loading payments...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("payments")
+            .select("*")
+            .eq("member_id",currentUser.id)
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
 
         return;
     }
 
 
-    const requestType =
-        document.getElementById("welfareType").value;
+    if(!data || !data.length){
 
-    const description =
-        document.getElementById("welfareDescription").value;
+        list.innerHTML =
+            `<div class="empty">
+                No payment records yet.
+             </div>`;
 
-
-    try{
-
-        const {
-            error
-        } = await supabaseClient
-            .from("welfare_requests")
-            .insert({
-                member_id:currentUser.id,
-                request_type:requestType,
-                description:description
-            });
-
-
-        if(error){
-            throw error;
-        }
-
-
-        showMessage(
-            "welfareMessage",
-            "Your welfare request has been submitted.",
-            "success"
-        );
-
-
-        document
-            .getElementById("welfareForm")
-            .reset();
-
-
-    }catch(error){
-
-        console.error(error);
-
-        showMessage(
-            "welfareMessage",
-            error.message ||
-            "Unable to submit welfare request.",
-            "error"
-        );
-
+        return;
     }
 
-});
+
+    list.innerHTML =
+        data.map(p => `
+
+            <div class="list-item">
+
+                <strong>
+                    ${safe(p.payment_type)}
+                </strong>
+
+                <p>
+                    Amount:
+                    D${safe(p.amount)}
+                </p>
+
+                <p>
+                    Method:
+                    ${safe(p.payment_method)}
+                </p>
+
+                <p>
+                    Reference:
+                    ${safe(p.payment_reference)}
+                </p>
+
+                <p>
+                    Date:
+                    ${formatDate(p.payment_date)}
+                </p>
+
+                <span class="badge ${
+                    p.status === "verified"
+                    ? "badge-approved"
+                    : "badge-pending"
+                }">
+                    ${safe(
+                        String(
+                            p.status
+                        ).toUpperCase()
+                    )}
+                </span>
+
+            </div>
+
+        `).join("");
+
+}
 
 
-/* =========================================================
+document
+    .getElementById("paymentForm")
+    .addEventListener(
+        "submit",
+        async function(event){
+
+            event.preventDefault();
+
+            if(!currentUser){
+
+                showMessage(
+                    "duesMessage",
+                    "Please log in first.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from("payments")
+                    .insert({
+
+                        member_id:
+                            currentUser.id,
+
+                        payment_type:
+                            document
+                                .getElementById(
+                                    "paymentType"
+                                ).value,
+
+                        amount:
+                            Number(
+                                document
+                                    .getElementById(
+                                        "paymentAmount"
+                                    ).value
+                            ),
+
+                        payment_method:
+                            document
+                                .getElementById(
+                                    "paymentMethod"
+                                ).value,
+
+                        payment_reference:
+                            document
+                                .getElementById(
+                                    "paymentReference"
+                                ).value
+
+                    });
+
+
+            if(error){
+
+                showMessage(
+                    "duesMessage",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showMessage(
+                "duesMessage",
+                "Payment submitted for verification.",
+                "success"
+            );
+
+
+            document
+                .getElementById(
+                    "paymentForm"
+                )
+                .reset();
+
+            loadPayments();
+
+        }
+    );
+
+
+/* ============================================================
+   WELFARE
+   ============================================================ */
+
+async function loadWelfare(){
+
+    if(!currentUser) return;
+
+    const list =
+        document.getElementById(
+            "welfareHistory"
+        );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("welfare_requests")
+            .select("*")
+            .eq("member_id",currentUser.id)
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No welfare requests yet.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(w => `
+
+            <div class="list-item">
+
+                <strong>
+                    ${safe(w.request_type)}
+                </strong>
+
+                <p>
+                    ${safe(w.description)}
+                </p>
+
+                <span class="badge badge-pending">
+                    ${safe(
+                        String(
+                            w.status ||
+                            "pending"
+                        ).toUpperCase()
+                    )}
+                </span>
+
+                <p class="small">
+                    ${formatDateTime(w.created_at)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+document
+    .getElementById("welfareForm")
+    .addEventListener(
+        "submit",
+        async function(event){
+
+            event.preventDefault();
+
+            if(!currentUser){
+
+                showMessage(
+                    "welfareMessage",
+                    "Please log in first.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from("welfare_requests")
+                    .insert({
+
+                        member_id:
+                            currentUser.id,
+
+                        request_type:
+                            document
+                                .getElementById(
+                                    "welfareType"
+                                ).value,
+
+                        description:
+                            document
+                                .getElementById(
+                                    "welfareDescription"
+                                ).value
+
+                    });
+
+
+            if(error){
+
+                showMessage(
+                    "welfareMessage",
+                    error.message,
+                    "error"
+                );
+
+                return;
+            }
+
+
+            showMessage(
+                "welfareMessage",
+                "Welfare request submitted.",
+                "success"
+            );
+
+
+            document
+                .getElementById(
+                    "welfareForm"
+                )
+                .reset();
+
+            loadWelfare();
+
+        }
+    );
+
+
+/* ============================================================
    EVENTS
-   ========================================================= */
+   ============================================================ */
 
 async function loadEvents(){
 
     const list =
-        document.getElementById("eventsList");
+        document.getElementById(
+            "eventsList"
+        );
 
     list.innerHTML =
-        '<div class="loading">Loading events...</div>';
+        "Loading events...";
 
 
-    try{
-
-        const {
-            data,
-            error
-        } = await supabaseClient
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
             .from("events")
             .select("*")
             .order("event_date",{ascending:true});
 
 
-        if(error){
-            throw error;
-        }
-
-
-        if(!data || data.length === 0){
-
-            list.innerHTML =
-                '<div class="empty">No events available.</div>';
-
-            return;
-        }
-
+    if(error){
 
         list.innerHTML =
-            data.map(event => `
-
-                <div class="member-card">
-
-                    <h3>${safe(event.title)}</h3>
-
-                    <p>
-                        ${safe(event.description)}
-                    </p>
-
-                    <p>
-                        📍 ${safe(event.venue || "Venue TBA")}
-                    </p>
-
-                    <p>
-                        📅 ${
-                            event.event_date
-                            ? new Date(event.event_date)
-                                .toLocaleString()
-                            : "Date TBA"
-                        }
-                    </p>
-
-                </div>
-
-            `).join("");
-
-
-    }catch(error){
-
-        console.error(error);
-
-        list.innerHTML =
-            '<div class="empty">Unable to load events.</div>';
-
-    }
-
-}
-
-
-/* =========================================================
-   ANNOUNCEMENTS
-   ========================================================= */
-
-async function loadAnnouncements(){
-
-    const list =
-        document.getElementById("announcementsList");
-
-
-    list.innerHTML =
-        '<div class="loading">Loading announcements...</div>';
-
-
-    try{
-
-        const {
-            data,
-            error
-        } = await supabaseClient
-            .from("announcements")
-            .select("*")
-            .order("created_at",{ascending:false});
-
-
-        if(error){
-            throw error;
-        }
-
-
-        if(!data || data.length === 0){
-
-            list.innerHTML =
-                '<div class="empty">No announcements available.</div>';
-
-            return;
-        }
-
-
-        list.innerHTML =
-            data.map(item => `
-
-                <div class="member-card">
-
-                    <h3>${safe(item.title)}</h3>
-
-                    <p>
-                        ${safe(item.message)}
-                    </p>
-
-                    <p>
-                        📅 ${
-                            item.created_at
-                            ? new Date(item.created_at)
-                                .toLocaleString()
-                            : ""
-                        }
-                    </p>
-
-                </div>
-
-            `).join("");
-
-
-    }catch(error){
-
-        console.error(error);
-
-        list.innerHTML =
-            '<div class="empty">Unable to load announcements.</div>';
-
-    }
-
-}
-
-
-/* =========================================================
-   ADMIN PANEL
-   ========================================================= */
-
-async function openAdminPanel(){
-
-    if(!currentUser){
-
-        showMessage(
-            "adminMessage",
-            "Please log in.",
-            "error"
-        );
-
-        openScreen("login");
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
 
         return;
     }
 
 
-    await loadCurrentMember();
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No events available.
+             </div>`;
+
+        return;
+    }
 
 
-    const isAdmin =
-        String(currentMember?.role || "")
-            .toLowerCase()
-            .trim() === "admin";
+    list.innerHTML =
+        data.map(e => `
+
+            <div class="card">
+
+                <h3>
+                    ${safe(e.title)}
+                </h3>
+
+                <p>
+                    ${safe(e.description)}
+                </p>
+
+                <p>
+                    📍 ${safe(e.venue)}
+                </p>
+
+                <p>
+                    📅 ${formatDateTime(e.event_date)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
 
 
-    if(!isAdmin){
+/* ============================================================
+   ANNOUNCEMENTS
+   ============================================================ */
 
-        showMessage(
-            "adminMessage",
-            "You are not authorized to access the RIBACOM Admin Panel.",
-            "error"
+async function loadAnnouncements(){
+
+    const list =
+        document.getElementById(
+            "announcementsList"
         );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("announcements")
+            .select("*")
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No announcements.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(a => `
+
+            <div class="card">
+
+                <h3>
+                    ${safe(a.title)}
+                </h3>
+
+                <p>
+                    ${safe(a.message)}
+                </p>
+
+                <p class="small">
+                    ${formatDateTime(a.created_at)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ============================================================
+   NEWS
+   ============================================================ */
+
+async function loadNews(){
+
+    const list =
+        document.getElementById(
+            "newsList"
+        );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("news")
+            .select("*")
+            .eq("published",true)
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No news published yet.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(n => `
+
+            <div class="card">
+
+                ${
+                    n.image_url
+                    ? `
+                    <img
+                        src="${safe(n.image_url)}"
+                        style="width:100%;max-height:260px;object-fit:cover;border-radius:10px">
+                    `
+                    : ""
+                }
+
+                <h3>
+                    ${safe(n.title)}
+                </h3>
+
+                <p>
+                    ${safe(n.content)}
+                </p>
+
+                <p class="small">
+                    ${formatDateTime(n.created_at)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ============================================================
+   GALLERY
+   ============================================================ */
+
+async function loadGallery(){
+
+    const list =
+        document.getElementById(
+            "galleryList"
+        );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("gallery")
+            .select("*")
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No gallery photos yet.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(g => `
+
+            <div class="gallery-item">
+
+                <img
+                    src="${safe(g.image_url)}"
+                    alt="${safe(g.title)}">
+
+                <div>
+
+                    <strong>
+                        ${safe(g.title)}
+                    </strong>
+
+                    <br>
+
+                    ${safe(g.caption)}
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ============================================================
+   YOUTH
+   ============================================================ */
+
+async function loadYouthActivities(){
+
+    const list =
+        document.getElementById(
+            "youthActivities"
+        );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("youth_activities")
+            .select("*")
+            .eq("published",true)
+            .order("activity_date",{ascending:true});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No youth activities published yet.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(a => `
+
+            <div class="list-item">
+
+                <h3>
+                    ${safe(a.title)}
+                </h3>
+
+                <p>
+                    ${safe(a.description)}
+                </p>
+
+                <p>
+                    📅 ${formatDateTime(a.activity_date)}
+                </p>
+
+                <p>
+                    📍 ${safe(a.venue)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ============================================================
+   WOMEN
+   ============================================================ */
+
+async function loadWomenActivities(){
+
+    const list =
+        document.getElementById(
+            "womenActivities"
+        );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("women_activities")
+            .select("*")
+            .eq("published",true)
+            .order("activity_date",{ascending:true});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No women activities published yet.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(a => `
+
+            <div class="list-item">
+
+                <h3>
+                    ${safe(a.title)}
+                </h3>
+
+                <p>
+                    ${safe(a.description)}
+                </p>
+
+                <p>
+                    📅 ${formatDateTime(a.activity_date)}
+                </p>
+
+                <p>
+                    📍 ${safe(a.venue)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+
+async function loadNotifications(){
+
+    if(!currentUser){
+
+        document
+            .getElementById(
+                "notificationsList"
+            )
+            .innerHTML =
+            `<div class="empty">
+                Please log in to view notifications.
+             </div>`;
+
+        return;
+    }
+
+
+    const list =
+        document.getElementById(
+            "notificationsList"
+        );
+
+    list.innerHTML =
+        "Loading...";
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("notifications")
+            .select("*")
+            .eq("member_id",currentUser.id)
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No notifications.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(n => `
+
+            <div class="list-item"
+                 style="${
+                     n.is_read
+                     ? ""
+                     : "border-left:4px solid #087443"
+                 }">
+
+                <strong>
+                    ${safe(n.title)}
+                </strong>
+
+                <p>
+                    ${safe(n.message)}
+                </p>
+
+                <p class="small">
+                    ${formatDateTime(n.created_at)}
+                </p>
+
+                ${
+                    !n.is_read
+                    ? `
+                    <button
+                        class="btn-secondary"
+                        onclick="markNotificationRead(${n.id})">
+                        Mark as read
+                    </button>
+                    `
+                    : `
+                    <span class="small">
+                        Read
+                    </span>
+                    `
+                }
+
+            </div>
+
+        `).join("");
+
+}
+
+
+async function markNotificationRead(id){
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .rpc(
+                "mark_notification_read",
+                {
+                    notification_id:id
+                }
+            );
+
+    if(error){
+
+        console.error(error);
+        return;
+    }
+
+    loadNotifications();
+}
+
+
+/* ============================================================
+   ADMIN
+   ============================================================ */
+
+async function loadAdmin(){
+
+    if(!currentMember ||
+       String(currentMember.role || "")
+           .toLowerCase() !== "admin"){
+
+        openScreen("dashboard");
 
         return;
     }
 
 
     await loadAdminMembers();
+    await loadAdminPayments();
+    await loadAdminWelfare();
 
 }
 
-
-/* =========================================================
-   ADMIN: LOAD MEMBERS
-   ========================================================= */
 
 async function loadAdminMembers(){
 
     const list =
-        document.getElementById("adminMembersList");
-
-
-    if(!currentMember ||
-       String(currentMember.role || "")
-           .toLowerCase()
-           .trim() !== "admin"){
-
-        showMessage(
-            "adminMessage",
-            "Administrator authorization required.",
-            "error"
+        document.getElementById(
+            "adminMembersList"
         );
 
-        return;
-    }
-
-
     list.innerHTML =
-        '<div class="loading">Loading membership applications...</div>';
+        "Loading members...";
 
 
-    try{
-
-        const {
-            data,
-            error
-        } = await supabaseClient
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
             .rpc("admin_list_members");
 
 
-        if(error){
-            throw error;
-        }
-
-
-        adminMembers =
-            data || [];
-
-
-        updateAdminStats(adminMembers);
-
-        applyMemberFilters();
-
-
-    }catch(error){
-
-        console.error(
-            "Admin list error:",
-            error
-        );
-
-
-        list.innerHTML =
-            '<div class="empty">Unable to load members.</div>';
-
+    if(error){
 
         showMessage(
             "adminMessage",
-            error.message ||
-            "Unable to load administrative data.",
+            error.message,
             "error"
         );
 
-    }
+        list.innerHTML = "";
 
-}
-
-
-/* =========================================================
-   ADMIN SEARCH + FILTER
-   ========================================================= */
-
-function applyMemberFilters(){
-
-    const list =
-        document.getElementById("adminMembersList");
-
-    if(!list){
         return;
     }
 
 
-    const searchInput =
-        document.getElementById("memberSearch");
+    adminMembersCache =
+        data || [];
 
-    const statusInput =
-        document.getElementById("memberStatusFilter");
+    updateAdminStats(
+        adminMembersCache
+    );
 
-
-    const search =
-        (searchInput?.value || "")
-            .trim()
-            .toLowerCase();
-
-
-    const selectedStatus =
-        (statusInput?.value || "all")
-            .toLowerCase();
-
-
-    const filtered =
-        adminMembers.filter(member => {
-
-            const status =
-                String(member.status || "pending")
-                    .toLowerCase();
-
-
-            const searchable = [
-
-                member.full_name,
-                member.email,
-                member.phone,
-                member.membership_number,
-                member.state_of_origin,
-                member.state,
-                member.local_government,
-                member.community_village,
-                member.community
-
-            ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-
-
-            const matchesSearch =
-                !search ||
-                searchable.includes(search);
-
-
-            const matchesStatus =
-                selectedStatus === "all" ||
-                status === selectedStatus;
-
-
-            return matchesSearch && matchesStatus;
-
-        });
-
-
-    renderAdminMembers(filtered);
+    renderAdminMembers();
 
 }
 
 
-/* =========================================================
-   ADMIN: RENDER MEMBERS
-   ========================================================= */
+function updateAdminStats(members){
 
-function renderAdminMembers(members){
+    const total =
+        members.length;
+
+    const pending =
+        members.filter(
+            m =>
+            String(m.status || "")
+                .toLowerCase()
+            === "pending"
+        ).length;
+
+    const approved =
+        members.filter(
+            m =>
+            String(m.status || "")
+                .toLowerCase()
+            === "approved"
+        ).length;
+
+    const rejected =
+        members.filter(
+            m =>
+            String(m.status || "")
+                .toLowerCase()
+            === "rejected"
+        ).length;
+
+
+    document
+        .getElementById("adminTotal")
+        .textContent = total;
+
+    document
+        .getElementById("adminPending")
+        .textContent = pending;
+
+    document
+        .getElementById("adminApproved")
+        .textContent = approved;
+
+    document
+        .getElementById("adminRejected")
+        .textContent = rejected;
+
+}
+
+
+function renderAdminMembers(){
 
     const list =
-        document.getElementById("adminMembersList");
+        document.getElementById(
+            "adminMembersList"
+        );
+
+    const search =
+        String(
+            document
+                .getElementById(
+                    "adminSearch"
+                )?.value ||
+            ""
+        )
+        .toLowerCase()
+        .trim();
 
 
-    if(!members || members.length === 0){
+    const filter =
+        String(
+            document
+                .getElementById(
+                    "adminStatusFilter"
+                )?.value ||
+            "all"
+        )
+        .toLowerCase();
+
+
+    const members =
+        adminMembersCache.filter(
+            member => {
+
+                const status =
+                    String(
+                        member.status ||
+                        "pending"
+                    ).toLowerCase();
+
+
+                if(
+                    filter !== "all" &&
+                    status !== filter
+                ){
+                    return false;
+                }
+
+
+                if(!search){
+                    return true;
+                }
+
+
+                const searchable = [
+
+                    member.full_name,
+
+                    member.email,
+
+                    member.phone,
+
+                    member.membership_number,
+
+                    member.state_of_origin,
+
+                    member.state,
+
+                    member.local_government,
+
+                    member.community_village,
+
+                    member.community,
+
+                    member.membership_category
+
+                ]
+                .join(" ")
+                .toLowerCase();
+
+
+                return searchable
+                    .includes(search);
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            "adminResultCount"
+        )
+        .textContent =
+        `Showing ${members.length} of ${adminMembersCache.length} members`;
+
+
+    if(!members.length){
 
         list.innerHTML =
-            '<div class="empty">No members match your search or filter.</div>';
+            `<div class="empty">
+                No matching members found.
+             </div>`;
 
         return;
     }
@@ -2733,58 +4100,57 @@ function renderAdminMembers(members){
         members.map(member => {
 
             const status =
-                String(member.status || "pending")
-                    .toLowerCase();
+                String(
+                    member.status ||
+                    "pending"
+                ).toLowerCase();
 
 
             let badgeClass =
                 "badge-pending";
 
 
-            if(status === "approved"){
-                badgeClass = "badge-approved";
-            }
+            if(status === "approved")
+                badgeClass =
+                    "badge-approved";
 
-            if(status === "rejected"){
-                badgeClass = "badge-rejected";
-            }
 
-            if(status === "suspended"){
-                badgeClass = "badge-suspended";
-            }
+            if(status === "rejected")
+                badgeClass =
+                    "badge-rejected";
+
+
+            if(status === "suspended")
+                badgeClass =
+                    "badge-suspended";
 
 
             const adminBadge =
-                String(member.role || "")
-                    .toLowerCase() === "admin"
+                String(
+                    member.role || ""
+                ).toLowerCase() === "admin"
+
                 ? '<span class="badge badge-admin">ADMIN</span>'
+
                 : "";
 
 
-            let actions = `
-
-                <button
-                    class="btn-secondary"
-                    onclick="viewMember('${member.id}')">
-                    👁 View
-                </button>
-
-            `;
+            let actionButtons = "";
 
 
             if(status === "pending"){
 
-                actions += `
+                actionButtons = `
 
                     <button
                         class="btn-success"
-                        onclick="approveMember('${member.id}')">
+                        onclick="approveMember('${safe(member.id)}')">
                         ✓ Approve
                     </button>
 
                     <button
                         class="btn-danger"
-                        onclick="rejectMember('${member.id}')">
+                        onclick="rejectMember('${safe(member.id)}')">
                         ✕ Reject
                     </button>
 
@@ -2795,12 +4161,12 @@ function renderAdminMembers(members){
 
             if(status === "approved"){
 
-                actions += `
+                actionButtons = `
 
                     <button
-                        class="btn-warning"
-                        onclick="suspendMember('${member.id}')">
-                        ⛔ Suspend
+                        class="btn-danger"
+                        onclick="suspendMember('${safe(member.id)}')">
+                        Suspend
                     </button>
 
                 `;
@@ -2810,27 +4176,12 @@ function renderAdminMembers(members){
 
             if(status === "suspended"){
 
-                actions += `
+                actionButtons = `
 
                     <button
                         class="btn-success"
-                        onclick="reactivateMember('${member.id}')">
-                        ✓ Reactivate
-                    </button>
-
-                `;
-
-            }
-
-
-            if(status === "rejected"){
-
-                actions += `
-
-                    <button
-                        class="btn-success"
-                        onclick="approveMember('${member.id}')">
-                        ✓ Approve
+                        onclick="reactivateMember('${safe(member.id)}')">
+                        Reactivate
                     </button>
 
                 `;
@@ -2843,11 +4194,16 @@ function renderAdminMembers(members){
                 <div class="member-card">
 
                     <h3>
-                        ${safe(member.full_name || "Unnamed Member")}
+                        ${safe(
+                            member.full_name ||
+                            "Unnamed Member"
+                        )}
                     </h3>
 
                     <span class="badge ${badgeClass}">
-                        ${safe(status.toUpperCase())}
+                        ${safe(
+                            status.toUpperCase()
+                        )}
                     </span>
 
                     ${adminBadge}
@@ -2864,35 +4220,72 @@ function renderAdminMembers(members){
 
                     <p>
                         <strong>Category:</strong>
-                        ${safe(member.membership_category)}
+                        ${safe(
+                            member.membership_category
+                        )}
                     </p>
 
                     <p>
                         <strong>Origin:</strong>
-                        ${safe(member.state_of_origin || member.state)}
+                        ${safe(
+                            member.state_of_origin ||
+                            member.state
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>LGA:</strong>
+                        ${safe(
+                            member.local_government
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Community:</strong>
+                        ${safe(
+                            member.community_village ||
+                            member.community
+                        )}
                     </p>
 
                     <p>
                         <strong>Membership No.:</strong>
-                        ${safe(member.membership_number || "Not assigned")}
+                        ${safe(
+                            member.membership_number ||
+                            "Not assigned"
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Application:</strong>
+                        ${safe(
+                            member.application_date ||
+                            "Not provided"
+                        )}
                     </p>
 
                     ${
-                        status === "suspended" &&
-                        member.suspension_reason
+                        member.suspended_reason
                         ? `
-                            <div class="suspension-box">
-                                <strong>Suspension reason:</strong>
-                                <br>
-                                ${safe(member.suspension_reason)}
-                            </div>
+                        <p>
+                            <strong>Suspension reason:</strong>
+                            ${safe(
+                                member.suspended_reason
+                            )}
+                        </p>
                         `
                         : ""
                     }
 
-                    <div class="member-actions">
-                        ${actions}
-                    </div>
+                    ${
+                        actionButtons
+                        ? `
+                        <div class="action-row">
+                            ${actionButtons}
+                        </div>
+                        `
+                        : ""
+                    }
 
                 </div>
 
@@ -2903,821 +4296,1130 @@ function renderAdminMembers(members){
 }
 
 
-/* =========================================================
-   ADMIN STATISTICS
-   ========================================================= */
-
-function updateAdminStats(members){
-
-    const total =
-        members.length;
-
-
-    const pending =
-        members.filter(
-            m =>
-            String(m.status || "pending")
-                .toLowerCase() === "pending"
-        ).length;
-
-
-    const approved =
-        members.filter(
-            m =>
-            String(m.status || "")
-                .toLowerCase() === "approved"
-        ).length;
-
-
-    const rejected =
-        members.filter(
-            m =>
-            String(m.status || "")
-                .toLowerCase() === "rejected"
-        ).length;
-
-
-    const suspended =
-        members.filter(
-            m =>
-            String(m.status || "")
-                .toLowerCase() === "suspended"
-        ).length;
-
+function clearAdminFilters(){
 
     document
-        .getElementById("adminTotal")
-        .textContent = total;
-
-
-    document
-        .getElementById("adminPending")
-        .textContent = pending;
-
+        .getElementById("adminSearch")
+        .value = "";
 
     document
-        .getElementById("adminApproved")
-        .textContent = approved;
+        .getElementById("adminStatusFilter")
+        .value = "all";
 
-
-    document
-        .getElementById("adminRejected")
-        .textContent = rejected;
-
-
-    document
-        .getElementById("adminSuspended")
-        .textContent = suspended;
+    renderAdminMembers();
 
 }
 
 
-/* =========================================================
-   ADMIN: VIEW MEMBER
-   ========================================================= */
-
-function viewMember(memberId){
-
-    const member =
-        adminMembers.find(
-            m => String(m.id) === String(memberId)
-        );
-
-
-    if(!member){
-
-        showMessage(
-            "adminMessage",
-            "Member information could not be found.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    document
-        .getElementById("modalMemberName")
-        .textContent =
-        member.full_name || "Member Details";
-
-
-    const status =
-        String(member.status || "pending")
-            .toLowerCase();
-
-
-    let badgeClass =
-        "badge-pending";
-
-
-    if(status === "approved"){
-        badgeClass = "badge-approved";
-    }
-
-    if(status === "rejected"){
-        badgeClass = "badge-rejected";
-    }
-
-    if(status === "suspended"){
-        badgeClass = "badge-suspended";
-    }
-
-
-    document
-        .getElementById("memberModalContent")
-        .innerHTML = `
-
-        <div>
-            <span class="badge ${badgeClass}">
-                ${safe(status.toUpperCase())}
-            </span>
-
-            ${
-                String(member.role || "")
-                    .toLowerCase() === "admin"
-                ? '<span class="badge badge-admin">ADMIN</span>'
-                : ""
-            }
-        </div>
-
-
-        <div class="detail-section">
-
-            <h3>A. Personal Information</h3>
-
-            <div class="info-row">
-                <strong>Full Name:</strong>
-                ${safe(member.full_name)}
-            </div>
-
-            <div class="info-row">
-                <strong>Gender:</strong>
-                ${safe(member.gender)}
-            </div>
-
-            <div class="info-row">
-                <strong>Date of Birth:</strong>
-                ${safe(member.date_of_birth)}
-            </div>
-
-            <div class="info-row">
-                <strong>Nationality:</strong>
-                ${safe(member.nationality)}
-            </div>
-
-            <div class="info-row">
-                <strong>Marital Status:</strong>
-                ${safe(member.marital_status)}
-            </div>
-
-            <div class="info-row">
-                <strong>Passport / ID:</strong>
-                ${safe(member.passport_id)}
-            </div>
-
-        </div>
-
-
-        <div class="detail-section">
-
-            <h3>B. Contact Information</h3>
-
-            <div class="info-row">
-                <strong>Email:</strong>
-                ${safe(member.email)}
-            </div>
-
-            <div class="info-row">
-                <strong>Phone:</strong>
-                ${safe(member.phone)}
-            </div>
-
-            <div class="info-row">
-                <strong>WhatsApp:</strong>
-                ${safe(member.whatsapp)}
-            </div>
-
-            <div class="info-row">
-                <strong>Address:</strong>
-                ${safe(member.address)}
-            </div>
-
-            <div class="info-row">
-                <strong>Town / Area:</strong>
-                ${safe(member.town_area)}
-            </div>
-
-            <div class="info-row">
-                <strong>Emergency Contact:</strong>
-                ${safe(member.emergency_contact)}
-            </div>
-
-            <div class="info-row">
-                <strong>Emergency Phone:</strong>
-                ${safe(member.emergency_phone)}
-            </div>
-
-        </div>
-
-
-        <div class="detail-section">
-
-            <h3>C. Rivers / Bayelsa Identity</h3>
-
-            <div class="info-row">
-                <strong>State of Origin:</strong>
-                ${safe(member.state_of_origin || member.state)}
-            </div>
-
-            <div class="info-row">
-                <strong>LGA:</strong>
-                ${safe(member.local_government)}
-            </div>
-
-            <div class="info-row">
-                <strong>Community / Village:</strong>
-                ${safe(member.community_village || member.community)}
-            </div>
-
-            <div class="info-row">
-                <strong>Clan / Family:</strong>
-                ${safe(member.clan_family)}
-            </div>
-
-            <div class="info-row">
-                <strong>Other Information:</strong>
-                ${safe(member.other_community_info)}
-            </div>
-
-        </div>
-
-
-        <div class="detail-section">
-
-            <h3>D. Family Information</h3>
-
-            <div class="info-row">
-                <strong>Spouse:</strong>
-                ${safe(member.spouse_name)}
-            </div>
-
-            <div class="info-row">
-                <strong>Children:</strong>
-                ${safe(member.number_of_children)}
-            </div>
-
-            <div class="info-row">
-                <strong>Next of Kin:</strong>
-                ${safe(member.next_of_kin)}
-            </div>
-
-            <div class="info-row">
-                <strong>Next-of-Kin Phone:</strong>
-                ${safe(member.next_of_kin_phone)}
-            </div>
-
-        </div>
-
-
-        <div class="detail-section">
-
-            <h3>E. Membership Information</h3>
-
-            <div class="info-row">
-                <strong>Category:</strong>
-                ${safe(member.membership_category)}
-            </div>
-
-            <div class="info-row">
-                <strong>Association Basis:</strong>
-                ${safe(member.association_basis)}
-            </div>
-
-            <div class="info-row">
-                <strong>Association Details:</strong>
-                ${safe(member.association_details)}
-            </div>
-
-            <div class="info-row">
-                <strong>Previous Membership:</strong>
-                ${safe(member.previous_membership)}
-            </div>
-
-            <div class="info-row">
-                <strong>Application Date:</strong>
-                ${safe(member.application_date)}
-            </div>
-
-            <div class="info-row">
-                <strong>Payment Method:</strong>
-                ${safe(member.payment_method)}
-            </div>
-
-            <div class="info-row">
-                <strong>Constitution Accepted:</strong>
-                ${member.constitution_accepted ? "Yes" : "No"}
-            </div>
-
-            <div class="info-row">
-                <strong>Membership Number:</strong>
-                ${safe(member.membership_number || "Not assigned")}
-            </div>
-
-        </div>
-
-
-        <div class="detail-section">
-
-            <h3>Account Information</h3>
-
-            <div class="info-row">
-                <strong>Account Status:</strong>
-                ${safe(status)}
-            </div>
-
-            <div class="info-row">
-                <strong>Account Created:</strong>
-                ${
-                    member.created_at
-                    ? safe(
-                        new Date(member.created_at)
-                            .toLocaleString()
-                      )
-                    : ""
-                }
-            </div>
-
-            ${
-                status === "suspended"
-                ? `
-                    <div class="suspension-box">
-
-                        <strong>Suspension Reason:</strong>
-
-                        <p style="margin-top:6px;">
-                            ${safe(member.suspension_reason || "No reason recorded.")}
-                        </p>
-
-                        ${
-                            member.suspended_at
-                            ? `
-                                <p style="margin-top:6px;">
-                                    <strong>Suspended:</strong>
-                                    ${safe(
-                                        new Date(member.suspended_at)
-                                            .toLocaleString()
-                                    )}
-                                </p>
-                            `
-                            : ""
-                        }
-
-                    </div>
-                `
-                : ""
-            }
-
-        </div>
-
-        `;
-
-
-    document
-        .getElementById("memberModal")
-        .classList.add("show");
-
-}
-
-
-function closeMemberModal(){
-
-    document
-        .getElementById("memberModal")
-        .classList.remove("show");
-
-}
-
-
-/* =========================================================
-   ADMIN: APPROVE MEMBER
-   ========================================================= */
-
-async function approveMember(memberId){
-
-    const member =
-        adminMembers.find(
-            m => String(m.id) === String(memberId)
-        );
-
-
-    const name =
-        member?.full_name ||
-        "this member";
-
+/* ============================================================
+   ADMIN MEMBER ACTIONS
+   ============================================================ */
+
+async function approveMember(id){
 
     if(!confirm(
-        "Approve " + name + "?"
+        "Approve this membership application?"
     )){
         return;
     }
 
 
-    try{
-
-        const {
-            error
-        } = await supabaseClient
+    const {
+        error
+    } =
+        await supabaseClient
             .rpc(
                 "admin_approve_member",
                 {
-                    target_id:memberId
+                    target_id:id
                 }
             );
 
 
-        if(error){
-            throw error;
-        }
-
+    if(error){
 
         showMessage(
             "adminMessage",
-            "Member approved successfully and membership number assigned.",
-            "success"
-        );
-
-
-        closeMemberModal();
-
-        await loadAdminMembers();
-
-
-    }catch(error){
-
-        console.error(
-            "Approve member error:",
-            error
-        );
-
-
-        showMessage(
-            "adminMessage",
-            error.message ||
-            "Unable to approve member.",
+            error.message,
             "error"
         );
 
+        return;
     }
+
+
+    showMessage(
+        "adminMessage",
+        "Member approved successfully.",
+        "success"
+    );
+
+
+    loadAdminMembers();
 
 }
 
 
-/* =========================================================
-   ADMIN: REJECT MEMBER
-   ========================================================= */
-
-async function rejectMember(memberId){
-
-    const member =
-        adminMembers.find(
-            m => String(m.id) === String(memberId)
-        );
-
-
-    const name =
-        member?.full_name ||
-        "this member";
-
+async function rejectMember(id){
 
     if(!confirm(
-        "Reject the membership application for " +
-        name +
-        "?"
+        "Reject this membership application?"
     )){
         return;
     }
 
 
-    try{
-
-        const {
-            error
-        } = await supabaseClient
+    const {
+        error
+    } =
+        await supabaseClient
             .rpc(
                 "admin_reject_member",
                 {
-                    target_id:memberId
+                    target_id:id
                 }
             );
 
 
-        if(error){
-            throw error;
-        }
-
+    if(error){
 
         showMessage(
             "adminMessage",
-            "Membership application rejected.",
-            "success"
-        );
-
-
-        closeMemberModal();
-
-        await loadAdminMembers();
-
-
-    }catch(error){
-
-        console.error(
-            "Reject member error:",
-            error
-        );
-
-
-        showMessage(
-            "adminMessage",
-            error.message ||
-            "Unable to reject member.",
+            error.message,
             "error"
         );
 
-    }
-
-}
-
-
-/* =========================================================
-   ADMIN: SUSPEND MEMBER
-   ========================================================= */
-
-async function suspendMember(memberId){
-
-    const member =
-        adminMembers.find(
-            m => String(m.id) === String(memberId)
-        );
-
-
-    if(!member){
         return;
     }
 
 
-    const name =
-        member.full_name ||
-        "this member";
+    showMessage(
+        "adminMessage",
+        "Membership application rejected.",
+        "success"
+    );
 
+
+    loadAdminMembers();
+
+}
+
+
+async function suspendMember(id){
 
     const reason =
         prompt(
-            "Enter the reason for suspending " +
-            name +
-            ":"
+            "Enter the reason for suspension:"
         );
 
 
-    if(reason === null){
-        return;
-    }
+    if(!reason) return;
 
 
-    if(!reason.trim()){
-
-        alert(
-            "A suspension reason is required."
-        );
-
-        return;
-    }
-
-
-    if(!confirm(
-        "Suspend " +
-        name +
-        "?\n\nReason:\n" +
-        reason
-    )){
-        return;
-    }
-
-
-    try{
-
-        const {
-            error
-        } = await supabaseClient
+    const {
+        error
+    } =
+        await supabaseClient
             .rpc(
                 "admin_suspend_member",
                 {
-                    target_id:memberId,
-                    reason:reason.trim()
+                    target_id:id,
+                    reason
                 }
             );
 
 
-        if(error){
-            throw error;
-        }
-
+    if(error){
 
         showMessage(
             "adminMessage",
-            "Member suspended successfully.",
-            "success"
-        );
-
-
-        closeMemberModal();
-
-        await loadAdminMembers();
-
-
-    }catch(error){
-
-        console.error(
-            "Suspend member error:",
-            error
-        );
-
-
-        showMessage(
-            "adminMessage",
-            error.message ||
-            "Unable to suspend member.",
+            error.message,
             "error"
         );
 
+        return;
     }
+
+
+    showMessage(
+        "adminMessage",
+        "Member suspended.",
+        "success"
+    );
+
+
+    loadAdminMembers();
 
 }
 
 
-/* =========================================================
-   ADMIN: REACTIVATE MEMBER
-   ========================================================= */
-
-async function reactivateMember(memberId){
-
-    const member =
-        adminMembers.find(
-            m => String(m.id) === String(memberId)
-        );
-
-
-    const name =
-        member?.full_name ||
-        "this member";
-
+async function reactivateMember(id){
 
     if(!confirm(
-        "Reactivate " +
-        name +
-        "?\n\nThe member will return to approved status."
+        "Reactivate this member?"
     )){
         return;
     }
 
 
-    try{
-
-        const {
-            error
-        } = await supabaseClient
+    const {
+        error
+    } =
+        await supabaseClient
             .rpc(
                 "admin_reactivate_member",
                 {
-                    target_id:memberId
+                    target_id:id
                 }
             );
 
 
-        if(error){
-            throw error;
-        }
-
+    if(error){
 
         showMessage(
             "adminMessage",
-            "Member reactivated successfully.",
-            "success"
-        );
-
-
-        closeMemberModal();
-
-        await loadAdminMembers();
-
-
-    }catch(error){
-
-        console.error(
-            "Reactivate member error:",
-            error
-        );
-
-
-        showMessage(
-            "adminMessage",
-            error.message ||
-            "Unable to reactivate member.",
+            error.message,
             "error"
         );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Member reactivated.",
+        "success"
+    );
+
+
+    loadAdminMembers();
+
+}
+
+
+/* ============================================================
+   ADMIN CONTENT CREATION
+   ============================================================ */
+
+async function adminPublishAnnouncement(){
+
+    const title =
+        document
+            .getElementById(
+                "adminAnnouncementTitle"
+            )
+            .value
+            .trim();
+
+    const message =
+        document
+            .getElementById(
+                "adminAnnouncementMessage"
+            )
+            .value
+            .trim();
+
+
+    if(!title || !message){
+
+        showMessage(
+            "adminMessage",
+            "Enter an announcement title and message.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("announcements")
+            .insert({
+                title,
+                message
+            });
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Announcement published.",
+        "success"
+    );
+
+
+    document
+        .getElementById(
+            "adminAnnouncementTitle"
+        )
+        .value = "";
+
+    document
+        .getElementById(
+            "adminAnnouncementMessage"
+        )
+        .value = "";
+
+
+    loadAnnouncements();
+
+}
+
+
+async function adminPublishNews(){
+
+    const title =
+        document
+            .getElementById(
+                "adminNewsTitle"
+            )
+            .value
+            .trim();
+
+    const content =
+        document
+            .getElementById(
+                "adminNewsContent"
+            )
+            .value
+            .trim();
+
+    const image =
+        document
+            .getElementById(
+                "adminNewsImage"
+            )
+            .value
+            .trim();
+
+
+    if(!title || !content){
+
+        showMessage(
+            "adminMessage",
+            "Enter a news title and content.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("news")
+            .insert({
+
+                title,
+
+                content,
+
+                image_url:
+                    image || null,
+
+                published:true
+
+            });
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "News published.",
+        "success"
+    );
+
+
+    document
+        .getElementById(
+            "adminNewsTitle"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminNewsContent"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminNewsImage"
+        ).value = "";
+
+}
+
+
+async function adminCreateEvent(){
+
+    const title =
+        document
+            .getElementById(
+                "adminEventTitle"
+            )
+            .value
+            .trim();
+
+    const description =
+        document
+            .getElementById(
+                "adminEventDescription"
+            )
+            .value
+            .trim();
+
+    const venue =
+        document
+            .getElementById(
+                "adminEventVenue"
+            )
+            .value
+            .trim();
+
+    const eventDate =
+        document
+            .getElementById(
+                "adminEventDate"
+            )
+            .value;
+
+
+    if(!title){
+
+        showMessage(
+            "adminMessage",
+            "Enter an event title.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("events")
+            .insert({
+
+                title,
+
+                description,
+
+                venue,
+
+                event_date:
+                    eventDate || null
+
+            });
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Event created.",
+        "success"
+    );
+
+
+    document
+        .getElementById(
+            "adminEventTitle"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminEventDescription"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminEventVenue"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminEventDate"
+        ).value = "";
+
+}
+
+
+async function adminAddGallery(){
+
+    const title =
+        document
+            .getElementById(
+                "adminGalleryTitle"
+            )
+            .value
+            .trim();
+
+    const image =
+        document
+            .getElementById(
+                "adminGalleryImage"
+            )
+            .value
+            .trim();
+
+    const caption =
+        document
+            .getElementById(
+                "adminGalleryCaption"
+            )
+            .value
+            .trim();
+
+
+    if(!image){
+
+        showMessage(
+            "adminMessage",
+            "Enter an image URL.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("gallery")
+            .insert({
+
+                title,
+
+                image_url:image,
+
+                caption
+
+            });
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Gallery photo added.",
+        "success"
+    );
+
+
+    document
+        .getElementById(
+            "adminGalleryTitle"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminGalleryImage"
+        ).value = "";
+
+    document
+        .getElementById(
+            "adminGalleryCaption"
+        ).value = "";
+
+}
+
+
+async function adminCreateYouthActivity(){
+
+    const title =
+        document
+            .getElementById(
+                "adminYouthTitle"
+            )
+            .value
+            .trim();
+
+    const description =
+        document
+            .getElementById(
+                "adminYouthDescription"
+            )
+            .value
+            .trim();
+
+    const venue =
+        document
+            .getElementById(
+                "adminYouthVenue"
+            )
+            .value
+            .trim();
+
+    const date =
+        document
+            .getElementById(
+                "adminYouthDate"
+            )
+            .value;
+
+
+    if(!title){
+
+        showMessage(
+            "adminMessage",
+            "Enter an activity title.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("youth_activities")
+            .insert({
+
+                title,
+
+                description,
+
+                venue,
+
+                activity_date:
+                    date || null,
+
+                published:true
+
+            });
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Youth activity published.",
+        "success"
+    );
+
+}
+
+
+async function adminCreateWomenActivity(){
+
+    const title =
+        document
+            .getElementById(
+                "adminWomenTitle"
+            )
+            .value
+            .trim();
+
+    const description =
+        document
+            .getElementById(
+                "adminWomenDescription"
+            )
+            .value
+            .trim();
+
+    const venue =
+        document
+            .getElementById(
+                "adminWomenVenue"
+            )
+            .value
+            .trim();
+
+    const date =
+        document
+            .getElementById(
+                "adminWomenDate"
+            )
+            .value;
+
+
+    if(!title){
+
+        showMessage(
+            "adminMessage",
+            "Enter an activity title.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("women_activities")
+            .insert({
+
+                title,
+
+                description,
+
+                venue,
+
+                activity_date:
+                    date || null,
+
+                published:true
+
+            });
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Women activity published.",
+        "success"
+    );
+
+}
+
+
+/* ============================================================
+   ADMIN PAYMENTS
+   ============================================================ */
+
+async function loadAdminPayments(){
+
+    const list =
+        document.getElementById(
+            "adminPayments"
+        );
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("payments")
+            .select("*")
+            .eq("status","pending")
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No pending payments.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(p => `
+
+            <div class="list-item">
+
+                <strong>
+                    ${safe(p.payment_type)}
+                </strong>
+
+                <p>
+                    Amount: D${safe(p.amount)}
+                </p>
+
+                <p>
+                    Member ID:
+                    ${safe(p.member_id)}
+                </p>
+
+                <p>
+                    Reference:
+                    ${safe(p.payment_reference)}
+                </p>
+
+                <button
+                    class="btn-success"
+                    onclick="verifyPayment(${p.id})">
+                    ✓ Verify Payment
+                </button>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+async function verifyPayment(id){
+
+    if(!confirm(
+        "Verify this payment?"
+    )){
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .rpc(
+                "admin_verify_payment",
+                {
+                    payment_id:id
+                }
+            );
+
+
+    if(error){
+
+        showMessage(
+            "adminMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "adminMessage",
+        "Payment verified.",
+        "success"
+    );
+
+
+    loadAdminPayments();
+
+}
+
+
+/* ============================================================
+   ADMIN WELFARE
+   ============================================================ */
+
+async function loadAdminWelfare(){
+
+    const list =
+        document.getElementById(
+            "adminWelfare"
+        );
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("welfare_requests")
+            .select("*")
+            .eq("status","pending")
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        list.innerHTML =
+            `<div class="message show error">
+                ${safe(error.message)}
+             </div>`;
+
+        return;
+    }
+
+
+    if(!data || !data.length){
+
+        list.innerHTML =
+            `<div class="empty">
+                No pending welfare requests.
+             </div>`;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(w => `
+
+            <div class="list-item">
+
+                <strong>
+                    ${safe(w.request_type)}
+                </strong>
+
+                <p>
+                    Member ID:
+                    ${safe(w.member_id)}
+                </p>
+
+                <p>
+                    ${safe(w.description)}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* ============================================================
+   PASSWORD
+   ============================================================ */
+
+function showChangePassword(){
+
+    document
+        .getElementById(
+            "passwordBox"
+        )
+        .classList.remove("hide");
+
+}
+
+
+async function changePassword(){
+
+    const password =
+        document
+            .getElementById(
+                "newPassword"
+            )
+            .value;
+
+
+    if(password.length < 6){
+
+        showMessage(
+            "passwordMessage",
+            "Password must contain at least 6 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient.auth
+            .updateUser({
+                password
+            });
+
+
+    if(error){
+
+        showMessage(
+            "passwordMessage",
+            error.message,
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "passwordMessage",
+        "Password updated successfully.",
+        "success"
+    );
+
+
+    document
+        .getElementById(
+            "newPassword"
+        ).value = "";
+
+}
+
+
+/* ============================================================
+   LOGOUT
+   ============================================================ */
+
+async function logout(){
+
+    await supabaseClient.auth.signOut();
+
+    currentUser = null;
+    currentMember = null;
+
+    openScreen("home");
+
+}
+
+
+/* ============================================================
+   HOME DATA
+   ============================================================ */
+
+async function loadHomeData(){
+
+    const announcementBox =
+        document.getElementById(
+            "homeAnnouncement"
+        );
+
+    const eventBox =
+        document.getElementById(
+            "homeEvent"
+        );
+
+
+    const announcementResult =
+        await supabaseClient
+            .from("announcements")
+            .select("*")
+            .order("created_at",{ascending:false})
+            .limit(1);
+
+
+    if(
+        announcementResult.data &&
+        announcementResult.data.length
+    ){
+
+        const a =
+            announcementResult.data[0];
+
+        announcementBox.innerHTML =
+            `<strong>${safe(a.title)}</strong>
+             <br>
+             ${safe(a.message)}`;
+
+    }else{
+
+        announcementBox.textContent =
+            "No announcements yet.";
+
+    }
+
+
+    const eventResult =
+        await supabaseClient
+            .from("events")
+            .select("*")
+            .order("event_date",{ascending:true})
+            .limit(1);
+
+
+    if(
+        eventResult.data &&
+        eventResult.data.length
+    ){
+
+        const e =
+            eventResult.data[0];
+
+        eventBox.innerHTML =
+            `<strong>${safe(e.title)}</strong>
+             <br>
+             ${formatDateTime(e.event_date)}
+             <br>
+             ${safe(e.venue)}`;
+
+    }else{
+
+        eventBox.textContent =
+            "No upcoming events.";
 
     }
 
 }
 
 
-/* =========================================================
-   CLOSE MODAL WHEN CLICKING OUTSIDE
-   ========================================================= */
+/* ============================================================
+   START APPLICATION
+   ============================================================ */
 
-document
-.getElementById("memberModal")
-.addEventListener("click",function(event){
+initializeApp();
 
-    if(event.target === this){
-        closeMemberModal();
-    }
-
-});
-
-
-/* =========================================================
-   AUTH STATE LISTENER
-   ========================================================= */
-
-supabaseClient.auth.onAuthStateChange(
-    async (event,session) => {
-
-        console.log(
-            "Auth event:",
-            event
-        );
-
-
-        if(session){
-
-            currentUser =
-                session.user;
-
-
-            setTimeout(
-                async () => {
-
-                    await loadCurrentMember();
-
-                    showLoggedInState();
-
-                },
-                300
-            );
-
-        }else{
-
-            currentUser = null;
-            currentMember = null;
-
-            showLoggedOutState();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   INITIALIZE APP
-   ========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        const dateField =
-            document.getElementById(
-                "regApplicationDate"
-            );
-
-        if(dateField){
-
-            const today =
-                new Date()
-                    .toISOString()
-                    .split("T")[0];
-
-            dateField.value = today;
-
-        }
-
-
-        await checkSession();
-
-    }
-);
+loadHomeData();
 
 </script>
 
