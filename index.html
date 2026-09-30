@@ -3,1343 +3,1152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="theme-color" content="#087f3d">
 <title>RIBACOM | Rivers Bayelsa Community The Gambia</title>
 
 <style>
-* {
-    box-sizing: border-box;
+:root{
+    --green:#087f3d;
+    --dark:#075b2d;
+    --light:#eaf7ef;
+    --gold:#d6a928;
+    --white:#ffffff;
+    --black:#17221b;
+    --gray:#66736b;
+    --border:#dce7df;
+    --danger:#c62828;
+    --shadow:0 4px 18px rgba(0,0,0,.08);
 }
 
-:root {
-    --green: #087f3d;
-    --dark-green: #075b2d;
-    --light-green: #eaf7ef;
-    --gold: #d9a441;
-    --white: #ffffff;
-    --dark: #173b2a;
-    --gray: #667085;
-    --light: #f4f7f5;
-    --border: #dce5df;
-    --danger: #b42318;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: var(--light);
-    color: var(--dark);
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f8f6;
+    color:var(--black);
+    padding-bottom:80px;
 }
 
 button,
 input,
 select,
-textarea {
-    font: inherit;
+textarea{
+    font:inherit;
 }
 
-button {
-    cursor: pointer;
+button{
+    cursor:pointer;
 }
 
-.app {
-    min-height: 100vh;
-    padding-bottom: 80px;
+.header{
+    background:linear-gradient(135deg,var(--green),var(--dark));
+    color:white;
+    padding:18px 16px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:var(--shadow);
 }
 
-/* =========================
-   HEADER
-========================= */
-
-.top-header {
-    background: var(--green);
-    color: white;
-    padding: 18px 18px 20px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,.12);
-}
-
-.logo {
-    width: 76px;
-    height: 76px;
-    margin: 0 auto 10px;
-    border-radius: 50%;
-    background: white;
-    color: var(--green);
-    border: 4px solid var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    font-weight: bold;
-}
-
-.top-header h1 {
-    margin: 4px 0;
-    font-size: 22px;
-}
-
-.top-header p {
-    margin: 4px 0;
-    font-size: 13px;
-}
-
-.motto {
-    color: #ffe29a;
-    font-weight: bold;
-}
-
-/* =========================
-   SCREENS
-========================= */
-
-.screen {
-    display: none;
-    max-width: 600px;
-    margin: auto;
-    padding: 20px 16px;
-}
-
-.screen.active {
-    display: block;
-}
-
-.page-title {
-    font-size: 25px;
-    margin: 5px 0 4px;
-}
-
-.page-subtitle {
-    color: var(--gray);
-    margin-bottom: 20px;
+.header-inner{
+    max-width:900px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
-/* =========================
-   CARDS
-========================= */
-
-.card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.04);
-}
-
-.card h3,
-.card h2 {
-    margin-top: 0;
-}
-
-.card p {
-    color: #4b5563;
-    line-height: 1.55;
+.logo{
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    background:white;
+    color:var(--green);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:900;
+    border:3px solid var(--gold);
 }
 
-.clickable {
-    cursor: pointer;
-    transition: .2s;
+.brand h1{
+    font-size:20px;
+    margin-bottom:3px;
 }
 
-.clickable:hover {
-    border-color: var(--green);
-    transform: translateY(-1px);
+.brand p{
+    font-size:11px;
+    opacity:.95;
+    letter-spacing:.4px;
 }
 
-.selected {
-    border: 2px solid var(--green);
-    background: var(--light-green);
+.motto{
+    font-size:10px;
+    color:#ffe38b;
+    font-weight:bold;
+    margin-top:4px;
 }
-
-/* =========================
-   BUTTONS
-========================= */
 
-.btn {
-    width: 100%;
-    border: 0;
-    border-radius: 11px;
-    padding: 14px;
-    margin: 6px 0;
-    font-weight: bold;
-    background: var(--green);
-    color: white;
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:18px 14px;
 }
 
-.btn:hover {
-    background: var(--dark-green);
+.screen{
+    display:none;
 }
 
-.btn.secondary {
-    background: #eef1ef;
-    color: var(--dark);
+.screen.active{
+    display:block;
 }
 
-.btn.gold {
-    background: var(--gold);
-    color: #222;
+.hero{
+    background:linear-gradient(135deg,#087f3d,#0b9b4d);
+    color:white;
+    border-radius:18px;
+    padding:30px 22px;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
 }
 
-.btn.danger {
-    background: var(--danger);
+.hero h2{
+    font-size:28px;
+    margin-bottom:10px;
 }
 
-.btn:disabled {
-    background: #aeb8b1;
-    cursor: not-allowed;
+.hero p{
+    line-height:1.6;
 }
 
-/* =========================
-   HOME
-========================= */
-
-.hero {
-    text-align: center;
-    padding: 20px 0;
+.card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow);
 }
 
-.hero h2 {
-    font-size: 28px;
-    margin: 5px 0;
+.card h3{
+    color:var(--dark);
+    margin-bottom:9px;
 }
 
-.hero p {
-    line-height: 1.6;
-    color: var(--gray);
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
 }
 
-.quick-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+@media(max-width:600px){
+    .grid{
+        grid-template-columns:1fr;
+    }
 }
 
-.quick-item {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 10px;
-    text-align: center;
-    cursor: pointer;
+.stat{
+    text-align:center;
+    padding:18px 10px;
 }
 
-.quick-item .icon {
-    font-size: 28px;
-    margin-bottom: 7px;
+.stat strong{
+    display:block;
+    color:var(--green);
+    font-size:25px;
+    margin-bottom:5px;
 }
 
-.quick-item strong {
-    display: block;
+.btn{
+    width:100%;
+    border:none;
+    border-radius:11px;
+    padding:13px 15px;
+    background:var(--green);
+    color:white;
+    font-weight:bold;
+    margin-top:10px;
 }
 
-/* =========================
-   FORMS
-========================= */
-
-.form-group {
-    margin-bottom: 15px;
+.btn:hover{
+    background:var(--dark);
 }
 
-.form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 6px;
+.btn.secondary{
+    background:#edf5ef;
+    color:var(--green);
 }
 
-input,
-select,
-textarea {
-    width: 100%;
-    border: 1px solid #cfd8d2;
-    border-radius: 10px;
-    padding: 13px;
-    background: white;
-    outline: none;
+.btn.gold{
+    background:var(--gold);
+    color:#202020;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-    border-color: var(--green);
+.btn.danger{
+    background:var(--danger);
 }
 
-textarea {
-    min-height: 110px;
-    resize: vertical;
+.btn.small{
+    width:auto;
+    padding:9px 14px;
 }
-
-/* =========================
-   MEMBERSHIP
-========================= */
 
-.membership-card {
-    padding: 20px;
+.section-title{
+    margin:5px 0 15px;
+    color:var(--dark);
 }
 
-.membership-card h3 {
-    color: var(--green);
+.field{
+    margin-bottom:13px;
 }
 
-.membership-icon {
-    font-size: 35px;
+.field label{
+    display:block;
+    font-size:13px;
+    font-weight:bold;
+    margin-bottom:6px;
 }
 
-/* =========================
-   DASHBOARD
-========================= */
-
-.dashboard-welcome {
-    background: var(--green);
-    color: white;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 15px;
+.field input,
+.field select,
+.field textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccd9d0;
+    border-radius:9px;
+    outline:none;
+    background:white;
 }
 
-.dashboard-welcome p {
-    color: white;
-    opacity: .9;
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+    border-color:var(--green);
 }
 
-.stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.field textarea{
+    min-height:100px;
+    resize:vertical;
 }
 
-.stat {
-    background: white;
-    padding: 18px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
+.notice{
+    background:#fff8df;
+    border-left:4px solid var(--gold);
+    padding:13px;
+    border-radius:8px;
+    margin-bottom:15px;
+    font-size:14px;
+    line-height:1.5;
 }
 
-.stat strong {
-    display: block;
-    font-size: 24px;
-    color: var(--green);
+.success{
+    background:#eaf8ef;
+    border-left:4px solid var(--green);
+    padding:13px;
+    border-radius:8px;
 }
 
-.stat span {
-    color: var(--gray);
-    font-size: 13px;
+.error{
+    background:#ffeded;
+    border-left:4px solid var(--danger);
+    padding:13px;
+    border-radius:8px;
 }
-
-/* =========================
-   DIGITAL CARD
-========================= */
 
-.digital-card {
-    background: linear-gradient(135deg, #087f3d, #075b2d);
-    color: white;
-    border-radius: 20px;
-    padding: 22px;
-    min-height: 280px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.18);
-    position: relative;
-    overflow: hidden;
+.category{
+    border:2px solid var(--border);
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:12px;
+    background:white;
 }
 
-.digital-card:after {
-    content: "";
-    position: absolute;
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    border: 25px solid rgba(255,255,255,.07);
-    right: -50px;
-    bottom: -60px;
+.category.selected{
+    border-color:var(--green);
+    background:var(--light);
 }
 
-.card-brand {
-    font-weight: bold;
-    letter-spacing: 1px;
+.category h3{
+    color:var(--green);
+    margin-bottom:7px;
 }
 
-.card-photo {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: white;
-    color: var(--green);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    font-weight: bold;
-    margin: 25px 0 15px;
+.category p{
+    color:var(--gray);
+    line-height:1.5;
+    font-size:14px;
 }
 
-.digital-card h2 {
-    margin: 5px 0;
+.back{
+    background:none;
+    border:none;
+    color:var(--green);
+    font-weight:bold;
+    margin-bottom:15px;
+    padding:5px 0;
 }
 
-.digital-card p {
-    color: white;
-    margin: 5px 0;
+.status{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    background:#fff3c4;
+    color:#705500;
+    font-size:12px;
+    font-weight:bold;
 }
 
-/* =========================
-   STATUS
-========================= */
-
-.status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
+.status.approved{
+    background:#dff5e7;
+    color:#08652e;
 }
 
-.status.pending {
-    background: #fff4d6;
-    color: #8a5b00;
+.status.rejected{
+    background:#ffe0e0;
+    color:#a00000;
 }
 
-.status.approved {
-    background: #dff6e7;
-    color: #087f3d;
+.digital-card{
+    background:linear-gradient(135deg,#087f3d,#064d27);
+    color:white;
+    border-radius:20px;
+    padding:23px;
+    min-height:220px;
+    position:relative;
+    overflow:hidden;
 }
 
-.status.info {
-    background: #e8f1ff;
-    color: #175cd3;
+.digital-card:after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    border:25px solid rgba(255,255,255,.08);
+    border-radius:50%;
+    right:-60px;
+    bottom:-70px;
 }
 
-/* =========================
-   LISTS
-========================= */
-
-.list-item {
-    border-bottom: 1px solid var(--border);
-    padding: 15px 0;
+.digital-card .card-logo{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:white;
+    color:var(--green);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:12px;
 }
 
-.list-item:last-child {
-    border-bottom: 0;
+.digital-card h2{
+    font-size:20px;
 }
 
-.list-item h4 {
-    margin: 0 0 5px;
+.digital-card .member-no{
+    margin-top:20px;
+    font-size:13px;
+    letter-spacing:2px;
 }
 
-.list-item p {
-    margin: 5px 0;
+.nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:68px;
+    background:white;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:center;
+    z-index:100;
+    box-shadow:0 -3px 15px rgba(0,0,0,.08);
 }
-
-/* =========================
-   LEADERSHIP
-========================= */
 
-.leader {
-    display: flex;
-    gap: 14px;
-    align-items: center;
+.nav-inner{
+    width:100%;
+    max-width:900px;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
 }
 
-.leader-photo {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    background: var(--light-green);
-    color: var(--green);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    flex-shrink: 0;
+.nav button{
+    background:none;
+    border:none;
+    color:#68736c;
+    font-size:11px;
 }
 
-/* =========================
-   ADMIN
-========================= */
-
-.admin-header {
-    background: #222;
-    color: white;
-    border-radius: 15px;
-    padding: 18px;
-    margin-bottom: 15px;
+.nav button.active{
+    color:var(--green);
+    font-weight:bold;
 }
 
-.admin-header p {
-    color: #ddd;
+.nav-icon{
+    display:block;
+    font-size:20px;
+    margin-bottom:3px;
 }
 
-.admin-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:85px;
+    transform:translateX(-50%);
+    background:#17221b;
+    color:white;
+    padding:12px 18px;
+    border-radius:10px;
+    display:none;
+    z-index:200;
+    max-width:90%;
+    text-align:center;
 }
 
-.admin-box {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
+.loading{
+    text-align:center;
+    padding:20px;
+    color:var(--gray);
 }
 
-.admin-box strong {
-    display: block;
-    font-size: 25px;
+.member-welcome{
+    background:white;
+    border-radius:15px;
+    padding:17px;
+    margin-bottom:15px;
+    box-shadow:var(--shadow);
 }
-
-/* =========================
-   NAVIGATION
-========================= */
 
-.bottom-nav {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 68px;
-    background: white;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 1000;
+.profile-row{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    padding:10px 0;
+    border-bottom:1px solid #edf1ee;
 }
 
-.nav-item {
-    text-align: center;
-    font-size: 11px;
-    color: #667085;
-    cursor: pointer;
+.profile-row:last-child{
+    border-bottom:none;
 }
 
-.nav-item .nav-icon {
-    font-size: 22px;
-    display: block;
-    margin-bottom: 2px;
+.profile-row span:first-child{
+    color:var(--gray);
+    font-size:13px;
 }
 
-.nav-item.active {
-    color: var(--green);
-    font-weight: bold;
+.profile-row span:last-child{
+    font-weight:bold;
+    text-align:right;
 }
 
-/* =========================
-   MODAL
-========================= */
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 2000;
-    inset: 0;
-    background: rgba(0,0,0,.55);
-    padding: 25px 15px;
-    overflow-y: auto;
+.hidden{
+    display:none!important;
 }
 
-.modal.show {
-    display: block;
+.checkbox{
+    display:flex;
+    gap:9px;
+    align-items:flex-start;
+    font-size:13px;
+    line-height:1.5;
 }
 
-.modal-box {
-    max-width: 520px;
-    margin: 50px auto;
-    background: white;
-    border-radius: 18px;
-    padding: 20px;
+.checkbox input{
+    width:18px;
+    height:18px;
 }
 
-/* =========================
-   TOAST
-========================= */
-
-.toast {
-    display: none;
-    position: fixed;
-    top: 18px;
-    left: 15px;
-    right: 15px;
-    z-index: 3000;
-    background: #173b2a;
-    color: white;
-    padding: 14px;
-    border-radius: 10px;
-    text-align: center;
+.menu-card{
+    display:flex;
+    align-items:center;
+    gap:13px;
 }
 
-.toast.show {
-    display: block;
+.menu-icon{
+    width:43px;
+    height:43px;
+    border-radius:12px;
+    background:var(--light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
 }
-
-/* =========================
-   FOOTER
-========================= */
 
-.footer {
-    text-align: center;
-    color: #777;
-    font-size: 12px;
-    padding: 25px 10px;
+.empty{
+    text-align:center;
+    color:var(--gray);
+    padding:25px 10px;
 }
 
-hr {
-    border: 0;
-    border-top: 1px solid var(--border);
-    margin: 18px 0;
+hr{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:18px 0;
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
-
-<!-- =========================
-     HEADER
-========================= -->
-
-<header class="top-header">
-
-    <div class="logo">R</div>
-
-    <h1>RIBACOM</h1>
-
-    <p>RIVERS BAYELSA COMMUNITY THE GAMBIA</p>
-
-    <p class="motto">TRUTH • UNITY • SERVICE</p>
-
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">R</div>
+        <div class="brand">
+            <h1>RIBACOM</h1>
+            <p>RIVERS BAYELSA COMMUNITY THE GAMBIA</p>
+            <div class="motto">TRUTH • UNITY • SERVICE</div>
+        </div>
+    </div>
 </header>
 
+<main class="container">
 
-<!-- =========================
-     HOME
-========================= -->
-
+<!-- HOME -->
 <section id="home" class="screen active">
 
     <div class="hero">
-
         <h2>Welcome to RIBACOM</h2>
-
         <p>
-            Rivers Bayelsa Community in Diaspora –
-            The Gambia.
+            Rivers Bayelsa Community in Diaspora – The Gambia.
+            A community built on truth, unity, service, welfare and cultural connection.
         </p>
-
-        <p>
-            Connecting our people, strengthening our
-            community and serving with unity.
-        </p>
-
+        <button class="btn gold" onclick="openScreen('membership')">
+            📝 JOIN RIBACOM
+        </button>
+        <button class="btn secondary" onclick="openScreen('login')">
+            🔐 MEMBER LOGIN
+        </button>
     </div>
 
+    <div class="grid">
 
-    <button class="btn" onclick="openScreen('membership')">
-        📝 JOIN RIBACOM
-    </button>
-
-    <button class="btn secondary" onclick="openScreen('login')">
-        🔐 MEMBER LOGIN
-    </button>
-
-
-    <div class="card">
-
-        <h3>Our Community</h3>
-
-        <p>
-            RIBACOM provides a platform for Rivers and
-            Bayelsa people and associates in The Gambia
-            to connect, support one another and promote
-            community development.
-        </p>
-
-    </div>
-
-
-    <div class="quick-grid">
-
-        <div class="quick-item" onclick="openScreen('events')">
-            <div class="icon">📅</div>
-            <strong>Events</strong>
+        <div class="card menu-card" onclick="openScreen('events')">
+            <div class="menu-icon">📅</div>
+            <div>
+                <h3>Events</h3>
+                <p>Community activities</p>
+            </div>
         </div>
 
-        <div class="quick-item" onclick="openScreen('announcements')">
-            <div class="icon">📢</div>
-            <strong>News</strong>
+        <div class="card menu-card" onclick="openScreen('announcements')">
+            <div class="menu-icon">📢</div>
+            <div>
+                <h3>Announcements</h3>
+                <p>Community news</p>
+            </div>
         </div>
 
-        <div class="quick-item" onclick="openScreen('leadership')">
-            <div class="icon">👥</div>
-            <strong>Leadership</strong>
+        <div class="card menu-card" onclick="openScreen('constitution')">
+            <div class="menu-icon">📜</div>
+            <div>
+                <h3>Constitution</h3>
+                <p>Governance documents</p>
+            </div>
         </div>
 
-        <div class="quick-item" onclick="openScreen('constitution')">
-            <div class="icon">📜</div>
-            <strong>Documents</strong>
+        <div class="card menu-card" onclick="openScreen('leadership')">
+            <div class="menu-icon">👥</div>
+            <div>
+                <h3>Leadership</h3>
+                <p>Community leadership</p>
+            </div>
         </div>
 
-    </div>
-
-
-    <div class="footer">
-        RIBACOM © 2026<br>
-        Truth • Unity • Service
     </div>
 
 </section>
 
 
-<!-- =========================
-     MEMBERSHIP
-========================= -->
-
+<!-- MEMBERSHIP CATEGORY -->
 <section id="membership" class="screen">
 
-    <h2 class="page-title">📝 Join RIBACOM</h2>
+    <button class="back" onclick="openScreen('home')">← Back</button>
 
-    <p class="page-subtitle">
-        Choose your membership category.
-    </p>
+    <h2 class="section-title">Join RIBACOM</h2>
 
+    <div class="notice">
+        Choose the membership category that applies to you.
+    </div>
 
-    <div
-        id="regularMembership"
-        class="card membership-card clickable"
-        onclick="chooseMembership('Regular Member')"
-    >
+    <div id="regularCategory"
+         class="category"
+         onclick="chooseMembership('Regular Member')">
 
-        <div class="membership-icon">🌿</div>
-
-        <h3>REGULAR MEMBER</h3>
+        <h3>🌊 Regular Member</h3>
 
         <p>
-            For persons of Rivers or Bayelsa birth,
-            ancestry, family or community origin.
+            For persons who are Rivers or Bayelsa indigenes by birth,
+            ancestry or family origin.
         </p>
 
     </div>
 
+    <div id="associateCategory"
+         class="category"
+         onclick="chooseMembership('Associate Member')">
 
-    <div
-        id="associateMembership"
-        class="card membership-card clickable"
-        onclick="chooseMembership('Associate Member')"
-    >
-
-        <div class="membership-icon">🤝</div>
-
-        <h3>ASSOCIATE MEMBER</h3>
+        <h3>🤝 Associate Member</h3>
 
         <p>
-            For persons who qualify through marriage
-            or who wish to identify with and support
-            the Rivers and Bayelsa community.
+            For persons connected to Rivers or Bayelsa through marriage,
+            community affiliation or personal interest.
         </p>
 
     </div>
 
-
-    <button
-        id="membershipContinue"
-        class="btn"
-        onclick="continueMembership()"
-        disabled
-    >
-        CONTINUE
-    </button>
-
-
-    <button class="btn secondary" onclick="openScreen('home')">
-        BACK
+    <button id="continueMembershipBtn"
+            class="btn"
+            onclick="continueMembership()"
+            disabled>
+        SELECT MEMBERSHIP
     </button>
 
 </section>
 
 
-<!-- =========================
-     MEMBERSHIP EXPLANATION
-========================= -->
-
+<!-- MEMBERSHIP INFO -->
 <section id="membershipInfo" class="screen">
 
-    <h2 id="membershipInfoTitle" class="page-title">
-        Membership
-    </h2>
+    <button class="back" onclick="openScreen('membership')">← Back</button>
 
     <div class="card">
+        <h2 id="membershipInfoTitle"></h2>
 
-        <h3>Membership Information</h3>
-
-        <p id="membershipInfoText"></p>
-
-        <hr>
-
-        <p>
-            Your next step is to complete the RIBACOM
-            membership application.
+        <p id="membershipInfoText"
+           style="line-height:1.7;color:var(--gray);margin-top:10px">
         </p>
 
+        <button class="btn" onclick="openRegistration()">
+            CONTINUE TO APPLICATION
+        </button>
     </div>
-
-
-    <button class="btn" onclick="openRegistration()">
-        CONTINUE TO APPLICATION
-    </button>
-
-
-    <button class="btn secondary" onclick="openScreen('membership')">
-        BACK
-    </button>
 
 </section>
 
 
-<!-- =========================
-     REGISTRATION
-========================= -->
-
+<!-- REGISTRATION -->
 <section id="registration" class="screen">
 
-    <h2 class="page-title">Membership Application</h2>
+    <button class="back" onclick="openScreen('membershipInfo')">← Back</button>
 
-    <p class="page-subtitle">
-        Complete your RIBACOM membership information.
-    </p>
+    <h2 class="section-title">Membership Application</h2>
 
-
-    <div class="card">
-
-        <h3>Personal Information</h3>
-
-        <div class="form-group">
-            <label>Full Name</label>
-            <input id="regFullName" type="text"
-                   placeholder="Enter full name">
-        </div>
-
-
-        <div class="form-group">
-            <label>Gender</label>
-
-            <select id="regGender">
-                <option value="">Select</option>
-                <option>Male</option>
-                <option>Female</option>
-            </select>
-        </div>
-
-
-        <div class="form-group">
-            <label>Date of Birth</label>
-            <input id="regDob" type="date">
-        </div>
-
-
-        <div class="form-group">
-            <label>Nationality</label>
-            <input id="regNationality" type="text"
-                   placeholder="Nationality">
-        </div>
-
-
-        <div class="form-group">
-            <label>Marital Status</label>
-
-            <select id="regMarital">
-                <option value="">Select</option>
-                <option>Single</option>
-                <option>Married</option>
-                <option>Divorced</option>
-                <option>Widowed</option>
-            </select>
-        </div>
-
-
-        <div class="form-group">
-            <label>Passport / National ID Number (Optional)</label>
-            <input id="regId" type="text">
-        </div>
-
+    <div class="notice">
+        Selected membership:
+        <strong id="selectedMembershipDisplay"></strong>
     </div>
 
+    <form id="registrationForm"
+          onsubmit="submitRegistration(event)">
 
-    <div class="card">
+        <div class="card">
 
-        <h3>Contact Information</h3>
+            <h3>A. Personal Information</h3>
 
-        <div class="form-group">
-            <label>Phone Number</label>
-            <input id="regPhone" type="tel"
-                   placeholder="+220">
+            <div class="field">
+                <label>Full Name *</label>
+                <input id="regFullName" required>
+            </div>
+
+            <div class="field">
+                <label>Gender</label>
+                <select id="regGender">
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Date of Birth</label>
+                <input id="regDob" type="date">
+            </div>
+
+            <div class="field">
+                <label>Nationality</label>
+                <input id="regNationality" value="Nigerian">
+            </div>
+
+            <div class="field">
+                <label>Marital Status</label>
+                <select id="regMaritalStatus">
+                    <option value="">Select</option>
+                    <option>Single</option>
+                    <option>Married</option>
+                    <option>Divorced</option>
+                    <option>Widowed</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Passport / National ID Number</label>
+                <input id="regPassport">
+            </div>
+
         </div>
 
 
-        <div class="form-group">
-            <label>WhatsApp Number</label>
-            <input id="regWhatsapp" type="tel"
-                   placeholder="+220">
+        <div class="card">
+
+            <h3>B. Contact Information</h3>
+
+            <div class="field">
+                <label>Phone Number *</label>
+                <input id="regPhone" type="tel" required>
+            </div>
+
+            <div class="field">
+                <label>WhatsApp Number</label>
+                <input id="regWhatsapp" type="tel">
+            </div>
+
+            <div class="field">
+                <label>Email Address *</label>
+                <input id="regEmail" type="email" required>
+            </div>
+
+            <div class="field">
+                <label>Current Address in The Gambia</label>
+                <input id="regAddress">
+            </div>
+
+            <div class="field">
+                <label>Town / Area</label>
+                <input id="regTown">
+            </div>
+
+            <div class="field">
+                <label>Emergency Contact</label>
+                <input id="regEmergency">
+            </div>
+
+            <div class="field">
+                <label>Emergency Contact Phone</label>
+                <input id="regEmergencyPhone" type="tel">
+            </div>
+
         </div>
 
 
-        <div class="form-group">
-            <label>Email Address</label>
-            <input id="regEmail" type="email"
-                   placeholder="Email">
+        <div class="card">
+
+            <h3>C. Rivers / Bayelsa Identity</h3>
+
+            <div class="field">
+                <label>State</label>
+
+                <select id="regState">
+                    <option value="">Select State</option>
+                    <option>Rivers</option>
+                    <option>Bayelsa</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Local Government Area</label>
+                <input id="regLga">
+            </div>
+
+            <div class="field">
+                <label>Community / Town / Village</label>
+                <input id="regCommunity">
+            </div>
+
+            <div class="field">
+                <label>Clan / Family</label>
+                <input id="regClan">
+            </div>
+
+            <div class="field">
+                <label>Other Community Information</label>
+                <textarea id="regCommunityInfo"></textarea>
+            </div>
+
+            <div id="associateFields" class="hidden">
+
+                <hr>
+
+                <h3>Associate Membership</h3>
+
+                <div class="field">
+                    <label>Basis of Association</label>
+
+                    <select id="regAssociationBasis">
+                        <option value="">Select</option>
+                        <option>Marriage</option>
+                        <option>Community affiliation</option>
+                        <option>Other interest</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Details</label>
+                    <textarea id="regAssociationDetails"></textarea>
+                </div>
+
+            </div>
+
         </div>
 
 
-        <div class="form-group">
-            <label>Current Address in The Gambia</label>
-            <input id="regAddress" type="text">
+        <div class="card">
+
+            <h3>D. Family Information</h3>
+
+            <div class="field">
+                <label>Spouse Name</label>
+                <input id="regSpouse">
+            </div>
+
+            <div class="field">
+                <label>Number of Children</label>
+                <input id="regChildren" type="number" min="0">
+            </div>
+
+            <div class="field">
+                <label>Next of Kin</label>
+                <input id="regNextOfKin">
+            </div>
+
+            <div class="field">
+                <label>Next-of-Kin Phone</label>
+                <input id="regNextOfKinPhone" type="tel">
+            </div>
+
         </div>
 
 
-        <div class="form-group">
-            <label>Town / Area</label>
-            <input id="regTown" type="text">
+        <div class="card">
+
+            <h3>E. Account Security</h3>
+
+            <div class="field">
+                <label>Password *</label>
+                <input id="regPassword" type="password" minlength="6" required>
+            </div>
+
+            <div class="field">
+                <label>Confirm Password *</label>
+                <input id="regConfirmPassword"
+                       type="password"
+                       minlength="6"
+                       required>
+            </div>
+
         </div>
 
 
-        <div class="form-group">
-            <label>Emergency Contact</label>
-            <input id="regEmergency" type="text">
+        <div class="card">
+
+            <h3>F. Membership</h3>
+
+            <div class="field">
+                <label>Previous RIBACOM Membership</label>
+                <input id="regPreviousMembership">
+            </div>
+
+            <div class="field">
+                <label>Preferred Payment Method</label>
+
+                <select id="regPayment">
+                    <option value="">Select</option>
+                    <option>Cash</option>
+                    <option>Bank Transfer</option>
+                    <option>Mobile Money</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+            <label class="checkbox">
+                <input id="regConstitution" type="checkbox" required>
+                <span>
+                    I confirm that the information provided is correct and
+                    I agree to abide by the RIBACOM Constitution.
+                </span>
+            </label>
+
         </div>
 
+        <button class="btn" type="submit">
+            CREATE RIBACOM ACCOUNT
+        </button>
 
-        <div class="form-group">
-            <label>Emergency Contact Phone</label>
-            <input id="regEmergencyPhone" type="tel">
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Rivers / Bayelsa Identity</h3>
-
-        <div class="form-group">
-            <label>State</label>
-
-            <select id="regState">
-                <option value="">Select State</option>
-                <option>Rivers</option>
-                <option>Bayelsa</option>
-            </select>
-        </div>
-
-
-        <div class="form-group">
-            <label>Local Government Area</label>
-            <input id="regLga" type="text">
-        </div>
-
-
-        <div class="form-group">
-            <label>Community / Town / Village</label>
-            <input id="regCommunity" type="text">
-        </div>
-
-
-        <div class="form-group">
-            <label>Clan / Family (Optional)</label>
-            <input id="regClan" type="text">
-        </div>
-
-
-        <div class="form-group">
-            <label>Other Community Information</label>
-            <textarea id="regOther"></textarea>
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Family Information</h3>
-
-        <div class="form-group">
-            <label>Spouse Name</label>
-            <input id="regSpouse" type="text">
-        </div>
-
-
-        <div class="form-group">
-            <label>Number of Children</label>
-            <input id="regChildren" type="number" min="0">
-        </div>
-
-
-        <div class="form-group">
-            <label>Next of Kin</label>
-            <input id="regNextKin" type="text">
-        </div>
-
-
-        <div class="form-group">
-            <label>Next-of-Kin Phone</label>
-            <input id="regNextKinPhone" type="tel">
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Account Security</h3>
-
-        <div class="form-group">
-            <label>Password</label>
-            <input id="regPassword" type="password"
-                   placeholder="Create password">
-        </div>
-
-
-        <div class="form-group">
-            <label>Confirm Password</label>
-            <input id="regConfirmPassword" type="password"
-                   placeholder="Confirm password">
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <label>
-            <input id="regAgreement" type="checkbox">
-            I accept the RIBACOM Constitution and agree
-            to provide accurate information.
-        </label>
-
-    </div>
-
-
-    <button class="btn" onclick="submitRegistration()">
-        SUBMIT MEMBERSHIP APPLICATION
-    </button>
-
-
-    <button class="btn secondary" onclick="openScreen('membershipInfo')">
-        BACK
-    </button>
+    </form>
 
 </section>
 
 
-<!-- =========================
-     LOGIN
-========================= -->
-
+<!-- LOGIN -->
 <section id="login" class="screen">
 
-    <h2 class="page-title">🔐 Member Login</h2>
+    <button class="back" onclick="openScreen('home')">← Back</button>
 
-    <p class="page-subtitle">
-        Access your RIBACOM member account.
-    </p>
-
+    <h2 class="section-title">Member Login</h2>
 
     <div class="card">
 
-        <div class="form-group">
-            <label>Email Address</label>
-            <input id="loginEmail" type="email"
-                   placeholder="Enter email">
-        </div>
+        <form onsubmit="loginMember(event)">
 
+            <div class="field">
+                <label>Email Address</label>
+                <input id="loginEmail"
+                       type="email"
+                       required>
+            </div>
 
-        <div class="form-group">
-            <label>Password</label>
-            <input id="loginPassword" type="password"
-                   placeholder="Enter password">
-        </div>
+            <div class="field">
+                <label>Password</label>
+                <input id="loginPassword"
+                       type="password"
+                       required>
+            </div>
 
+            <button class="btn" type="submit">
+                🔐 LOGIN
+            </button>
 
-        <button class="btn" onclick="demoLogin()">
-            LOGIN
-        </button>
-
-
-        <button class="btn secondary" onclick="openRegistration()">
-            CREATE ACCOUNT
-        </button>
-
+        </form>
 
         <button class="btn secondary"
-                onclick="showToast('Password recovery will be connected to Supabase.')">
-            FORGOT PASSWORD?
+                onclick="openScreen('membership')">
+            CREATE NEW ACCOUNT
         </button>
 
     </div>
 
+</section>
 
-    <button class="btn secondary" onclick="openScreen('home')">
-        BACK
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="screen">
+
+    <div class="member-welcome">
+
+        <h2 id="dashboardWelcome">
+            Welcome, Member
+        </h2>
+
+        <p id="dashboardEmail"
+           style="color:var(--gray);margin-top:5px">
+        </p>
+
+        <div style="margin-top:10px">
+            <span id="dashboardStatus"
+                  class="status">
+                Pending
+            </span>
+        </div>
+
+    </div>
+
+    <div class="grid">
+
+        <div class="card stat">
+            <strong id="statStatus">Pending</strong>
+            Membership
+        </div>
+
+        <div class="card stat">
+            <strong id="statCategory">—</strong>
+            Category
+        </div>
+
+        <div class="card stat">
+            <strong id="statMemberNo">—</strong>
+            Member No.
+        </div>
+
+        <div class="card stat">
+            <strong>RIBACOM</strong>
+            Community
+        </div>
+
+    </div>
+
+    <div class="card menu-card"
+         onclick="openScreen('digitalCard')">
+
+        <div class="menu-icon">🪪</div>
+
+        <div>
+            <h3>Digital Membership Card</h3>
+            <p>View your RIBACOM identification card</p>
+        </div>
+
+    </div>
+
+    <div class="card menu-card"
+         onclick="openScreen('profile')">
+
+        <div class="menu-icon">👤</div>
+
+        <div>
+            <h3>My Profile</h3>
+            <p>View your membership information</p>
+        </div>
+
+    </div>
+
+    <div class="card menu-card"
+         onclick="openScreen('dues')">
+
+        <div class="menu-icon">💰</div>
+
+        <div>
+            <h3>Dues & Contributions</h3>
+            <p>Membership contributions</p>
+        </div>
+
+    </div>
+
+    <div class="card menu-card"
+         onclick="openScreen('welfare')">
+
+        <div class="menu-icon">🤝</div>
+
+        <div>
+            <h3>Welfare</h3>
+            <p>Submit a welfare request</p>
+        </div>
+
+    </div>
+
+    <button class="btn danger"
+            onclick="logoutMember()">
+        🚪 LOGOUT
     </button>
 
 </section>
 
 
-<!-- =========================
-     MEMBER DASHBOARD
-========================= -->
-
-<section id="dashboard" class="screen">
-
-    <div class="dashboard-welcome">
-
-        <h2>Welcome, RIBACOM Member</h2>
-
-        <p>
-            Your community dashboard
-        </p>
-
-    </div>
-
-
-    <div class="stat-grid">
-
-        <div class="stat">
-            <strong>Pending</strong>
-            <span>Membership Status</span>
-        </div>
-
-        <div class="stat">
-            <strong>D50</strong>
-            <span>Monthly Dues</span>
-        </div>
-
-        <div class="stat">
-            <strong>0</strong>
-            <span>Welfare Requests</span>
-        </div>
-
-        <div class="stat">
-            <strong>0</strong>
-            <span>Notifications</span>
-        </div>
-
-    </div>
-
-
-    <br>
-
-
-    <div class="card">
-
-        <h3>Member Services</h3>
-
-        <button class="btn" onclick="openScreen('digitalCard')">
-            🪪 Digital Membership Card
-        </button>
-
-        <button class="btn" onclick="openScreen('dues')">
-            💰 Dues & Contributions
-        </button>
-
-        <button class="btn" onclick="openScreen('welfare')">
-            🤝 Welfare
-        </button>
-
-        <button class="btn" onclick="openScreen('notifications')">
-            🔔 Notifications
-        </button>
-
-        <button class="btn" onclick="openScreen('profile')">
-            👤 My Profile
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     DIGITAL CARD
-========================= -->
-
+<!-- DIGITAL CARD -->
 <section id="digitalCard" class="screen">
 
-    <h2 class="page-title">🪪 Digital Membership Card</h2>
+    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+
+    <h2 class="section-title">Digital Membership Card</h2>
 
     <div class="digital-card">
 
-        <div class="card-brand">
-            RIBACOM
+        <div class="card-logo">R</div>
+
+        <div>RIVERS BAYELSA COMMUNITY THE GAMBIA</div>
+
+        <h2 id="cardName" style="margin-top:8px">
+            Member
+        </h2>
+
+        <div id="cardCategory">
+            Member
         </div>
 
-        <div class="card-photo">
-            R
+        <div class="member-no">
+            <span id="cardNumber">
+                RIB-PENDING
+            </span>
         </div>
 
-        <h2>RIBACOM MEMBER</h2>
-
-        <p><strong>Name:</strong> Member Name</p>
-
-        <p><strong>Membership No:</strong> RIB-000001</p>
-
-        <p><strong>Category:</strong> Regular Member</p>
-
-        <p><strong>Status:</strong> Pending Approval</p>
+        <div style="margin-top:10px">
+            <span id="cardStatus" class="status">
+                Pending Approval
+            </span>
+        </div>
 
     </div>
-
-
-    <br>
-
-    <button class="btn gold"
-            onclick="showToast('Digital card download will be connected later.')">
-        DOWNLOAD CARD
-    </button>
-
-
-    <button class="btn secondary" onclick="openScreen('dashboard')">
-        BACK TO DASHBOARD
-    </button>
 
 </section>
 
 
-<!-- =========================
-     DUES
-========================= -->
-
+<!-- DUES -->
 <section id="dues" class="screen">
 
-    <h2 class="page-title">💰 Dues & Contributions</h2>
+    <button class="back" onclick="openScreen('dashboard')">← Back</button>
 
-    <p class="page-subtitle">
-        Manage your community financial contributions.
-    </p>
-
-
-    <div class="stat-grid">
-
-        <div class="stat">
-            <strong>D50</strong>
-            <span>Monthly Dues</span>
-        </div>
-
-        <div class="stat">
-            <strong>D200</strong>
-            <span>Welfare Levy</span>
-        </div>
-
-    </div>
-
-
-    <br>
-
+    <h2 class="section-title">Dues & Contributions</h2>
 
     <div class="card">
 
-        <h3>Make a Contribution</h3>
+        <div class="notice">
+            Current membership dues and approved contribution methods
+            should be confirmed by RIBACOM leadership.
+        </div>
 
-        <div class="form-group">
+        <div class="field">
             <label>Contribution Type</label>
 
-            <select id="contributionType">
-                <option>Monthly Dues</option>
+            <select id="duesType">
+                <option>Membership Dues</option>
                 <option>Welfare Levy</option>
                 <option>Special Contribution</option>
                 <option>Donation</option>
             </select>
         </div>
 
-
-        <div class="form-group">
-            <label>Amount (GMD)</label>
-            <input id="contributionAmount"
+        <div class="field">
+            <label>Amount</label>
+            <input id="duesAmount"
                    type="number"
+                   min="0"
                    placeholder="Enter amount">
         </div>
 
-
-        <div class="form-group">
+        <div class="field">
             <label>Payment Method</label>
 
-            <select>
-                <option>Mobile Money</option>
+            <select id="duesMethod">
+                <option>Cash</option>
                 <option>Bank Transfer</option>
-                <option>Other</option>
+                <option>Mobile Money</option>
             </select>
         </div>
 
-
         <button class="btn"
                 onclick="submitContribution()">
-            CONTINUE PAYMENT
+            SUBMIT CONTRIBUTION
         </button>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Contribution History</h3>
-
-        <div class="list-item">
-            <strong>No contributions recorded</strong>
-            <p>Your payment history will appear here.</p>
-        </div>
 
     </div>
 
 </section>
 
 
-<!-- =========================
-     WELFARE
-========================= -->
-
+<!-- WELFARE -->
 <section id="welfare" class="screen">
 
-    <h2 class="page-title">🤝 Welfare</h2>
+    <button class="back" onclick="openScreen('dashboard')">← Back</button>
 
-    <p class="page-subtitle">
-        Request welfare support from RIBACOM.
-    </p>
-
+    <h2 class="section-title">Welfare Request</h2>
 
     <div class="card">
 
-        <h3>Submit Welfare Request</h3>
-
-        <div class="form-group">
-
+        <div class="field">
             <label>Request Type</label>
 
             <select id="welfareType">
-
                 <option>Wedding</option>
-
                 <option>Birth</option>
-
                 <option>Loss of Parent</option>
-
                 <option>Loss of Spouse</option>
-
                 <option>Loss of Child</option>
-
-                <option>Other Welfare Support</option>
-
+                <option>Emergency</option>
+                <option>Other</option>
             </select>
-
         </div>
 
-
-        <div class="form-group">
-
+        <div class="field">
             <label>Description</label>
 
-            <textarea
-                id="welfareDescription"
-                placeholder="Describe your request">
-            </textarea>
-
+            <textarea id="welfareDescription"
+                      placeholder="Describe your request"></textarea>
         </div>
-
 
         <button class="btn"
                 onclick="submitWelfare()">
@@ -1348,678 +1157,383 @@ hr {
 
     </div>
 
-
-    <div class="card">
-
-        <h3>My Welfare Requests</h3>
-
-        <div class="list-item">
-
-            <span class="status pending">
-                No active request
-            </span>
-
-            <p>
-                Submitted welfare requests will appear here.
-            </p>
-
-        </div>
-
-    </div>
-
 </section>
 
 
-<!-- =========================
-     EVENTS
-========================= -->
-
+<!-- EVENTS -->
 <section id="events" class="screen">
 
-    <h2 class="page-title">📅 Events</h2>
+    <button class="back" onclick="goBackFromPublic()">← Back</button>
 
-    <p class="page-subtitle">
-        RIBACOM community events and activities.
-    </p>
+    <h2 class="section-title">Community Events</h2>
 
-
-    <div class="card">
-
-        <h3>RIBACOM General Meeting</h3>
-
-        <p><strong>📅 Date:</strong> Last Sunday of the month</p>
-
-        <p><strong>⏰ Time:</strong> 4:00 PM</p>
-
-        <p><strong>📍 Venue:</strong> RIBACOM meeting venue</p>
-
-        <span class="status info">
-            Community Event
-        </span>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Community Activities</h3>
-
-        <p>
-            New events, meetings, cultural activities and
-            community programmes will be published here.
-        </p>
-
+    <div id="eventsList">
+        <div class="loading">Loading events...</div>
     </div>
 
 </section>
 
 
-<!-- =========================
-     ANNOUNCEMENTS
-========================= -->
-
+<!-- ANNOUNCEMENTS -->
 <section id="announcements" class="screen">
 
-    <h2 class="page-title">📢 Announcements</h2>
+    <button class="back" onclick="goBackFromPublic()">← Back</button>
 
-    <p class="page-subtitle">
-        Official RIBACOM announcements.
-    </p>
+    <h2 class="section-title">Announcements</h2>
 
-
-    <div class="card">
-
-        <div class="list-item">
-
-            <h4>Welcome to the RIBACOM App</h4>
-
-            <p>
-                This platform is being developed to connect
-                Rivers and Bayelsa community members across
-                The Gambia.
-            </p>
-
-        </div>
-
-
-        <div class="list-item">
-
-            <h4>Community Service</h4>
-
-            <p>
-                RIBACOM is committed to Truth, Unity and
-                Service.
-            </p>
-
-        </div>
-
+    <div id="announcementsList">
+        <div class="loading">Loading announcements...</div>
     </div>
 
 </section>
 
 
-<!-- =========================
-     CONSTITUTION
-========================= -->
-
+<!-- CONSTITUTION -->
 <section id="constitution" class="screen">
 
-    <h2 class="page-title">📜 Constitution & Documents</h2>
+    <button class="back" onclick="goBackFromPublic()">← Back</button>
 
-    <p class="page-subtitle">
-        RIBACOM governance and community documents.
-    </p>
-
+    <h2 class="section-title">Constitution & Documents</h2>
 
     <div class="card">
+        <h3>RIBACOM Master Constitution</h3>
 
-        <h3>RIBACOM Constitution</h3>
-
-        <p>
-            Latest Master Constitution containing the
-            governance framework of Rivers Bayelsa Community
-            in Diaspora – The Gambia.
+        <p style="line-height:1.6;color:var(--gray)">
+            The official RIBACOM Constitution contains the governing
+            provisions of the Rivers Bayelsa Community in Diaspora –
+            The Gambia.
         </p>
 
-        <button class="btn"
-                onclick="showToast('Constitution PDF will be connected here.')">
-            VIEW CONSTITUTION
+        <button class="btn secondary"
+                onclick="showToast('Official constitution document will be added here.')">
+            VIEW DOCUMENT
         </button>
-
     </div>
 
-
     <div class="card">
+        <h3>Community Documents</h3>
 
-        <h3>Governance Documents</h3>
-
-        <button class="btn secondary"
-                onclick="showToast('Document section coming soon.')">
-            Rules & Procedures
-        </button>
-
-        <button class="btn secondary"
-                onclick="showToast('Document section coming soon.')">
-            Meeting Documents
-        </button>
-
-        <button class="btn secondary"
-                onclick="showToast('Document section coming soon.')">
-            Community Forms
-        </button>
-
+        <p style="line-height:1.6;color:var(--gray)">
+            Approved policies, notices and community documents will
+            be published here by authorized leadership.
+        </p>
     </div>
 
 </section>
 
 
-<!-- =========================
-     LEADERSHIP
-========================= -->
-
+<!-- LEADERSHIP -->
 <section id="leadership" class="screen">
 
-    <h2 class="page-title">👥 Leadership</h2>
+    <button class="back" onclick="goBackFromPublic()">← Back</button>
 
-    <p class="page-subtitle">
-        RIBACOM leadership structure.
-    </p>
-
+    <h2 class="section-title">RIBACOM Leadership</h2>
 
     <div class="card">
+        <h3>Executive Committee</h3>
 
-        <div class="leader">
-
-            <div class="leader-photo">C</div>
-
-            <div>
-                <strong>Chairman</strong>
-                <p>RIBACOM Chairman</p>
-            </div>
-
-        </div>
-
+        <p style="color:var(--gray);line-height:1.6">
+            Chairman<br>
+            Vice-Chairman<br>
+            Secretary General<br>
+            Assistant Secretary General<br>
+            Treasurer<br>
+            Public Relations Officer<br>
+            Welfare Officer / Provost
+        </p>
     </div>
 
-
     <div class="card">
+        <h3>Oversight Committee</h3>
 
-        <div class="leader">
-
-            <div class="leader-photo">V</div>
-
-            <div>
-                <strong>Vice Chairman</strong>
-                <p>RIBACOM Vice Chairman</p>
-            </div>
-
-        </div>
-
+        <p style="color:var(--gray);line-height:1.6">
+            Legal Adviser<br>
+            Protocol Adviser<br>
+            Youth Adviser<br>
+            Cultural Adviser
+        </p>
     </div>
 
-
     <div class="card">
+        <h3>Council of Elders</h3>
 
-        <div class="leader">
-
-            <div class="leader-photo">SG</div>
-
-            <div>
-                <strong>Secretary General</strong>
-                <p>RIBACOM Secretary General</p>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="leader">
-
-            <div class="leader-photo">AS</div>
-
-            <div>
-                <strong>Assistant Secretary General</strong>
-                <p>RIBACOM Assistant Secretary General</p>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="leader">
-
-            <div class="leader-photo">T</div>
-
-            <div>
-                <strong>Treasurer</strong>
-                <p>RIBACOM Treasurer</p>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="leader">
-
-            <div class="leader-photo">P</div>
-
-            <div>
-                <strong>PRO</strong>
-                <p>Public Relations Officer</p>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <div class="leader">
-
-            <div class="leader-photo">W</div>
-
-            <div>
-                <strong>Welfare Officer / Provost</strong>
-                <p>RIBACOM Welfare Officer</p>
-            </div>
-
-        </div>
-
+        <p style="color:var(--gray);line-height:1.6">
+            The Council of Elders provides guidance and community
+            wisdom in accordance with the RIBACOM Constitution.
+        </p>
     </div>
 
 </section>
 
 
-<!-- =========================
-     NOTIFICATIONS
-========================= -->
-
+<!-- NOTIFICATIONS -->
 <section id="notifications" class="screen">
 
-    <h2 class="page-title">🔔 Notifications</h2>
+    <button class="back" onclick="openScreen('dashboard')">← Back</button>
 
-    <p class="page-subtitle">
-        Your RIBACOM notifications.
-    </p>
-
+    <h2 class="section-title">Notifications</h2>
 
     <div class="card">
-
-        <div class="list-item">
-
-            <span class="status info">
-                INFORMATION
-            </span>
-
-            <h4>Welcome to RIBACOM</h4>
-
-            <p>
-                Your notifications will appear here.
-            </p>
-
-        </div>
-
+        <h3>🔔 Welcome to RIBACOM</h3>
+        <p style="color:var(--gray);line-height:1.6">
+            Your membership notifications will appear here.
+        </p>
     </div>
 
 </section>
 
 
-<!-- =========================
-     PROFILE
-========================= -->
-
+<!-- PROFILE -->
 <section id="profile" class="screen">
 
-    <h2 class="page-title">👤 My Profile</h2>
+    <button class="back" onclick="openScreen('dashboard')">← Back</button>
 
-    <div class="card">
+    <h2 class="section-title">My Profile</h2>
 
-        <div class="form-group">
-            <label>Full Name</label>
-            <input value="Member Name">
-        </div>
-
-
-        <div class="form-group">
-            <label>Email</label>
-            <input value="member@example.com">
-        </div>
-
-
-        <div class="form-group">
-            <label>Phone</label>
-            <input value="+220">
-        </div>
-
-
-        <button class="btn"
-                onclick="showToast('Profile updates will be saved through Supabase in Version 2.')">
-            SAVE PROFILE
-        </button>
-
+    <div class="card" id="profileDetails">
+        <div class="loading">Loading profile...</div>
     </div>
 
 </section>
 
 
-<!-- =========================
-     ADMIN
-========================= -->
-
+<!-- ADMIN -->
 <section id="admin" class="screen">
 
-    <div class="admin-header">
+    <button class="back" onclick="openScreen('dashboard')">← Back</button>
 
-        <h2>⚙️ Admin Dashboard</h2>
+    <h2 class="section-title">Admin Dashboard</h2>
 
-        <p>
-            RIBACOM administration and management.
-        </p>
-
+    <div class="notice">
+        ⚠️ Administrative access control will be implemented in a
+        later secure backend phase.
     </div>
 
+    <div class="grid">
 
-    <div class="admin-grid">
-
-        <div class="admin-box">
-            <strong>0</strong>
-            Pending Members
+        <div class="card stat">
+            <strong>Members</strong>
+            Management
         </div>
 
-        <div class="admin-box">
-            <strong>0</strong>
-            Total Members
+        <div class="card stat">
+            <strong>Events</strong>
+            Management
         </div>
 
-        <div class="admin-box">
-            <strong>0</strong>
-            Welfare Requests
+        <div class="card stat">
+            <strong>News</strong>
+            Management
         </div>
 
-        <div class="admin-box">
-            <strong>D0</strong>
-            Contributions
+        <div class="card stat">
+            <strong>Welfare</strong>
+            Management
         </div>
-
-    </div>
-
-
-    <br>
-
-
-    <div class="card">
-
-        <h3>Administration</h3>
-
-        <button class="btn"
-                onclick="showToast('Member management will connect to Supabase.')">
-            👥 Manage Members
-        </button>
-
-        <button class="btn"
-                onclick="showToast('Event management will connect to Supabase.')">
-            📅 Manage Events
-        </button>
-
-        <button class="btn"
-                onclick="showToast('Announcements will connect to Supabase.')">
-            📢 Manage Announcements
-        </button>
-
-        <button class="btn"
-                onclick="showToast('Welfare management will connect to Supabase.')">
-            🤝 Manage Welfare
-        </button>
-
-        <button class="btn"
-                onclick="showToast('Document management will connect to Supabase.')">
-            📜 Manage Documents
-        </button>
 
     </div>
 
 </section>
 
-
-<!-- =========================
-     BOTTOM NAVIGATION
-========================= -->
-
-<nav class="bottom-nav">
-
-    <div class="nav-item active"
-         onclick="openScreen('home')">
-
-        <span class="nav-icon">🏠</span>
-        Home
-
-    </div>
+</main>
 
 
-    <div class="nav-item"
-         onclick="openScreen('events')">
+<!-- BOTTOM NAVIGATION -->
+<nav class="nav">
 
-        <span class="nav-icon">📅</span>
-        Events
+    <div class="nav-inner">
 
-    </div>
+        <button onclick="openScreen('home')" data-nav="home">
+            <span class="nav-icon">🏠</span>
+            Home
+        </button>
 
+        <button onclick="openScreen('events')" data-nav="events">
+            <span class="nav-icon">📅</span>
+            Events
+        </button>
 
-    <div class="nav-item"
-         onclick="openScreen('announcements')">
+        <button onclick="openScreen('announcements')" data-nav="announcements">
+            <span class="nav-icon">📢</span>
+            News
+        </button>
 
-        <span class="nav-icon">📢</span>
-        News
+        <button onclick="memberNav()" data-nav="dashboard">
+            <span class="nav-icon">👤</span>
+            Member
+        </button>
 
-    </div>
-
-
-    <div class="nav-item"
-         onclick="openScreen('dashboard')">
-
-        <span class="nav-icon">👤</span>
-        Member
-
-    </div>
-
-
-    <div class="nav-item"
-         onclick="openScreen('login')">
-
-        <span class="nav-icon">🔐</span>
-        Login
+        <button onclick="loginNav()" data-nav="login">
+            <span class="nav-icon">🔐</span>
+            Login
+        </button>
 
     </div>
 
 </nav>
 
 
-<!-- =========================
-     TOAST
-========================= -->
-
 <div id="toast" class="toast"></div>
 
 
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 
-/* =====================================================
-   RIBACOM VERSION 1 APPLICATION
-===================================================== */
+const SUPABASE_URL =
+    "https://ugxszhbdcnfcnkwapgnd.supabase.co";
 
+const SUPABASE_KEY =
+    "sb_publishable_TnhJlJErycLtPHL3JnbtMA_Oe34G_ks";
 
-/* -------------------------
-   APPLICATION STATE
-------------------------- */
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
 
 let selectedMembership = "";
 
-let currentScreen = "home";
+let currentMember = null;
+
+let lastPublicScreen = "home";
 
 
-/* -------------------------
-   OPEN SCREEN
-------------------------- */
+/* =========================
+   NAVIGATION
+========================= */
 
-function openScreen(screenId) {
+function openScreen(screenId){
 
-    const screens =
-        document.querySelectorAll(".screen");
+    document.querySelectorAll(".screen")
+        .forEach(screen => {
+            screen.classList.remove("active");
+        });
 
-    screens.forEach(function(screen) {
-
-        screen.classList.remove("active");
-
-    });
-
-
-    const target =
+    const screen =
         document.getElementById(screenId);
 
-
-    if (target) {
-
-        target.classList.add("active");
-
-        currentScreen = screenId;
-
+    if(screen){
+        screen.classList.add("active");
     }
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
 
     updateNavigation(screenId);
-}
 
-
-/* -------------------------
-   NAVIGATION HIGHLIGHT
-------------------------- */
-
-function updateNavigation(screenId) {
-
-    const navItems =
-        document.querySelectorAll(".nav-item");
-
-    navItems.forEach(function(item) {
-
-        item.classList.remove("active");
-
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
     });
 
-
-    if (screenId === "home") {
-
-        navItems[0].classList.add("active");
-
+    if(screenId === "events"){
+        loadEvents();
     }
 
-    else if (screenId === "events") {
-
-        navItems[1].classList.add("active");
-
+    if(screenId === "announcements"){
+        loadAnnouncements();
     }
 
-    else if (screenId === "announcements") {
-
-        navItems[2].classList.add("active");
-
-    }
-
-    else if (
-        screenId === "dashboard" ||
-        screenId === "digitalCard" ||
-        screenId === "dues" ||
-        screenId === "welfare" ||
-        screenId === "profile" ||
-        screenId === "notifications"
-    ) {
-
-        navItems[3].classList.add("active");
-
-    }
-
-    else if (screenId === "login") {
-
-        navItems[4].classList.add("active");
-
+    if(screenId === "profile"){
+        loadProfile();
     }
 }
 
 
-/* -------------------------
-   MEMBERSHIP SELECTION
-------------------------- */
+function updateNavigation(screenId){
 
-function chooseMembership(category) {
+    document.querySelectorAll(".nav button")
+        .forEach(button => {
+            button.classList.remove("active");
+        });
+
+    const button =
+        document.querySelector(
+            `.nav button[data-nav="${screenId}"]`
+        );
+
+    if(button){
+        button.classList.add("active");
+    }
+}
+
+
+function goBackFromPublic(){
+
+    openScreen(lastPublicScreen || "home");
+
+}
+
+
+function memberNav(){
+
+    if(currentMember){
+        openScreen("dashboard");
+    }else{
+        openScreen("login");
+    }
+
+}
+
+
+function loginNav(){
+
+    if(currentMember){
+        openScreen("dashboard");
+    }else{
+        openScreen("login");
+    }
+
+}
+
+
+/* =========================
+   MEMBERSHIP SELECTION
+========================= */
+
+function chooseMembership(category){
 
     selectedMembership = category;
 
+    document
+        .getElementById("regularCategory")
+        .classList.remove("selected");
 
-    const regular =
-        document.getElementById(
-            "regularMembership"
-        );
+    document
+        .getElementById("associateCategory")
+        .classList.remove("selected");
 
-    const associate =
-        document.getElementById(
-            "associateMembership"
-        );
+    if(category === "Regular Member"){
 
+        document
+            .getElementById("regularCategory")
+            .classList.add("selected");
 
-    regular.classList.remove("selected");
+    }else{
 
-    associate.classList.remove("selected");
-
-
-    if (category === "Regular Member") {
-
-        regular.classList.add("selected");
-
-    }
-
-    else {
-
-        associate.classList.add("selected");
+        document
+            .getElementById("associateCategory")
+            .classList.add("selected");
 
     }
-
 
     const button =
         document.getElementById(
-            "membershipContinue"
+            "continueMembershipBtn"
         );
-
 
     button.disabled = false;
 
-    button.innerText =
+    button.textContent =
         "CONTINUE AS " +
         category.toUpperCase();
+
 }
 
 
-/* -------------------------
-   MEMBERSHIP CONTINUE
-------------------------- */
+function continueMembership(){
 
-function continueMembership() {
-
-    if (!selectedMembership) {
+    if(!selectedMembership){
 
         showToast(
             "Please select a membership category."
@@ -2028,126 +1542,88 @@ function continueMembership() {
         return;
     }
 
+    document.getElementById(
+        "membershipInfoTitle"
+    ).textContent =
+        selectedMembership;
 
-    const title =
-        document.getElementById(
-            "membershipInfoTitle"
-        );
+    if(selectedMembership === "Regular Member"){
 
-
-    const text =
         document.getElementById(
             "membershipInfoText"
-        );
+        ).textContent =
+            "Regular Membership is for persons who are Rivers or Bayelsa indigenes by birth, ancestry or family origin. You will be asked to provide relevant Rivers or Bayelsa identity information.";
 
+    }else{
 
-    if (
-        selectedMembership ===
-        "Regular Member"
-    ) {
-
-        title.innerText =
-            "REGULAR MEMBER";
-
-        text.innerText =
-            "Regular Membership is for persons of Rivers or Bayelsa birth, ancestry, family or community origin.";
+        document.getElementById(
+            "membershipInfoText"
+        ).textContent =
+            "Associate Membership is for persons connected to Rivers or Bayelsa through marriage, community affiliation or personal interest. You will be asked to explain your basis of association.";
 
     }
-
-    else {
-
-        title.innerText =
-            "ASSOCIATE MEMBER";
-
-        text.innerText =
-            "Associate Membership is for persons who qualify through marriage or who wish to identify with and support the Rivers and Bayelsa community.";
-
-    }
-
 
     openScreen("membershipInfo");
+
 }
 
 
-/* -------------------------
-   OPEN REGISTRATION
-------------------------- */
+function openRegistration(){
 
-function openRegistration() {
+    document.getElementById(
+        "selectedMembershipDisplay"
+    ).textContent =
+        selectedMembership;
 
-    if (!selectedMembership) {
-
-        showToast(
-            "Please choose a membership category first."
+    const associateFields =
+        document.getElementById(
+            "associateFields"
         );
 
-        openScreen("membership");
-
-        return;
+    if(selectedMembership === "Associate Member"){
+        associateFields.classList.remove("hidden");
+    }else{
+        associateFields.classList.add("hidden");
     }
-
 
     openScreen("registration");
+
 }
 
 
-/* -------------------------
+/* =========================
    REGISTRATION
-------------------------- */
+========================= */
 
-function submitRegistration() {
+async function submitRegistration(event){
+
+    event.preventDefault();
 
     const fullName =
-        document.getElementById(
-            "regFullName"
-        ).value.trim();
-
+        document.getElementById("regFullName").value.trim();
 
     const email =
-        document.getElementById(
-            "regEmail"
-        ).value.trim();
-
+        document.getElementById("regEmail").value.trim();
 
     const password =
-        document.getElementById(
-            "regPassword"
-        ).value;
-
+        document.getElementById("regPassword").value;
 
     const confirmPassword =
-        document.getElementById(
-            "regConfirmPassword"
-        ).value;
+        document.getElementById("regConfirmPassword").value;
 
+    const phone =
+        document.getElementById("regPhone").value.trim();
 
-    const agreement =
-        document.getElementById(
-            "regAgreement"
-        ).checked;
-
-
-    if (!fullName) {
+    if(!fullName || !email || !password || !phone){
 
         showToast(
-            "Please enter your full name."
+            "Please complete all required fields."
         );
 
         return;
     }
 
-
-    if (!email) {
-
-        showToast(
-            "Please enter your email address."
-        );
-
-        return;
-    }
-
-
-    if (password.length < 6) {
+    if(password.length < 6){
 
         showToast(
             "Password must contain at least 6 characters."
@@ -2156,8 +1632,7 @@ function submitRegistration() {
         return;
     }
 
-
-    if (password !== confirmPassword) {
+    if(password !== confirmPassword){
 
         showToast(
             "Passwords do not match."
@@ -2166,8 +1641,20 @@ function submitRegistration() {
         return;
     }
 
+    if(!selectedMembership){
 
-    if (!agreement) {
+        showToast(
+            "Please select your membership category."
+        );
+
+        return;
+    }
+
+    if(
+        !document.getElementById(
+            "regConstitution"
+        ).checked
+    ){
 
         showToast(
             "Please accept the RIBACOM Constitution."
@@ -2178,29 +1665,369 @@ function submitRegistration() {
 
 
     showToast(
-        "Application received. Supabase registration will be connected in Version 2."
+        "Creating your RIBACOM account..."
     );
 
 
-    setTimeout(function() {
+    const metadata = {
 
-        openScreen("login");
+        full_name:fullName,
 
-    }, 1800);
+        gender:
+            document.getElementById(
+                "regGender"
+            ).value,
+
+        date_of_birth:
+            document.getElementById(
+                "regDob"
+            ).value,
+
+        nationality:
+            document.getElementById(
+                "regNationality"
+            ).value,
+
+        marital_status:
+            document.getElementById(
+                "regMaritalStatus"
+            ).value,
+
+        passport_id:
+            document.getElementById(
+                "regPassport"
+            ).value,
+
+        phone:phone,
+
+        whatsapp:
+            document.getElementById(
+                "regWhatsapp"
+            ).value,
+
+        address:
+            document.getElementById(
+                "regAddress"
+            ).value,
+
+        town_area:
+            document.getElementById(
+                "regTown"
+            ).value,
+
+        emergency_contact:
+            document.getElementById(
+                "regEmergency"
+            ).value,
+
+        emergency_phone:
+            document.getElementById(
+                "regEmergencyPhone"
+            ).value,
+
+        state:
+            document.getElementById(
+                "regState"
+            ).value,
+
+        state_of_origin:
+            document.getElementById(
+                "regState"
+            ).value,
+
+        local_government:
+            document.getElementById(
+                "regLga"
+            ).value,
+
+        community:
+            document.getElementById(
+                "regCommunity"
+            ).value,
+
+        community_village:
+            document.getElementById(
+                "regCommunity"
+            ).value,
+
+        clan_family:
+            document.getElementById(
+                "regClan"
+            ).value,
+
+        other_community_info:
+            document.getElementById(
+                "regCommunityInfo"
+            ).value,
+
+        spouse_name:
+            document.getElementById(
+                "regSpouse"
+            ).value,
+
+        number_of_children:
+            document.getElementById(
+                "regChildren"
+            ).value || 0,
+
+        next_of_kin:
+            document.getElementById(
+                "regNextOfKin"
+            ).value,
+
+        next_of_kin_phone:
+            document.getElementById(
+                "regNextOfKinPhone"
+            ).value,
+
+        membership_category:
+            selectedMembership,
+
+        previous_membership:
+            document.getElementById(
+                "regPreviousMembership"
+            ).value,
+
+        application_date:
+            new Date().toISOString().slice(0,10),
+
+        payment_method:
+            document.getElementById(
+                "regPayment"
+            ).value,
+
+        constitution_accepted:true,
+
+        association_basis:
+            document.getElementById(
+                "regAssociationBasis"
+            )?.value || "",
+
+        association_details:
+            document.getElementById(
+                "regAssociationDetails"
+            )?.value || ""
+
+    };
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.signUp({
+
+            email:email,
+
+            password:password,
+
+            options:{
+                data:metadata
+            }
+
+        });
+
+
+    if(error){
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    if(data.user){
+
+        /*
+         * If email confirmation is disabled,
+         * a session may exist immediately.
+         */
+
+        if(data.session){
+
+            await syncMemberProfile(
+                data.user,
+                metadata
+            );
+
+            await loadCurrentMember();
+
+            showToast(
+                "Registration successful!"
+            );
+
+            setTimeout(
+                () => openScreen("dashboard"),
+                1200
+            );
+
+        }else{
+
+            /*
+             * Email confirmation is enabled.
+             */
+
+            showToast(
+                "Account created. Please check your email and confirm your account before logging in."
+            );
+
+            setTimeout(
+                () => openScreen("login"),
+                2500
+            );
+
+        }
+
+    }
+
 }
 
 
-/* -------------------------
-   DEMO LOGIN
-------------------------- */
+/* =========================
+   SYNC MEMBER PROFILE
+========================= */
 
-function demoLogin() {
+async function syncMemberProfile(
+    user,
+    metadata
+){
+
+    if(!user) return;
+
+
+    const profile = {
+
+        id:user.id,
+
+        full_name:
+            metadata.full_name || "New Member",
+
+        phone:
+            metadata.phone || null,
+
+        email:
+            user.email || null,
+
+        state:
+            metadata.state || null,
+
+        community:
+            metadata.community || null,
+
+        gender:
+            metadata.gender || null,
+
+        date_of_birth:
+            metadata.date_of_birth || null,
+
+        nationality:
+            metadata.nationality || null,
+
+        marital_status:
+            metadata.marital_status || null,
+
+        passport_id:
+            metadata.passport_id || null,
+
+        whatsapp:
+            metadata.whatsapp || null,
+
+        address:
+            metadata.address || null,
+
+        town_area:
+            metadata.town_area || null,
+
+        emergency_contact:
+            metadata.emergency_contact || null,
+
+        emergency_phone:
+            metadata.emergency_phone || null,
+
+        state_of_origin:
+            metadata.state_of_origin || null,
+
+        local_government:
+            metadata.local_government || null,
+
+        community_village:
+            metadata.community_village || null,
+
+        clan_family:
+            metadata.clan_family || null,
+
+        other_community_info:
+            metadata.other_community_info || null,
+
+        spouse_name:
+            metadata.spouse_name || null,
+
+        number_of_children:
+            Number(
+                metadata.number_of_children || 0
+            ),
+
+        next_of_kin:
+            metadata.next_of_kin || null,
+
+        next_of_kin_phone:
+            metadata.next_of_kin_phone || null,
+
+        membership_category:
+            metadata.membership_category || null,
+
+        previous_membership:
+            metadata.previous_membership || null,
+
+        application_date:
+            metadata.application_date || null,
+
+        payment_method:
+            metadata.payment_method || null,
+
+        constitution_accepted:
+            metadata.constitution_accepted || false
+
+    };
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("members")
+            .update(profile)
+            .eq("id",user.id);
+
+
+    if(error){
+
+        console.error(
+            "Profile sync error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function loginMember(event){
+
+    event.preventDefault();
 
     const email =
         document.getElementById(
             "loginEmail"
         ).value.trim();
-
 
     const password =
         document.getElementById(
@@ -2208,7 +2035,7 @@ function demoLogin() {
         ).value;
 
 
-    if (!email || !password) {
+    if(!email || !password){
 
         showToast(
             "Enter your email and password."
@@ -2219,51 +2046,402 @@ function demoLogin() {
 
 
     showToast(
-        "Demo login successful."
+        "Logging in..."
     );
 
 
-    setTimeout(function() {
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.signInWithPassword({
 
-        openScreen("dashboard");
+            email:email,
 
-    }, 1000);
-}
+            password:password
 
-
-/* -------------------------
-   CONTRIBUTION
-------------------------- */
-
-function submitContribution() {
-
-    const amount =
-        document.getElementById(
-            "contributionAmount"
-        ).value;
+        });
 
 
-    if (!amount || Number(amount) <= 0) {
+    if(error){
+
+        console.error(error);
 
         showToast(
-            "Please enter a valid contribution amount."
+            error.message
         );
 
         return;
     }
 
 
-    showToast(
-        "Payment system will be connected in Version 2."
-    );
+    if(data.user){
+
+        await syncProfileFromAuthUser(
+            data.user
+        );
+
+        await loadCurrentMember();
+
+        showToast(
+            "Login successful."
+        );
+
+        setTimeout(
+            () => openScreen("dashboard"),
+            700
+        );
+
+    }
+
 }
 
 
-/* -------------------------
-   WELFARE
-------------------------- */
+/* =========================
+   SYNC AFTER LOGIN
+========================= */
 
-function submitWelfare() {
+async function syncProfileFromAuthUser(user){
+
+    if(!user) return;
+
+    const metadata =
+        user.user_metadata || {};
+
+
+    const {
+        data:member
+    } =
+        await supabaseClient
+            .from("members")
+            .select("*")
+            .eq("id",user.id)
+            .maybeSingle();
+
+
+    if(!member){
+
+        /*
+         * Normally the Supabase trigger creates
+         * this record automatically.
+         */
+
+        return;
+    }
+
+
+    await syncMemberProfile(
+        user,
+        metadata
+    );
+
+}
+
+
+/* =========================
+   LOAD CURRENT MEMBER
+========================= */
+
+async function loadCurrentMember(){
+
+    const {
+        data:{
+            user
+        }
+    } =
+        await supabaseClient.auth.getUser();
+
+
+    if(!user){
+
+        currentMember = null;
+
+        return null;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("members")
+            .select("*")
+            .eq("id",user.id)
+            .maybeSingle();
+
+
+    if(error){
+
+        console.error(error);
+
+        return null;
+    }
+
+
+    currentMember = data;
+
+    updateDashboard();
+
+    return data;
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function updateDashboard(){
+
+    if(!currentMember) return;
+
+
+    const name =
+        currentMember.full_name ||
+        "Member";
+
+
+    document.getElementById(
+        "dashboardWelcome"
+    ).textContent =
+        "Welcome, " + name;
+
+
+    document.getElementById(
+        "dashboardEmail"
+    ).textContent =
+        currentMember.email || "";
+
+
+    const status =
+        currentMember.status ||
+        "pending";
+
+
+    document.getElementById(
+        "dashboardStatus"
+    ).textContent =
+        formatStatus(status);
+
+
+    document.getElementById(
+        "statStatus"
+    ).textContent =
+        formatStatus(status);
+
+
+    document.getElementById(
+        "statCategory"
+    ).textContent =
+        currentMember.membership_category ||
+        "—";
+
+
+    document.getElementById(
+        "statMemberNo"
+    ).textContent =
+        currentMember.membership_number ||
+        "Pending";
+
+
+    document.getElementById(
+        "cardName"
+    ).textContent =
+        name;
+
+
+    document.getElementById(
+        "cardCategory"
+    ).textContent =
+        currentMember.membership_category ||
+        "Member";
+
+
+    document.getElementById(
+        "cardNumber"
+    ).textContent =
+        currentMember.membership_number ||
+        "RIB-PENDING";
+
+
+    document.getElementById(
+        "cardStatus"
+    ).textContent =
+        formatStatus(status);
+
+}
+
+
+function formatStatus(status){
+
+    if(!status) return "Pending";
+
+    return status.charAt(0).toUpperCase() +
+           status.slice(1);
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logoutMember(){
+
+    const {
+        error
+    } =
+        await supabaseClient.auth.signOut();
+
+
+    if(error){
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    currentMember = null;
+
+    showToast(
+        "You have been logged out."
+    );
+
+    setTimeout(
+        () => openScreen("home"),
+        700
+    );
+
+}
+
+
+/* =========================
+   PROFILE
+========================= */
+
+async function loadProfile(){
+
+    if(!currentMember){
+
+        await loadCurrentMember();
+
+    }
+
+
+    const box =
+        document.getElementById(
+            "profileDetails"
+        );
+
+
+    if(!currentMember){
+
+        box.innerHTML =
+            '<div class="empty">Please log in to view your profile.</div>';
+
+        return;
+    }
+
+
+    const m = currentMember;
+
+
+    box.innerHTML = `
+
+        <div class="profile-row">
+            <span>Full Name</span>
+            <span>${safe(m.full_name)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Email</span>
+            <span>${safe(m.email)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Phone</span>
+            <span>${safe(m.phone)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>WhatsApp</span>
+            <span>${safe(m.whatsapp)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Membership</span>
+            <span>${safe(m.membership_category)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>State</span>
+            <span>${safe(m.state)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Community</span>
+            <span>${safe(m.community)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>LGA</span>
+            <span>${safe(m.local_government)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Town / Area</span>
+            <span>${safe(m.town_area)}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Status</span>
+            <span>${safe(formatStatus(m.status))}</span>
+        </div>
+
+        <div class="profile-row">
+            <span>Membership Number</span>
+            <span>${safe(m.membership_number || "Pending")}</span>
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   WELFARE
+========================= */
+
+async function submitWelfare(){
+
+    if(!currentMember){
+
+        await loadCurrentMember();
+
+    }
+
+
+    if(!currentMember){
+
+        showToast(
+            "Please login first."
+        );
+
+        openScreen("login");
+
+        return;
+    }
+
+
+    const type =
+        document.getElementById(
+            "welfareType"
+        ).value;
+
 
     const description =
         document.getElementById(
@@ -2271,7 +2449,7 @@ function submitWelfare() {
         ).value.trim();
 
 
-    if (!description) {
+    if(!description){
 
         showToast(
             "Please describe your welfare request."
@@ -2281,72 +2459,362 @@ function submitWelfare() {
     }
 
 
-    showToast(
-        "Welfare request recorded for the demo."
-    );
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("welfare_requests")
+            .insert({
+
+                member_id:
+                    currentMember.id,
+
+                request_type:
+                    type,
+
+                description:
+                    description,
+
+                status:"pending"
+
+            });
+
+
+    if(error){
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
 
 
     document.getElementById(
         "welfareDescription"
     ).value = "";
+
+
+    showToast(
+        "Welfare request submitted successfully."
+    );
+
 }
 
 
-/* -------------------------
-   TOAST MESSAGE
-------------------------- */
+/* =========================
+   CONTRIBUTIONS
+========================= */
 
-function showToast(message) {
+function submitContribution(){
 
-    const toast =
+    if(!currentMember){
+
+        showToast(
+            "Please login first."
+        );
+
+        openScreen("login");
+
+        return;
+    }
+
+
+    const amount =
         document.getElementById(
-            "toast"
+            "duesAmount"
+        ).value;
+
+
+    if(!amount || Number(amount) <= 0){
+
+        showToast(
+            "Enter a valid contribution amount."
+        );
+
+        return;
+    }
+
+
+    showToast(
+        "Contribution recorded for processing. Online payment will be connected in a later phase."
+    );
+
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+async function loadEvents(){
+
+    const list =
+        document.getElementById(
+            "eventsList"
         );
 
 
-    toast.innerText = message;
+    list.innerHTML =
+        '<div class="loading">Loading events...</div>';
 
-    toast.classList.add("show");
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("events")
+            .select("*")
+            .order("event_date",{ascending:true});
 
 
-    setTimeout(function() {
+    if(error){
 
-        toast.classList.remove("show");
+        console.error(error);
 
-    }, 3000);
+        list.innerHTML =
+            '<div class="empty">Unable to load events.</div>';
+
+        return;
+    }
+
+
+    if(!data || data.length === 0){
+
+        list.innerHTML =
+            '<div class="empty">No community events have been published yet.</div>';
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(event => `
+
+            <div class="card">
+
+                <h3>
+                    ${safe(event.title)}
+                </h3>
+
+                <p style="color:var(--gray);line-height:1.6;margin-top:7px">
+                    ${safe(event.description || "")}
+                </p>
+
+                <hr>
+
+                <p>
+                    📍 ${safe(event.venue || "Venue to be announced")}
+                </p>
+
+                <p style="margin-top:6px">
+                    📅 ${event.event_date
+                        ? new Date(event.event_date).toLocaleString()
+                        : "Date to be announced"}
+                </p>
+
+            </div>
+
+        `).join("");
+
 }
 
 
-/* -------------------------
-   INITIALIZE
-------------------------- */
+/* =========================
+   ANNOUNCEMENTS
+========================= */
+
+async function loadAnnouncements(){
+
+    const list =
+        document.getElementById(
+            "announcementsList"
+        );
+
+
+    list.innerHTML =
+        '<div class="loading">Loading announcements...</div>';
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("announcements")
+            .select("*")
+            .order("created_at",{ascending:false});
+
+
+    if(error){
+
+        console.error(error);
+
+        list.innerHTML =
+            '<div class="empty">Unable to load announcements.</div>';
+
+        return;
+    }
+
+
+    if(!data || data.length === 0){
+
+        list.innerHTML =
+            '<div class="empty">No announcements have been published yet.</div>';
+
+        return;
+    }
+
+
+    list.innerHTML =
+        data.map(item => `
+
+            <div class="card">
+
+                <h3>
+                    ${safe(item.title)}
+                </h3>
+
+                <p style="color:var(--gray);line-height:1.6;margin-top:8px">
+                    ${safe(item.message)}
+                </p>
+
+                <p style="font-size:11px;color:#89958d;margin-top:12px">
+                    ${item.created_at
+                        ? new Date(item.created_at).toLocaleString()
+                        : ""}
+                </p>
+
+            </div>
+
+        `).join("");
+
+}
+
+
+/* =========================
+   SECURITY HELPERS
+========================= */
+
+function safe(value){
+
+    if(value === null ||
+       value === undefined ||
+       value === ""){
+
+        return "—";
+    }
+
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer;
+
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+
+    toast.textContent =
+        message;
+
+
+    toast.style.display =
+        "block";
+
+
+    clearTimeout(toastTimer);
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+                toast.style.display =
+                    "none";
+            },
+            4000
+        );
+
+}
+
+
+/* =========================
+   AUTH INITIALIZATION
+========================= */
+
+async function initializeApp(){
+
+    console.log(
+        "RIBACOM Version 2 starting..."
+    );
+
+
+    const {
+        data:{
+            session
+        }
+    } =
+        await supabaseClient.auth.getSession();
+
+
+    if(session){
+
+        await loadCurrentMember();
+
+    }
+
+
+    /*
+     * Keep the app aware of login/logout changes.
+     */
+
+    supabaseClient.auth.onAuthStateChange(
+        async (event,session) => {
+
+            if(session){
+
+                await loadCurrentMember();
+
+            }else{
+
+                currentMember = null;
+
+            }
+
+        }
+    );
+
+
+    loadEvents();
+
+    loadAnnouncements();
+
+}
+
 
 document.addEventListener(
     "DOMContentLoaded",
-    function() {
-
-        openScreen("home");
-
-    }
+    initializeApp
 );
 
 </script>
 
-</div>
-<!-- SUPABASE CONNECTION - VERSION 2 -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-const SUPABASE_URL = "https://ugxszhbdcnfcnkwapgnd.supabase.co";
-
-const SUPABASE_KEY = "sb_publishable_TnhJlJErycLtPHL3JnbtMA_Oe34G_ks";
-
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
-
-console.log("RIBACOM Supabase connected");
-</script>
 </body>
 </html>
