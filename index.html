@@ -2333,6 +2333,20 @@ document.addEventListener(
 </script>
 
 </div>
+<!-- SUPABASE CONNECTION - VERSION 2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const SUPABASE_URL = "https://ugxszhbdcnfcnkwapgnd.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_TnhJlJErycLtPHL3JnbtMA_Oe34G_ks";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+console.log("RIBACOM Supabase connected");
+</script>
 </body>
 </html>
