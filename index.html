@@ -12,7 +12,7 @@
     --dark:#075b2d;
     --light:#eaf7ef;
     --gold:#d6a928;
-    --white:#ffffff;
+    --white:#fff;
     --black:#17221b;
     --gray:#66736b;
     --border:#dce7df;
@@ -33,10 +33,7 @@ body{
     padding-bottom:80px;
 }
 
-button,
-input,
-select,
-textarea{
+button,input,select,textarea{
     font:inherit;
 }
 
@@ -196,6 +193,7 @@ button{
 .btn.small{
     width:auto;
     padding:9px 14px;
+    margin:3px;
 }
 
 .section-title{
@@ -223,12 +221,6 @@ button{
     border-radius:9px;
     outline:none;
     background:white;
-}
-
-.field input:focus,
-.field select:focus,
-.field textarea:focus{
-    border-color:var(--green);
 }
 
 .field textarea{
@@ -321,17 +313,6 @@ button{
     min-height:220px;
     position:relative;
     overflow:hidden;
-}
-
-.digital-card:after{
-    content:"";
-    position:absolute;
-    width:180px;
-    height:180px;
-    border:25px solid rgba(255,255,255,.08);
-    border-radius:50%;
-    right:-60px;
-    bottom:-70px;
 }
 
 .digital-card .card-logo{
@@ -488,6 +469,23 @@ button{
     padding:25px 10px;
 }
 
+.member-admin-card{
+    border-left:5px solid var(--gold);
+}
+
+.admin-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:12px;
+}
+
+.small-text{
+    font-size:12px;
+    color:var(--gray);
+    line-height:1.5;
+}
+
 hr{
     border:none;
     border-top:1px solid var(--border);
@@ -520,9 +518,11 @@ hr{
             Rivers Bayelsa Community in Diaspora – The Gambia.
             A community built on truth, unity, service, welfare and cultural connection.
         </p>
+
         <button class="btn gold" onclick="openScreen('membership')">
             📝 JOIN RIBACOM
         </button>
+
         <button class="btn secondary" onclick="openScreen('login')">
             🔐 MEMBER LOGIN
         </button>
@@ -567,7 +567,7 @@ hr{
 </section>
 
 
-<!-- MEMBERSHIP CATEGORY -->
+<!-- MEMBERSHIP -->
 <section id="membership" class="screen">
 
     <button class="back" onclick="openScreen('home')">← Back</button>
@@ -620,6 +620,7 @@ hr{
     <button class="back" onclick="openScreen('membership')">← Back</button>
 
     <div class="card">
+
         <h2 id="membershipInfoTitle"></h2>
 
         <p id="membershipInfoText"
@@ -629,6 +630,7 @@ hr{
         <button class="btn" onclick="openRegistration()">
             CONTINUE TO APPLICATION
         </button>
+
     </div>
 
 </section>
@@ -832,7 +834,10 @@ hr{
 
             <div class="field">
                 <label>Password *</label>
-                <input id="regPassword" type="password" minlength="6" required>
+                <input id="regPassword"
+                       type="password"
+                       minlength="6"
+                       required>
             </div>
 
             <div class="field">
@@ -868,7 +873,10 @@ hr{
             </div>
 
             <label class="checkbox">
-                <input id="regConstitution" type="checkbox" required>
+                <input id="regConstitution"
+                       type="checkbox"
+                       required>
+
                 <span>
                     I confirm that the information provided is correct and
                     I agree to abide by the RIBACOM Constitution.
@@ -932,22 +940,39 @@ hr{
 
     <div class="member-welcome">
 
-        <h2 id="dashboardWelcome">
-            Welcome, Member
-        </h2>
+        <h2 id="dashboardWelcome">Welcome, Member</h2>
 
         <p id="dashboardEmail"
            style="color:var(--gray);margin-top:5px">
         </p>
 
         <div style="margin-top:10px">
-            <span id="dashboardStatus"
-                  class="status">
+            <span id="dashboardStatus" class="status">
                 Pending
             </span>
         </div>
 
     </div>
+
+
+    <div id="adminAccessCard"
+         class="card hidden"
+         onclick="openAdmin()"
+         style="cursor:pointer;border:2px solid var(--gold)">
+
+        <div class="menu-card">
+
+            <div class="menu-icon">🔐</div>
+
+            <div>
+                <h3>RIBACOM Admin</h3>
+                <p>Manage members and applications</p>
+            </div>
+
+        </div>
+
+    </div>
+
 
     <div class="grid">
 
@@ -973,6 +998,7 @@ hr{
 
     </div>
 
+
     <div class="card menu-card"
          onclick="openScreen('digitalCard')">
 
@@ -984,6 +1010,7 @@ hr{
         </div>
 
     </div>
+
 
     <div class="card menu-card"
          onclick="openScreen('profile')">
@@ -997,6 +1024,7 @@ hr{
 
     </div>
 
+
     <div class="card menu-card"
          onclick="openScreen('dues')">
 
@@ -1008,6 +1036,7 @@ hr{
         </div>
 
     </div>
+
 
     <div class="card menu-card"
          onclick="openScreen('welfare')">
@@ -1021,6 +1050,7 @@ hr{
 
     </div>
 
+
     <button class="btn danger"
             onclick="logoutMember()">
         🚪 LOGOUT
@@ -1032,7 +1062,9 @@ hr{
 <!-- DIGITAL CARD -->
 <section id="digitalCard" class="screen">
 
-    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+    <button class="back" onclick="openScreen('dashboard')">
+        ← Back
+    </button>
 
     <h2 class="section-title">Digital Membership Card</h2>
 
@@ -1051,9 +1083,7 @@ hr{
         </div>
 
         <div class="member-no">
-            <span id="cardNumber">
-                RIB-PENDING
-            </span>
+            <span id="cardNumber">RIB-PENDING</span>
         </div>
 
         <div style="margin-top:10px">
@@ -1070,7 +1100,9 @@ hr{
 <!-- DUES -->
 <section id="dues" class="screen">
 
-    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+    <button class="back" onclick="openScreen('dashboard')">
+        ← Back
+    </button>
 
     <h2 class="section-title">Dues & Contributions</h2>
 
@@ -1123,7 +1155,9 @@ hr{
 <!-- WELFARE -->
 <section id="welfare" class="screen">
 
-    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+    <button class="back" onclick="openScreen('dashboard')">
+        ← Back
+    </button>
 
     <h2 class="section-title">Welfare Request</h2>
 
@@ -1163,7 +1197,9 @@ hr{
 <!-- EVENTS -->
 <section id="events" class="screen">
 
-    <button class="back" onclick="goBackFromPublic()">← Back</button>
+    <button class="back" onclick="goBackFromPublic()">
+        ← Back
+    </button>
 
     <h2 class="section-title">Community Events</h2>
 
@@ -1177,7 +1213,9 @@ hr{
 <!-- ANNOUNCEMENTS -->
 <section id="announcements" class="screen">
 
-    <button class="back" onclick="goBackFromPublic()">← Back</button>
+    <button class="back" onclick="goBackFromPublic()">
+        ← Back
+    </button>
 
     <h2 class="section-title">Announcements</h2>
 
@@ -1191,11 +1229,14 @@ hr{
 <!-- CONSTITUTION -->
 <section id="constitution" class="screen">
 
-    <button class="back" onclick="goBackFromPublic()">← Back</button>
+    <button class="back" onclick="goBackFromPublic()">
+        ← Back
+    </button>
 
     <h2 class="section-title">Constitution & Documents</h2>
 
     <div class="card">
+
         <h3>RIBACOM Master Constitution</h3>
 
         <p style="line-height:1.6;color:var(--gray)">
@@ -1208,15 +1249,7 @@ hr{
                 onclick="showToast('Official constitution document will be added here.')">
             VIEW DOCUMENT
         </button>
-    </div>
 
-    <div class="card">
-        <h3>Community Documents</h3>
-
-        <p style="line-height:1.6;color:var(--gray)">
-            Approved policies, notices and community documents will
-            be published here by authorized leadership.
-        </p>
     </div>
 
 </section>
@@ -1225,7 +1258,9 @@ hr{
 <!-- LEADERSHIP -->
 <section id="leadership" class="screen">
 
-    <button class="back" onclick="goBackFromPublic()">← Back</button>
+    <button class="back" onclick="goBackFromPublic()">
+        ← Back
+    </button>
 
     <h2 class="section-title">RIBACOM Leadership</h2>
 
@@ -1269,7 +1304,9 @@ hr{
 <!-- NOTIFICATIONS -->
 <section id="notifications" class="screen">
 
-    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+    <button class="back" onclick="openScreen('dashboard')">
+        ← Back
+    </button>
 
     <h2 class="section-title">Notifications</h2>
 
@@ -1286,7 +1323,9 @@ hr{
 <!-- PROFILE -->
 <section id="profile" class="screen">
 
-    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+    <button class="back" onclick="openScreen('dashboard')">
+        ← Back
+    </button>
 
     <h2 class="section-title">My Profile</h2>
 
@@ -1297,38 +1336,66 @@ hr{
 </section>
 
 
-<!-- ADMIN -->
+<!-- ADMIN DASHBOARD -->
 <section id="admin" class="screen">
 
-    <button class="back" onclick="openScreen('dashboard')">← Back</button>
+    <button class="back" onclick="openScreen('dashboard')">
+        ← Back
+    </button>
 
-    <h2 class="section-title">Admin Dashboard</h2>
+    <h2 class="section-title">🔐 Admin Dashboard</h2>
 
-    <div class="notice">
-        ⚠️ Administrative access control will be implemented in a
-        later secure backend phase.
+    <div id="adminSecurityMessage"
+         class="notice">
+        Checking administrator access...
     </div>
 
-    <div class="grid">
 
-        <div class="card stat">
-            <strong>Members</strong>
-            Management
+    <div id="adminContent" class="hidden">
+
+        <div class="grid">
+
+            <div class="card stat">
+                <strong id="adminTotalMembers">0</strong>
+                Total Members
+            </div>
+
+            <div class="card stat">
+                <strong id="adminPendingMembers">0</strong>
+                Pending
+            </div>
+
+            <div class="card stat">
+                <strong id="adminApprovedMembers">0</strong>
+                Approved
+            </div>
+
+            <div class="card stat">
+                <strong id="adminRejectedMembers">0</strong>
+                Rejected
+            </div>
+
         </div>
 
-        <div class="card stat">
-            <strong>Events</strong>
-            Management
+
+        <div class="card">
+
+            <h3>Member Applications</h3>
+
+            <button class="btn secondary"
+                    onclick="loadAdminMembers()">
+                🔄 REFRESH MEMBERS
+            </button>
+
         </div>
 
-        <div class="card stat">
-            <strong>News</strong>
-            Management
-        </div>
 
-        <div class="card stat">
-            <strong>Welfare</strong>
-            Management
+        <div id="adminMembersList">
+
+            <div class="loading">
+                Loading members...
+            </div>
+
         </div>
 
     </div>
@@ -1338,32 +1405,37 @@ hr{
 </main>
 
 
-<!-- BOTTOM NAVIGATION -->
+<!-- NAVIGATION -->
 <nav class="nav">
 
     <div class="nav-inner">
 
-        <button onclick="openScreen('home')" data-nav="home">
+        <button onclick="openScreen('home')"
+                data-nav="home">
             <span class="nav-icon">🏠</span>
             Home
         </button>
 
-        <button onclick="openScreen('events')" data-nav="events">
+        <button onclick="openScreen('events')"
+                data-nav="events">
             <span class="nav-icon">📅</span>
             Events
         </button>
 
-        <button onclick="openScreen('announcements')" data-nav="announcements">
+        <button onclick="openScreen('announcements')"
+                data-nav="announcements">
             <span class="nav-icon">📢</span>
             News
         </button>
 
-        <button onclick="memberNav()" data-nav="dashboard">
+        <button onclick="memberNav()"
+                data-nav="dashboard">
             <span class="nav-icon">👤</span>
             Member
         </button>
 
-        <button onclick="loginNav()" data-nav="login">
+        <button onclick="loginNav()"
+                data-nav="login">
             <span class="nav-icon">🔐</span>
             Login
         </button>
@@ -1376,7 +1448,6 @@ hr{
 <div id="toast" class="toast"></div>
 
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -1395,10 +1466,9 @@ const supabaseClient =
 
 
 let selectedMembership = "";
-
 let currentMember = null;
-
 let lastPublicScreen = "home";
+let toastTimer;
 
 
 /* =========================
@@ -1407,10 +1477,18 @@ let lastPublicScreen = "home";
 
 function openScreen(screenId){
 
+    if(
+        ["events","announcements","constitution","leadership"].includes(screenId)
+    ){
+        lastPublicScreen = document
+            .querySelector(".screen.active")
+            ?.id || "home";
+    }
+
     document.querySelectorAll(".screen")
-        .forEach(screen => {
-            screen.classList.remove("active");
-        });
+        .forEach(screen =>
+            screen.classList.remove("active")
+        );
 
     const screen =
         document.getElementById(screenId);
@@ -1437,15 +1515,19 @@ function openScreen(screenId){
     if(screenId === "profile"){
         loadProfile();
     }
+
+    if(screenId === "admin"){
+        openAdmin();
+    }
 }
 
 
 function updateNavigation(screenId){
 
     document.querySelectorAll(".nav button")
-        .forEach(button => {
-            button.classList.remove("active");
-        });
+        .forEach(button =>
+            button.classList.remove("active")
+        );
 
     const button =
         document.querySelector(
@@ -1459,9 +1541,7 @@ function updateNavigation(screenId){
 
 
 function goBackFromPublic(){
-
     openScreen(lastPublicScreen || "home");
-
 }
 
 
@@ -1472,7 +1552,6 @@ function memberNav(){
     }else{
         openScreen("login");
     }
-
 }
 
 
@@ -1483,12 +1562,11 @@ function loginNav(){
     }else{
         openScreen("login");
     }
-
 }
 
 
 /* =========================
-   MEMBERSHIP SELECTION
+   MEMBERSHIP
 ========================= */
 
 function chooseMembership(category){
@@ -1514,7 +1592,6 @@ function chooseMembership(category){
         document
             .getElementById("associateCategory")
             .classList.add("selected");
-
     }
 
     const button =
@@ -1527,7 +1604,6 @@ function chooseMembership(category){
     button.textContent =
         "CONTINUE AS " +
         category.toUpperCase();
-
 }
 
 
@@ -1544,27 +1620,18 @@ function continueMembership(){
 
     document.getElementById(
         "membershipInfoTitle"
+    ).textContent = selectedMembership;
+
+    document.getElementById(
+        "membershipInfoText"
     ).textContent =
-        selectedMembership;
-
-    if(selectedMembership === "Regular Member"){
-
-        document.getElementById(
-            "membershipInfoText"
-        ).textContent =
-            "Regular Membership is for persons who are Rivers or Bayelsa indigenes by birth, ancestry or family origin. You will be asked to provide relevant Rivers or Bayelsa identity information.";
-
-    }else{
-
-        document.getElementById(
-            "membershipInfoText"
-        ).textContent =
-            "Associate Membership is for persons connected to Rivers or Bayelsa through marriage, community affiliation or personal interest. You will be asked to explain your basis of association.";
-
-    }
+        selectedMembership === "Regular Member"
+        ?
+        "Regular Membership is for persons who are Rivers or Bayelsa indigenes by birth, ancestry or family origin."
+        :
+        "Associate Membership is for persons connected to Rivers or Bayelsa through marriage, community affiliation or personal interest.";
 
     openScreen("membershipInfo");
-
 }
 
 
@@ -1572,13 +1639,10 @@ function openRegistration(){
 
     document.getElementById(
         "selectedMembershipDisplay"
-    ).textContent =
-        selectedMembership;
+    ).textContent = selectedMembership;
 
     const associateFields =
-        document.getElementById(
-            "associateFields"
-        );
+        document.getElementById("associateFields");
 
     if(selectedMembership === "Associate Member"){
         associateFields.classList.remove("hidden");
@@ -1587,7 +1651,6 @@ function openRegistration(){
     }
 
     openScreen("registration");
-
 }
 
 
@@ -1614,14 +1677,13 @@ async function submitRegistration(event){
     const phone =
         document.getElementById("regPhone").value.trim();
 
+
     if(!fullName || !email || !password || !phone){
 
-        showToast(
-            "Please complete all required fields."
-        );
-
+        showToast("Please complete all required fields.");
         return;
     }
+
 
     if(password.length < 6){
 
@@ -1632,14 +1694,13 @@ async function submitRegistration(event){
         return;
     }
 
+
     if(password !== confirmPassword){
 
-        showToast(
-            "Passwords do not match."
-        );
-
+        showToast("Passwords do not match.");
         return;
     }
+
 
     if(!selectedMembership){
 
@@ -1650,11 +1711,8 @@ async function submitRegistration(event){
         return;
     }
 
-    if(
-        !document.getElementById(
-            "regConstitution"
-        ).checked
-    ){
+
+    if(!document.getElementById("regConstitution").checked){
 
         showToast(
             "Please accept the RIBACOM Constitution."
@@ -1674,127 +1732,81 @@ async function submitRegistration(event){
         full_name:fullName,
 
         gender:
-            document.getElementById(
-                "regGender"
-            ).value,
+            document.getElementById("regGender").value,
 
         date_of_birth:
-            document.getElementById(
-                "regDob"
-            ).value,
+            document.getElementById("regDob").value,
 
         nationality:
-            document.getElementById(
-                "regNationality"
-            ).value,
+            document.getElementById("regNationality").value,
 
         marital_status:
-            document.getElementById(
-                "regMaritalStatus"
-            ).value,
+            document.getElementById("regMaritalStatus").value,
 
         passport_id:
-            document.getElementById(
-                "regPassport"
-            ).value,
+            document.getElementById("regPassport").value,
 
         phone:phone,
 
         whatsapp:
-            document.getElementById(
-                "regWhatsapp"
-            ).value,
+            document.getElementById("regWhatsapp").value,
 
         address:
-            document.getElementById(
-                "regAddress"
-            ).value,
+            document.getElementById("regAddress").value,
 
         town_area:
-            document.getElementById(
-                "regTown"
-            ).value,
+            document.getElementById("regTown").value,
 
         emergency_contact:
-            document.getElementById(
-                "regEmergency"
-            ).value,
+            document.getElementById("regEmergency").value,
 
         emergency_phone:
-            document.getElementById(
-                "regEmergencyPhone"
-            ).value,
+            document.getElementById("regEmergencyPhone").value,
 
         state:
-            document.getElementById(
-                "regState"
-            ).value,
+            document.getElementById("regState").value,
 
         state_of_origin:
-            document.getElementById(
-                "regState"
-            ).value,
+            document.getElementById("regState").value,
 
         local_government:
-            document.getElementById(
-                "regLga"
-            ).value,
+            document.getElementById("regLga").value,
 
         community:
-            document.getElementById(
-                "regCommunity"
-            ).value,
+            document.getElementById("regCommunity").value,
 
         community_village:
-            document.getElementById(
-                "regCommunity"
-            ).value,
+            document.getElementById("regCommunity").value,
 
         clan_family:
-            document.getElementById(
-                "regClan"
-            ).value,
+            document.getElementById("regClan").value,
 
         other_community_info:
-            document.getElementById(
-                "regCommunityInfo"
-            ).value,
+            document.getElementById("regCommunityInfo").value,
 
         spouse_name:
-            document.getElementById(
-                "regSpouse"
-            ).value,
+            document.getElementById("regSpouse").value,
 
         number_of_children:
-            document.getElementById(
-                "regChildren"
-            ).value || 0,
+            document.getElementById("regChildren").value || 0,
 
         next_of_kin:
-            document.getElementById(
-                "regNextOfKin"
-            ).value,
+            document.getElementById("regNextOfKin").value,
 
         next_of_kin_phone:
-            document.getElementById(
-                "regNextOfKinPhone"
-            ).value,
+            document.getElementById("regNextOfKinPhone").value,
 
         membership_category:
             selectedMembership,
 
         previous_membership:
-            document.getElementById(
-                "regPreviousMembership"
-            ).value,
+            document.getElementById("regPreviousMembership").value,
 
         application_date:
             new Date().toISOString().slice(0,10),
 
         payment_method:
-            document.getElementById(
-                "regPayment"
-            ).value,
+            document.getElementById("regPayment").value,
 
         constitution_accepted:true,
 
@@ -1807,7 +1819,6 @@ async function submitRegistration(event){
             document.getElementById(
                 "regAssociationDetails"
             )?.value || ""
-
     };
 
 
@@ -1824,7 +1835,6 @@ async function submitRegistration(event){
             options:{
                 data:metadata
             }
-
         });
 
 
@@ -1832,20 +1842,13 @@ async function submitRegistration(event){
 
         console.error(error);
 
-        showToast(
-            error.message
-        );
+        showToast(error.message);
 
         return;
     }
 
 
     if(data.user){
-
-        /*
-         * If email confirmation is disabled,
-         * a session may exist immediately.
-         */
 
         if(data.session){
 
@@ -1867,10 +1870,6 @@ async function submitRegistration(event){
 
         }else{
 
-            /*
-             * Email confirmation is enabled.
-             */
-
             showToast(
                 "Account created. Please check your email and confirm your account before logging in."
             );
@@ -1879,29 +1878,20 @@ async function submitRegistration(event){
                 () => openScreen("login"),
                 2500
             );
-
         }
-
     }
-
 }
 
 
 /* =========================
-   SYNC MEMBER PROFILE
+   PROFILE SYNC
 ========================= */
 
-async function syncMemberProfile(
-    user,
-    metadata
-){
+async function syncMemberProfile(user,metadata){
 
     if(!user) return;
 
-
     const profile = {
-
-        id:user.id,
 
         full_name:
             metadata.full_name || "New Member",
@@ -1967,9 +1957,7 @@ async function syncMemberProfile(
             metadata.spouse_name || null,
 
         number_of_children:
-            Number(
-                metadata.number_of_children || 0
-            ),
+            Number(metadata.number_of_children || 0),
 
         next_of_kin:
             metadata.next_of_kin || null,
@@ -1991,13 +1979,10 @@ async function syncMemberProfile(
 
         constitution_accepted:
             metadata.constitution_accepted || false
-
     };
 
 
-    const {
-        error
-    } =
+    const {error} =
         await supabaseClient
             .from("members")
             .update(profile)
@@ -2010,9 +1995,7 @@ async function syncMemberProfile(
             "Profile sync error:",
             error
         );
-
     }
-
 }
 
 
@@ -2045,9 +2028,7 @@ async function loginMember(event){
     }
 
 
-    showToast(
-        "Logging in..."
-    );
+    showToast("Logging in...");
 
 
     const {
@@ -2059,17 +2040,12 @@ async function loginMember(event){
             email:email,
 
             password:password
-
         });
 
 
     if(error){
 
-        console.error(error);
-
-        showToast(
-            error.message
-        );
+        showToast(error.message);
 
         return;
     }
@@ -2083,23 +2059,15 @@ async function loginMember(event){
 
         await loadCurrentMember();
 
-        showToast(
-            "Login successful."
-        );
+        showToast("Login successful.");
 
         setTimeout(
             () => openScreen("dashboard"),
             700
         );
-
     }
-
 }
 
-
-/* =========================
-   SYNC AFTER LOGIN
-========================= */
 
 async function syncProfileFromAuthUser(user){
 
@@ -2109,9 +2077,7 @@ async function syncProfileFromAuthUser(user){
         user.user_metadata || {};
 
 
-    const {
-        data:member
-    } =
+    const {data:member} =
         await supabaseClient
             .from("members")
             .select("*")
@@ -2119,27 +2085,18 @@ async function syncProfileFromAuthUser(user){
             .maybeSingle();
 
 
-    if(!member){
+    if(member){
 
-        /*
-         * Normally the Supabase trigger creates
-         * this record automatically.
-         */
-
-        return;
+        await syncMemberProfile(
+            user,
+            metadata
+        );
     }
-
-
-    await syncMemberProfile(
-        user,
-        metadata
-    );
-
 }
 
 
 /* =========================
-   LOAD CURRENT MEMBER
+   CURRENT MEMBER
 ========================= */
 
 async function loadCurrentMember(){
@@ -2184,7 +2141,6 @@ async function loadCurrentMember(){
     updateDashboard();
 
     return data;
-
 }
 
 
@@ -2198,9 +2154,7 @@ function updateDashboard(){
 
 
     const name =
-        currentMember.full_name ||
-        "Member";
-
+        currentMember.full_name || "Member";
 
     document.getElementById(
         "dashboardWelcome"
@@ -2215,8 +2169,7 @@ function updateDashboard(){
 
 
     const status =
-        currentMember.status ||
-        "pending";
+        currentMember.status || "pending";
 
 
     document.getElementById(
@@ -2234,15 +2187,13 @@ function updateDashboard(){
     document.getElementById(
         "statCategory"
     ).textContent =
-        currentMember.membership_category ||
-        "—";
+        currentMember.membership_category || "—";
 
 
     document.getElementById(
         "statMemberNo"
     ).textContent =
-        currentMember.membership_number ||
-        "Pending";
+        currentMember.membership_number || "Pending";
 
 
     document.getElementById(
@@ -2254,15 +2205,13 @@ function updateDashboard(){
     document.getElementById(
         "cardCategory"
     ).textContent =
-        currentMember.membership_category ||
-        "Member";
+        currentMember.membership_category || "Member";
 
 
     document.getElementById(
         "cardNumber"
     ).textContent =
-        currentMember.membership_number ||
-        "RIB-PENDING";
+        currentMember.membership_number || "RIB-PENDING";
 
 
     document.getElementById(
@@ -2270,6 +2219,21 @@ function updateDashboard(){
     ).textContent =
         formatStatus(status);
 
+
+    const adminCard =
+        document.getElementById(
+            "adminAccessCard"
+        );
+
+
+    if(currentMember.role === "admin"){
+
+        adminCard.classList.remove("hidden");
+
+    }else{
+
+        adminCard.classList.add("hidden");
+    }
 }
 
 
@@ -2279,7 +2243,357 @@ function formatStatus(status){
 
     return status.charAt(0).toUpperCase() +
            status.slice(1);
+}
 
+
+/* =========================
+   ADMIN
+========================= */
+
+async function isAdmin(){
+
+    if(!currentMember){
+
+        await loadCurrentMember();
+    }
+
+    return currentMember &&
+           currentMember.role === "admin";
+}
+
+
+async function openAdmin(){
+
+    const allowed = await isAdmin();
+
+    if(!allowed){
+
+        showToast(
+            "Administrator access required."
+        );
+
+        openScreen("dashboard");
+
+        return;
+    }
+
+
+    document.getElementById(
+        "adminSecurityMessage"
+    ).innerHTML =
+        "🔐 You are signed in as a RIBACOM administrator.";
+
+
+    document.getElementById(
+        "adminContent"
+    ).classList.remove("hidden");
+
+
+    await loadAdminMembers();
+}
+
+
+async function loadAdminMembers(){
+
+    const allowed = await isAdmin();
+
+    if(!allowed){
+
+        showToast(
+            "Administrator access required."
+        );
+
+        return;
+    }
+
+
+    const list =
+        document.getElementById(
+            "adminMembersList"
+        );
+
+
+    list.innerHTML =
+        '<div class="loading">Loading member applications...</div>';
+
+
+    /*
+     * This calls a secure Supabase function.
+     * We will create the function in the
+     * next database step.
+     */
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.rpc(
+            "admin_list_members"
+        );
+
+
+    if(error){
+
+        console.error(error);
+
+        list.innerHTML =
+            `<div class="error">
+                Admin database function is not installed yet.
+                Please complete the next Supabase step.
+            </div>`;
+
+        return;
+    }
+
+
+    const members = data || [];
+
+
+    const total =
+        members.length;
+
+    const pending =
+        members.filter(
+            m => m.status === "pending"
+        ).length;
+
+    const approved =
+        members.filter(
+            m => m.status === "approved"
+        ).length;
+
+    const rejected =
+        members.filter(
+            m => m.status === "rejected"
+        ).length;
+
+
+    document.getElementById(
+        "adminTotalMembers"
+    ).textContent = total;
+
+    document.getElementById(
+        "adminPendingMembers"
+    ).textContent = pending;
+
+    document.getElementById(
+        "adminApprovedMembers"
+    ).textContent = approved;
+
+    document.getElementById(
+        "adminRejectedMembers"
+    ).textContent = rejected;
+
+
+    if(!members.length){
+
+        list.innerHTML =
+            '<div class="empty">No members found.</div>';
+
+        return;
+    }
+
+
+    list.innerHTML =
+        members.map(member => `
+
+            <div class="card member-admin-card">
+
+                <h3>
+                    ${safe(member.full_name)}
+                </h3>
+
+                <p class="small-text">
+                    ${safe(member.email)}
+                </p>
+
+                <hr>
+
+                <div class="profile-row">
+                    <span>Membership</span>
+                    <span>
+                        ${safe(member.membership_category)}
+                    </span>
+                </div>
+
+                <div class="profile-row">
+                    <span>State</span>
+                    <span>
+                        ${safe(member.state)}
+                    </span>
+                </div>
+
+                <div class="profile-row">
+                    <span>Community</span>
+                    <span>
+                        ${safe(member.community)}
+                    </span>
+                </div>
+
+                <div class="profile-row">
+                    <span>Status</span>
+                    <span>
+                        ${statusBadge(member.status)}
+                    </span>
+                </div>
+
+                <div class="profile-row">
+                    <span>Member No.</span>
+                    <span>
+                        ${safe(member.membership_number || "Pending")}
+                    </span>
+                </div>
+
+                <div class="admin-actions">
+
+                    ${
+                        member.status !== "approved"
+                        ?
+                        `<button
+                            class="btn small"
+                            onclick="approveMember('${member.id}')">
+                            ✅ APPROVE
+                        </button>`
+                        :
+                        ""
+                    }
+
+                    ${
+                        member.status !== "rejected"
+                        ?
+                        `<button
+                            class="btn danger small"
+                            onclick="rejectMember('${member.id}')">
+                            ❌ REJECT
+                        </button>`
+                        :
+                        ""
+                    }
+
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+async function approveMember(memberId){
+
+    if(!confirm(
+        "Approve this RIBACOM membership application?"
+    )){
+        return;
+    }
+
+
+    showToast(
+        "Approving membership..."
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.rpc(
+            "admin_approve_member",
+            {
+                target_member_id:memberId
+            }
+        );
+
+
+    if(error){
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    showToast(
+        "Member approved successfully."
+    );
+
+
+    await loadAdminMembers();
+}
+
+
+async function rejectMember(memberId){
+
+    if(!confirm(
+        "Reject this RIBACOM membership application?"
+    )){
+        return;
+    }
+
+
+    showToast(
+        "Rejecting membership..."
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.rpc(
+            "admin_reject_member",
+            {
+                target_member_id:memberId
+            }
+        );
+
+
+    if(error){
+
+        console.error(error);
+
+        showToast(
+            error.message
+        );
+
+        return;
+    }
+
+
+    showToast(
+        "Membership application rejected."
+    );
+
+
+    await loadAdminMembers();
+}
+
+
+function statusBadge(status){
+
+    const value =
+        formatStatus(status || "pending");
+
+
+    let cls = "";
+
+    if(status === "approved"){
+        cls = "approved";
+    }
+
+    if(status === "rejected"){
+        cls = "rejected";
+    }
+
+
+    return `
+        <span class="status ${cls}">
+            ${safe(value)}
+        </span>
+    `;
 }
 
 
@@ -2289,17 +2603,13 @@ function formatStatus(status){
 
 async function logoutMember(){
 
-    const {
-        error
-    } =
+    const {error} =
         await supabaseClient.auth.signOut();
 
 
     if(error){
 
-        showToast(
-            error.message
-        );
+        showToast(error.message);
 
         return;
     }
@@ -2311,11 +2621,11 @@ async function logoutMember(){
         "You have been logged out."
     );
 
+
     setTimeout(
         () => openScreen("home"),
         700
     );
-
 }
 
 
@@ -2326,9 +2636,7 @@ async function logoutMember(){
 async function loadProfile(){
 
     if(!currentMember){
-
         await loadCurrentMember();
-
     }
 
 
@@ -2408,7 +2716,6 @@ async function loadProfile(){
         </div>
 
     `;
-
 }
 
 
@@ -2419,9 +2726,7 @@ async function loadProfile(){
 async function submitWelfare(){
 
     if(!currentMember){
-
         await loadCurrentMember();
-
     }
 
 
@@ -2459,34 +2764,24 @@ async function submitWelfare(){
     }
 
 
-    const {
-        error
-    } =
+    const {error} =
         await supabaseClient
             .from("welfare_requests")
             .insert({
 
-                member_id:
-                    currentMember.id,
+                member_id:currentMember.id,
 
-                request_type:
-                    type,
+                request_type:type,
 
-                description:
-                    description,
+                description:description,
 
                 status:"pending"
-
             });
 
 
     if(error){
 
-        console.error(error);
-
-        showToast(
-            error.message
-        );
+        showToast(error.message);
 
         return;
     }
@@ -2500,7 +2795,6 @@ async function submitWelfare(){
     showToast(
         "Welfare request submitted successfully."
     );
-
 }
 
 
@@ -2541,7 +2835,6 @@ function submitContribution(){
     showToast(
         "Contribution recorded for processing. Online payment will be connected in a later phase."
     );
-
 }
 
 
@@ -2568,12 +2861,13 @@ async function loadEvents(){
         await supabaseClient
             .from("events")
             .select("*")
-            .order("event_date",{ascending:true});
+            .order(
+                "event_date",
+                {ascending:true}
+            );
 
 
     if(error){
-
-        console.error(error);
 
         list.innerHTML =
             '<div class="empty">Unable to load events.</div>';
@@ -2582,7 +2876,7 @@ async function loadEvents(){
     }
 
 
-    if(!data || data.length === 0){
+    if(!data || !data.length){
 
         list.innerHTML =
             '<div class="empty">No community events have been published yet.</div>';
@@ -2611,15 +2905,20 @@ async function loadEvents(){
                 </p>
 
                 <p style="margin-top:6px">
-                    📅 ${event.event_date
-                        ? new Date(event.event_date).toLocaleString()
-                        : "Date to be announced"}
+                    📅 ${
+                        event.event_date
+                        ?
+                        new Date(
+                            event.event_date
+                        ).toLocaleString()
+                        :
+                        "Date to be announced"
+                    }
                 </p>
 
             </div>
 
         `).join("");
-
 }
 
 
@@ -2646,12 +2945,13 @@ async function loadAnnouncements(){
         await supabaseClient
             .from("announcements")
             .select("*")
-            .order("created_at",{ascending:false});
+            .order(
+                "created_at",
+                {ascending:false}
+            );
 
 
     if(error){
-
-        console.error(error);
 
         list.innerHTML =
             '<div class="empty">Unable to load announcements.</div>';
@@ -2660,7 +2960,7 @@ async function loadAnnouncements(){
     }
 
 
-    if(!data || data.length === 0){
+    if(!data || !data.length){
 
         list.innerHTML =
             '<div class="empty">No announcements have been published yet.</div>';
@@ -2683,28 +2983,34 @@ async function loadAnnouncements(){
                 </p>
 
                 <p style="font-size:11px;color:#89958d;margin-top:12px">
-                    ${item.created_at
-                        ? new Date(item.created_at).toLocaleString()
-                        : ""}
+                    ${
+                        item.created_at
+                        ?
+                        new Date(
+                            item.created_at
+                        ).toLocaleString()
+                        :
+                        ""
+                    }
                 </p>
 
             </div>
 
         `).join("");
-
 }
 
 
 /* =========================
-   SECURITY HELPERS
+   SECURITY
 ========================= */
 
 function safe(value){
 
-    if(value === null ||
-       value === undefined ||
-       value === ""){
-
+    if(
+        value === null ||
+        value === undefined ||
+        value === ""
+    ){
         return "—";
     }
 
@@ -2715,16 +3021,12 @@ function safe(value){
         .replace(/>/g,"&gt;")
         .replace(/"/g,"&quot;")
         .replace(/'/g,"&#039;");
-
 }
 
 
 /* =========================
    TOAST
 ========================= */
-
-let toastTimer;
-
 
 function showToast(message){
 
@@ -2746,23 +3048,21 @@ function showToast(message){
     toastTimer =
         setTimeout(
             () => {
-                toast.style.display =
-                    "none";
+                toast.style.display = "none";
             },
             4000
         );
-
 }
 
 
 /* =========================
-   AUTH INITIALIZATION
+   INITIALIZATION
 ========================= */
 
 async function initializeApp(){
 
     console.log(
-        "RIBACOM Version 2 starting..."
+        "RIBACOM Admin Version starting..."
     );
 
 
@@ -2777,13 +3077,8 @@ async function initializeApp(){
     if(session){
 
         await loadCurrentMember();
-
     }
 
-
-    /*
-     * Keep the app aware of login/logout changes.
-     */
 
     supabaseClient.auth.onAuthStateChange(
         async (event,session) => {
@@ -2795,9 +3090,7 @@ async function initializeApp(){
             }else{
 
                 currentMember = null;
-
             }
-
         }
     );
 
@@ -2805,7 +3098,6 @@ async function initializeApp(){
     loadEvents();
 
     loadAnnouncements();
-
 }
 
 
