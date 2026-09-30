@@ -280,6 +280,11 @@ label{
     color:#a61b1b;
 }
 
+.badge-suspended{
+    background:#ffe5d0;
+    color:#9a3412;
+}
+
 .badge-admin{
     background:#e5e7ff;
     color:#3730a3;
@@ -309,7 +314,7 @@ label{
 
 .info-row strong{
     display:inline-block;
-    min-width:130px;
+    min-width:145px;
 }
 
 .card-id{
@@ -380,7 +385,92 @@ nav button.active{
     color:#697570;
 }
 
+.admin-toolbar{
+    display:grid;
+    grid-template-columns:1fr 170px;
+    gap:10px;
+}
+
+.admin-toolbar input,
+.admin-toolbar select{
+    margin-bottom:0;
+}
+
+.member-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.member-actions button{
+    flex:1;
+    min-width:100px;
+}
+
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:500;
+    display:none;
+    overflow-y:auto;
+    padding:20px;
+}
+
+.modal-overlay.show{
+    display:block;
+}
+
+.modal{
+    background:white;
+    max-width:760px;
+    margin:30px auto;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 10px 35px rgba(0,0,0,.25);
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.modal-header h2{
+    color:#075b3a;
+    font-size:21px;
+}
+
+.close-btn{
+    background:#edf2ef;
+    color:#075b3a;
+    padding:8px 12px;
+}
+
+.detail-section{
+    margin-top:18px;
+}
+
+.detail-section h3{
+    color:#075b3a;
+    margin-bottom:8px;
+    border-bottom:1px solid #e5ebe8;
+    padding-bottom:8px;
+}
+
+.suspension-box{
+    background:#fff4eb;
+    border:1px solid #ffd6b8;
+    border-radius:10px;
+    padding:12px;
+    margin-top:10px;
+}
+
 @media(max-width:600px){
+
     .grid{
         grid-template-columns:1fr 1fr;
     }
@@ -391,6 +481,24 @@ nav button.active{
 
     .container{
         width:92%;
+    }
+
+    .admin-toolbar{
+        grid-template-columns:1fr;
+    }
+
+    .modal-overlay{
+        padding:10px;
+    }
+
+    .modal{
+        margin:10px auto;
+        padding:16px;
+    }
+
+    .info-row strong{
+        display:block;
+        margin-bottom:3px;
     }
 }
 </style>
@@ -1144,17 +1252,54 @@ nav button.active{
             <span>Rejected</span>
         </div>
 
+        <div class="card stat">
+            <strong id="adminSuspended">0</strong>
+            <span>Suspended</span>
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3 style="margin-bottom:12px;">
+            Member Management
+        </h3>
+
+        <div class="admin-toolbar">
+
+            <input
+                id="memberSearch"
+                type="search"
+                placeholder="🔎 Search name, email, phone or membership no."
+                oninput="applyMemberFilters()">
+
+            <select
+                id="memberStatusFilter"
+                onchange="applyMemberFilters()">
+
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="suspended">Suspended</option>
+
+            </select>
+
+        </div>
+
     </div>
 
     <div class="card">
 
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-            <h3>Membership Applications</h3>
+
+            <h3>Members & Applications</h3>
 
             <button class="btn-secondary"
                     onclick="loadAdminMembers()">
                 🔄 Refresh
             </button>
+
         </div>
 
         <br>
@@ -1198,6 +1343,33 @@ nav button.active{
 </nav>
 
 
+<!-- MEMBER DETAILS MODAL -->
+<div id="memberModal" class="modal-overlay">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2 id="modalMemberName">
+                Member Details
+            </h2>
+
+            <button class="close-btn"
+                    onclick="closeMemberModal()">
+                ✕
+            </button>
+
+        </div>
+
+        <div id="memberModalContent">
+            Loading member information...
+        </div>
+
+    </div>
+
+</div>
+
+
 <!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -1227,6 +1399,8 @@ const supabaseClient =
 let currentUser = null;
 let currentMember = null;
 let previousScreen = "home";
+
+let adminMembers = [];
 
 
 /* =========================================================
@@ -1711,11 +1885,6 @@ document
             currentUser =
                 data.user;
 
-
-            /*
-             * The database trigger creates the member record.
-             * We wait briefly, then update the complete profile.
-             */
 
             await new Promise(
                 resolve =>
@@ -2430,143 +2599,13 @@ async function loadAdminMembers(){
         }
 
 
-        const members =
+        adminMembers =
             data || [];
 
 
-        updateAdminStats(members);
+        updateAdminStats(adminMembers);
 
-
-        if(members.length === 0){
-
-            list.innerHTML =
-                '<div class="empty">No membership applications found.</div>';
-
-            return;
-        }
-
-
-        list.innerHTML =
-            members.map(member => {
-
-                const status =
-                    String(member.status || "pending")
-                        .toLowerCase();
-
-
-                let badgeClass =
-                    "badge-pending";
-
-
-                if(status === "approved"){
-                    badgeClass = "badge-approved";
-                }
-
-                if(status === "rejected"){
-                    badgeClass = "badge-rejected";
-                }
-
-
-                const adminBadge =
-                    String(member.role || "")
-                        .toLowerCase() === "admin"
-                    ? '<span class="badge badge-admin">ADMIN</span>'
-                    : "";
-
-
-                return `
-
-                    <div class="member-card">
-
-                        <h3>
-                            ${safe(member.full_name || "Unnamed Member")}
-                        </h3>
-
-                        <span class="badge ${badgeClass}">
-                            ${safe(status.toUpperCase())}
-                        </span>
-
-                        ${adminBadge}
-
-                        <p>
-                            <strong>Email:</strong>
-                            ${safe(member.email)}
-                        </p>
-
-                        <p>
-                            <strong>Phone:</strong>
-                            ${safe(member.phone)}
-                        </p>
-
-                        <p>
-                            <strong>Category:</strong>
-                            ${safe(member.membership_category)}
-                        </p>
-
-                        <p>
-                            <strong>Origin:</strong>
-                            ${safe(member.state_of_origin || member.state)}
-                        </p>
-
-                        <p>
-                            <strong>LGA:</strong>
-                            ${safe(member.local_government)}
-                        </p>
-
-                        <p>
-                            <strong>Community:</strong>
-                            ${safe(member.community_village || member.community)}
-                        </p>
-
-                        <p>
-                            <strong>Membership No.:</strong>
-                            ${safe(member.membership_number || "Not assigned")}
-                        </p>
-
-                        <p>
-                            <strong>Application:</strong>
-                            ${
-                                member.application_date
-                                ? safe(member.application_date)
-                                : "Not provided"
-                            }
-                        </p>
-
-                        ${
-                            status !== "approved"
-                            ? `
-
-                            <div class="action-row">
-
-                                <button
-                                    class="btn-success"
-                                    onclick="approveMember('${safe(member.id)}')">
-                                    ✓ Approve
-                                </button>
-
-                                ${
-                                    status !== "rejected"
-                                    ? `
-                                    <button
-                                        class="btn-danger"
-                                        onclick="rejectMember('${safe(member.id)}')">
-                                        ✕ Reject
-                                    </button>
-                                    `
-                                    : ""
-                                }
-
-                            </div>
-
-                            `
-                            : ""
-                        }
-
-                    </div>
-
-                `;
-
-            }).join("");
+        applyMemberFilters();
 
 
     }catch(error){
@@ -2589,6 +2628,277 @@ async function loadAdminMembers(){
         );
 
     }
+
+}
+
+
+/* =========================================================
+   ADMIN SEARCH + FILTER
+   ========================================================= */
+
+function applyMemberFilters(){
+
+    const list =
+        document.getElementById("adminMembersList");
+
+    if(!list){
+        return;
+    }
+
+
+    const searchInput =
+        document.getElementById("memberSearch");
+
+    const statusInput =
+        document.getElementById("memberStatusFilter");
+
+
+    const search =
+        (searchInput?.value || "")
+            .trim()
+            .toLowerCase();
+
+
+    const selectedStatus =
+        (statusInput?.value || "all")
+            .toLowerCase();
+
+
+    const filtered =
+        adminMembers.filter(member => {
+
+            const status =
+                String(member.status || "pending")
+                    .toLowerCase();
+
+
+            const searchable = [
+
+                member.full_name,
+                member.email,
+                member.phone,
+                member.membership_number,
+                member.state_of_origin,
+                member.state,
+                member.local_government,
+                member.community_village,
+                member.community
+
+            ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
+
+
+            const matchesSearch =
+                !search ||
+                searchable.includes(search);
+
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                status === selectedStatus;
+
+
+            return matchesSearch && matchesStatus;
+
+        });
+
+
+    renderAdminMembers(filtered);
+
+}
+
+
+/* =========================================================
+   ADMIN: RENDER MEMBERS
+   ========================================================= */
+
+function renderAdminMembers(members){
+
+    const list =
+        document.getElementById("adminMembersList");
+
+
+    if(!members || members.length === 0){
+
+        list.innerHTML =
+            '<div class="empty">No members match your search or filter.</div>';
+
+        return;
+    }
+
+
+    list.innerHTML =
+        members.map(member => {
+
+            const status =
+                String(member.status || "pending")
+                    .toLowerCase();
+
+
+            let badgeClass =
+                "badge-pending";
+
+
+            if(status === "approved"){
+                badgeClass = "badge-approved";
+            }
+
+            if(status === "rejected"){
+                badgeClass = "badge-rejected";
+            }
+
+            if(status === "suspended"){
+                badgeClass = "badge-suspended";
+            }
+
+
+            const adminBadge =
+                String(member.role || "")
+                    .toLowerCase() === "admin"
+                ? '<span class="badge badge-admin">ADMIN</span>'
+                : "";
+
+
+            let actions = `
+
+                <button
+                    class="btn-secondary"
+                    onclick="viewMember('${member.id}')">
+                    👁 View
+                </button>
+
+            `;
+
+
+            if(status === "pending"){
+
+                actions += `
+
+                    <button
+                        class="btn-success"
+                        onclick="approveMember('${member.id}')">
+                        ✓ Approve
+                    </button>
+
+                    <button
+                        class="btn-danger"
+                        onclick="rejectMember('${member.id}')">
+                        ✕ Reject
+                    </button>
+
+                `;
+
+            }
+
+
+            if(status === "approved"){
+
+                actions += `
+
+                    <button
+                        class="btn-warning"
+                        onclick="suspendMember('${member.id}')">
+                        ⛔ Suspend
+                    </button>
+
+                `;
+
+            }
+
+
+            if(status === "suspended"){
+
+                actions += `
+
+                    <button
+                        class="btn-success"
+                        onclick="reactivateMember('${member.id}')">
+                        ✓ Reactivate
+                    </button>
+
+                `;
+
+            }
+
+
+            if(status === "rejected"){
+
+                actions += `
+
+                    <button
+                        class="btn-success"
+                        onclick="approveMember('${member.id}')">
+                        ✓ Approve
+                    </button>
+
+                `;
+
+            }
+
+
+            return `
+
+                <div class="member-card">
+
+                    <h3>
+                        ${safe(member.full_name || "Unnamed Member")}
+                    </h3>
+
+                    <span class="badge ${badgeClass}">
+                        ${safe(status.toUpperCase())}
+                    </span>
+
+                    ${adminBadge}
+
+                    <p>
+                        <strong>Email:</strong>
+                        ${safe(member.email)}
+                    </p>
+
+                    <p>
+                        <strong>Phone:</strong>
+                        ${safe(member.phone)}
+                    </p>
+
+                    <p>
+                        <strong>Category:</strong>
+                        ${safe(member.membership_category)}
+                    </p>
+
+                    <p>
+                        <strong>Origin:</strong>
+                        ${safe(member.state_of_origin || member.state)}
+                    </p>
+
+                    <p>
+                        <strong>Membership No.:</strong>
+                        ${safe(member.membership_number || "Not assigned")}
+                    </p>
+
+                    ${
+                        status === "suspended" &&
+                        member.suspension_reason
+                        ? `
+                            <div class="suspension-box">
+                                <strong>Suspension reason:</strong>
+                                <br>
+                                ${safe(member.suspension_reason)}
+                            </div>
+                        `
+                        : ""
+                    }
+
+                    <div class="member-actions">
+                        ${actions}
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
 
 }
 
@@ -2627,6 +2937,14 @@ function updateAdminStats(members){
         ).length;
 
 
+    const suspended =
+        members.filter(
+            m =>
+            String(m.status || "")
+                .toLowerCase() === "suspended"
+        ).length;
+
+
     document
         .getElementById("adminTotal")
         .textContent = total;
@@ -2646,6 +2964,338 @@ function updateAdminStats(members){
         .getElementById("adminRejected")
         .textContent = rejected;
 
+
+    document
+        .getElementById("adminSuspended")
+        .textContent = suspended;
+
+}
+
+
+/* =========================================================
+   ADMIN: VIEW MEMBER
+   ========================================================= */
+
+function viewMember(memberId){
+
+    const member =
+        adminMembers.find(
+            m => String(m.id) === String(memberId)
+        );
+
+
+    if(!member){
+
+        showMessage(
+            "adminMessage",
+            "Member information could not be found.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    document
+        .getElementById("modalMemberName")
+        .textContent =
+        member.full_name || "Member Details";
+
+
+    const status =
+        String(member.status || "pending")
+            .toLowerCase();
+
+
+    let badgeClass =
+        "badge-pending";
+
+
+    if(status === "approved"){
+        badgeClass = "badge-approved";
+    }
+
+    if(status === "rejected"){
+        badgeClass = "badge-rejected";
+    }
+
+    if(status === "suspended"){
+        badgeClass = "badge-suspended";
+    }
+
+
+    document
+        .getElementById("memberModalContent")
+        .innerHTML = `
+
+        <div>
+            <span class="badge ${badgeClass}">
+                ${safe(status.toUpperCase())}
+            </span>
+
+            ${
+                String(member.role || "")
+                    .toLowerCase() === "admin"
+                ? '<span class="badge badge-admin">ADMIN</span>'
+                : ""
+            }
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>A. Personal Information</h3>
+
+            <div class="info-row">
+                <strong>Full Name:</strong>
+                ${safe(member.full_name)}
+            </div>
+
+            <div class="info-row">
+                <strong>Gender:</strong>
+                ${safe(member.gender)}
+            </div>
+
+            <div class="info-row">
+                <strong>Date of Birth:</strong>
+                ${safe(member.date_of_birth)}
+            </div>
+
+            <div class="info-row">
+                <strong>Nationality:</strong>
+                ${safe(member.nationality)}
+            </div>
+
+            <div class="info-row">
+                <strong>Marital Status:</strong>
+                ${safe(member.marital_status)}
+            </div>
+
+            <div class="info-row">
+                <strong>Passport / ID:</strong>
+                ${safe(member.passport_id)}
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>B. Contact Information</h3>
+
+            <div class="info-row">
+                <strong>Email:</strong>
+                ${safe(member.email)}
+            </div>
+
+            <div class="info-row">
+                <strong>Phone:</strong>
+                ${safe(member.phone)}
+            </div>
+
+            <div class="info-row">
+                <strong>WhatsApp:</strong>
+                ${safe(member.whatsapp)}
+            </div>
+
+            <div class="info-row">
+                <strong>Address:</strong>
+                ${safe(member.address)}
+            </div>
+
+            <div class="info-row">
+                <strong>Town / Area:</strong>
+                ${safe(member.town_area)}
+            </div>
+
+            <div class="info-row">
+                <strong>Emergency Contact:</strong>
+                ${safe(member.emergency_contact)}
+            </div>
+
+            <div class="info-row">
+                <strong>Emergency Phone:</strong>
+                ${safe(member.emergency_phone)}
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>C. Rivers / Bayelsa Identity</h3>
+
+            <div class="info-row">
+                <strong>State of Origin:</strong>
+                ${safe(member.state_of_origin || member.state)}
+            </div>
+
+            <div class="info-row">
+                <strong>LGA:</strong>
+                ${safe(member.local_government)}
+            </div>
+
+            <div class="info-row">
+                <strong>Community / Village:</strong>
+                ${safe(member.community_village || member.community)}
+            </div>
+
+            <div class="info-row">
+                <strong>Clan / Family:</strong>
+                ${safe(member.clan_family)}
+            </div>
+
+            <div class="info-row">
+                <strong>Other Information:</strong>
+                ${safe(member.other_community_info)}
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>D. Family Information</h3>
+
+            <div class="info-row">
+                <strong>Spouse:</strong>
+                ${safe(member.spouse_name)}
+            </div>
+
+            <div class="info-row">
+                <strong>Children:</strong>
+                ${safe(member.number_of_children)}
+            </div>
+
+            <div class="info-row">
+                <strong>Next of Kin:</strong>
+                ${safe(member.next_of_kin)}
+            </div>
+
+            <div class="info-row">
+                <strong>Next-of-Kin Phone:</strong>
+                ${safe(member.next_of_kin_phone)}
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>E. Membership Information</h3>
+
+            <div class="info-row">
+                <strong>Category:</strong>
+                ${safe(member.membership_category)}
+            </div>
+
+            <div class="info-row">
+                <strong>Association Basis:</strong>
+                ${safe(member.association_basis)}
+            </div>
+
+            <div class="info-row">
+                <strong>Association Details:</strong>
+                ${safe(member.association_details)}
+            </div>
+
+            <div class="info-row">
+                <strong>Previous Membership:</strong>
+                ${safe(member.previous_membership)}
+            </div>
+
+            <div class="info-row">
+                <strong>Application Date:</strong>
+                ${safe(member.application_date)}
+            </div>
+
+            <div class="info-row">
+                <strong>Payment Method:</strong>
+                ${safe(member.payment_method)}
+            </div>
+
+            <div class="info-row">
+                <strong>Constitution Accepted:</strong>
+                ${member.constitution_accepted ? "Yes" : "No"}
+            </div>
+
+            <div class="info-row">
+                <strong>Membership Number:</strong>
+                ${safe(member.membership_number || "Not assigned")}
+            </div>
+
+        </div>
+
+
+        <div class="detail-section">
+
+            <h3>Account Information</h3>
+
+            <div class="info-row">
+                <strong>Account Status:</strong>
+                ${safe(status)}
+            </div>
+
+            <div class="info-row">
+                <strong>Account Created:</strong>
+                ${
+                    member.created_at
+                    ? safe(
+                        new Date(member.created_at)
+                            .toLocaleString()
+                      )
+                    : ""
+                }
+            </div>
+
+            ${
+                status === "suspended"
+                ? `
+                    <div class="suspension-box">
+
+                        <strong>Suspension Reason:</strong>
+
+                        <p style="margin-top:6px;">
+                            ${safe(member.suspension_reason || "No reason recorded.")}
+                        </p>
+
+                        ${
+                            member.suspended_at
+                            ? `
+                                <p style="margin-top:6px;">
+                                    <strong>Suspended:</strong>
+                                    ${safe(
+                                        new Date(member.suspended_at)
+                                            .toLocaleString()
+                                    )}
+                                </p>
+                            `
+                            : ""
+                        }
+
+                    </div>
+                `
+                : ""
+            }
+
+        </div>
+
+        `;
+
+
+    document
+        .getElementById("memberModal")
+        .classList.add("show");
+
+}
+
+
+function closeMemberModal(){
+
+    document
+        .getElementById("memberModal")
+        .classList.remove("show");
+
 }
 
 
@@ -2655,8 +3305,19 @@ function updateAdminStats(members){
 
 async function approveMember(memberId){
 
+    const member =
+        adminMembers.find(
+            m => String(m.id) === String(memberId)
+        );
+
+
+    const name =
+        member?.full_name ||
+        "this member";
+
+
     if(!confirm(
-        "Approve this membership application?"
+        "Approve " + name + "?"
     )){
         return;
     }
@@ -2687,6 +3348,8 @@ async function approveMember(memberId){
         );
 
 
+        closeMemberModal();
+
         await loadAdminMembers();
 
 
@@ -2716,8 +3379,21 @@ async function approveMember(memberId){
 
 async function rejectMember(memberId){
 
+    const member =
+        adminMembers.find(
+            m => String(m.id) === String(memberId)
+        );
+
+
+    const name =
+        member?.full_name ||
+        "this member";
+
+
     if(!confirm(
-        "Reject this membership application?"
+        "Reject the membership application for " +
+        name +
+        "?"
     )){
         return;
     }
@@ -2748,6 +3424,8 @@ async function rejectMember(memberId){
         );
 
 
+        closeMemberModal();
+
         await loadAdminMembers();
 
 
@@ -2772,6 +3450,203 @@ async function rejectMember(memberId){
 
 
 /* =========================================================
+   ADMIN: SUSPEND MEMBER
+   ========================================================= */
+
+async function suspendMember(memberId){
+
+    const member =
+        adminMembers.find(
+            m => String(m.id) === String(memberId)
+        );
+
+
+    if(!member){
+        return;
+    }
+
+
+    const name =
+        member.full_name ||
+        "this member";
+
+
+    const reason =
+        prompt(
+            "Enter the reason for suspending " +
+            name +
+            ":"
+        );
+
+
+    if(reason === null){
+        return;
+    }
+
+
+    if(!reason.trim()){
+
+        alert(
+            "A suspension reason is required."
+        );
+
+        return;
+    }
+
+
+    if(!confirm(
+        "Suspend " +
+        name +
+        "?\n\nReason:\n" +
+        reason
+    )){
+        return;
+    }
+
+
+    try{
+
+        const {
+            error
+        } = await supabaseClient
+            .rpc(
+                "admin_suspend_member",
+                {
+                    target_id:memberId,
+                    reason:reason.trim()
+                }
+            );
+
+
+        if(error){
+            throw error;
+        }
+
+
+        showMessage(
+            "adminMessage",
+            "Member suspended successfully.",
+            "success"
+        );
+
+
+        closeMemberModal();
+
+        await loadAdminMembers();
+
+
+    }catch(error){
+
+        console.error(
+            "Suspend member error:",
+            error
+        );
+
+
+        showMessage(
+            "adminMessage",
+            error.message ||
+            "Unable to suspend member.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN: REACTIVATE MEMBER
+   ========================================================= */
+
+async function reactivateMember(memberId){
+
+    const member =
+        adminMembers.find(
+            m => String(m.id) === String(memberId)
+        );
+
+
+    const name =
+        member?.full_name ||
+        "this member";
+
+
+    if(!confirm(
+        "Reactivate " +
+        name +
+        "?\n\nThe member will return to approved status."
+    )){
+        return;
+    }
+
+
+    try{
+
+        const {
+            error
+        } = await supabaseClient
+            .rpc(
+                "admin_reactivate_member",
+                {
+                    target_id:memberId
+                }
+            );
+
+
+        if(error){
+            throw error;
+        }
+
+
+        showMessage(
+            "adminMessage",
+            "Member reactivated successfully.",
+            "success"
+        );
+
+
+        closeMemberModal();
+
+        await loadAdminMembers();
+
+
+    }catch(error){
+
+        console.error(
+            "Reactivate member error:",
+            error
+        );
+
+
+        showMessage(
+            "adminMessage",
+            error.message ||
+            "Unable to reactivate member.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL WHEN CLICKING OUTSIDE
+   ========================================================= */
+
+document
+.getElementById("memberModal")
+.addEventListener("click",function(event){
+
+    if(event.target === this){
+        closeMemberModal();
+    }
+
+});
+
+
+/* =========================================================
    AUTH STATE LISTENER
    ========================================================= */
 
@@ -2789,10 +3664,6 @@ supabaseClient.auth.onAuthStateChange(
             currentUser =
                 session.user;
 
-            /*
-             * Delay database request slightly so the
-             * authentication transaction is settled.
-             */
 
             setTimeout(
                 async () => {
@@ -2826,10 +3697,6 @@ document.addEventListener(
     "DOMContentLoaded",
     async () => {
 
-        /*
-         * Automatically set application date.
-         */
-
         const dateField =
             document.getElementById(
                 "regApplicationDate"
@@ -2846,10 +3713,6 @@ document.addEventListener(
 
         }
 
-
-        /*
-         * Check existing Supabase session.
-         */
 
         await checkSession();
 
