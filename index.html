@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>RIBACOM – Rivers Bayelsa Community The Gambia</title>
-
-<meta name="description"
-      content="Rivers Bayelsa Community in Diaspora – The Gambia. Peace • Unity • Progress">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="theme-color" content="#075e54">
+<meta name="description" content="RIVERS BAYELSA COMMUNITY THE GAMBIA - RIBACOM">
+<title>RIBACOM | Rivers Bayelsa Community The Gambia</title>
 
 <style>
 *{
@@ -18,12 +14,30 @@
     padding:0;
 }
 
+:root{
+    --primary:#075e54;
+    --primary-dark:#03463f;
+    --secondary:#0b8f68;
+    --accent:#f2b705;
+    --light:#f4f8f7;
+    --white:#ffffff;
+    --dark:#16322f;
+    --muted:#667774;
+    --border:#dce7e4;
+    --danger:#c62828;
+    --success:#18864b;
+    --shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
 body{
     font-family:Arial,Helvetica,sans-serif;
-    background:#f4f7f6;
-    color:#18332d;
-    min-height:100vh;
-    padding-bottom:80px;
+    background:var(--light);
+    color:var(--dark);
+    line-height:1.5;
 }
 
 button,
@@ -38,24 +52,41 @@ button{
 }
 
 .hidden{
-    display:none!important;
+    display:none !important;
 }
 
-/* HEADER */
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+    background:var(--primary);
+    color:white;
+    padding:10px 15px;
+    text-align:center;
+    font-size:13px;
+}
+
+.topbar strong{
+    color:#fff;
+}
+
+/* =========================
+   HEADER
+========================= */
 
 header{
-    background:linear-gradient(135deg,#006b3c,#008f55);
-    color:white;
-    padding:18px 16px;
+    background:white;
+    border-bottom:1px solid var(--border);
     position:sticky;
     top:0;
     z-index:1000;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
 
 .header-inner{
     max-width:1100px;
     margin:auto;
+    padding:12px 15px;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -65,40 +96,59 @@ header{
 .brand{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:10px;
+    cursor:pointer;
 }
 
 .logo{
-    width:52px;
-    height:52px;
+    width:48px;
+    height:48px;
     border-radius:50%;
-    background:white;
+    background:var(--primary);
+    color:white;
     display:flex;
     align-items:center;
     justify-content:center;
-    color:#007a43;
-    font-weight:900;
-    font-size:16px;
-    border:3px solid #d4af37;
+    font-weight:bold;
+    font-size:12px;
+    text-align:center;
+    border:3px solid var(--accent);
 }
 
 .brand-text h1{
-    font-size:18px;
-    line-height:1.2;
+    font-size:16px;
+    color:var(--primary);
 }
 
 .brand-text p{
-    font-size:11px;
-    opacity:.9;
-    margin-top:3px;
+    font-size:10px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.5px;
 }
 
-/* MAIN */
+.menu-btn{
+    border:0;
+    background:var(--primary);
+    color:white;
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    font-size:21px;
+}
+
+.desktop-nav{
+    display:none;
+}
+
+/* =========================
+   MAIN
+========================= */
 
 main{
     max-width:1100px;
     margin:auto;
-    padding:20px 15px;
+    padding:20px 14px 100px;
 }
 
 .screen{
@@ -109,421 +159,628 @@ main{
     display:block;
 }
 
+/* =========================
+   HERO
+========================= */
+
 .hero{
-    background:linear-gradient(135deg,#006b3c,#00a05a);
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
     color:white;
-    border-radius:18px;
     padding:35px 22px;
-    text-align:center;
+    border-radius:20px;
+    box-shadow:var(--shadow);
     margin-bottom:20px;
+    position:relative;
+    overflow:hidden;
+}
+
+.hero:after{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:35px solid rgba(255,255,255,.08);
+    right:-60px;
+    top:-60px;
 }
 
 .hero h2{
-    font-size:30px;
+    font-size:28px;
     margin-bottom:10px;
 }
 
 .hero p{
-    line-height:1.6;
+    max-width:700px;
+    color:rgba(255,255,255,.92);
 }
 
-.card{
-    background:white;
-    border-radius:14px;
-    padding:20px;
-    margin-bottom:18px;
-    box-shadow:0 2px 10px rgba(0,0,0,.07);
+.hero-buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:20px;
 }
 
-.card h3{
-    color:#006b3c;
-    margin-bottom:10px;
-}
-
-.card p{
-    line-height:1.6;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:15px;
-}
-
-.stat-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:12px;
-    margin-bottom:20px;
-}
-
-.stat{
-    background:white;
-    border-radius:12px;
-    padding:18px;
-    text-align:center;
-    box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
-
-.stat strong{
-    display:block;
-    font-size:25px;
-    color:#007a43;
-    margin-bottom:5px;
-}
-
-/* BUTTONS */
+/* =========================
+   BUTTONS
+========================= */
 
 .btn{
-    border:none;
-    background:#007a43;
+    border:0;
+    background:var(--primary);
     color:white;
-    padding:11px 17px;
-    border-radius:8px;
-    margin-top:8px;
+    padding:11px 16px;
+    border-radius:9px;
+    font-weight:bold;
     transition:.2s;
 }
 
 .btn:hover{
-    opacity:.9;
+    background:var(--primary-dark);
 }
 
 .btn-secondary{
-    background:#555;
+    background:white;
+    color:var(--primary);
+    border:1px solid var(--primary);
+}
+
+.btn-secondary:hover{
+    background:#edf7f5;
+}
+
+.btn-accent{
+    background:var(--accent);
+    color:#1e1e1e;
 }
 
 .btn-danger{
-    background:#b42318;
+    background:var(--danger);
 }
 
-.btn-warning{
-    background:#c58a00;
+.btn-success{
+    background:var(--success);
 }
 
-.btn-light{
-    background:#e8f2ed;
-    color:#006b3c;
+.btn-small{
+    padding:7px 10px;
+    font-size:12px;
 }
 
-.btn-full{
+.btn-block{
     width:100%;
 }
 
-/* FORMS */
+/* =========================
+   CARDS
+========================= */
 
-.form-group{
-    margin-bottom:14px;
+.grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:15px;
 }
 
-label{
+.card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:18px;
+    box-shadow:0 3px 15px rgba(0,0,0,.04);
+}
+
+.card h3{
+    color:var(--primary);
+    margin-bottom:7px;
+}
+
+.card p{
+    color:var(--muted);
+}
+
+.section-title{
+    margin:25px 0 12px;
+    color:var(--primary);
+}
+
+.feature-icon{
+    font-size:28px;
+    margin-bottom:8px;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+.form-card{
+    max-width:650px;
+    margin:15px auto;
+    background:white;
+    border-radius:16px;
+    padding:22px;
+    box-shadow:var(--shadow);
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+.form-group label{
     display:block;
-    font-weight:bold;
     margin-bottom:6px;
+    font-weight:bold;
     font-size:14px;
 }
 
-input,
-select,
-textarea{
+.form-group input,
+.form-group select,
+.form-group textarea{
     width:100%;
-    padding:11px;
-    border:1px solid #ccd8d3;
-    border-radius:8px;
+    border:1px solid #ccd9d6;
+    border-radius:9px;
+    padding:11px 12px;
     background:white;
-    color:#18332d;
+    outline:none;
 }
 
-textarea{
+.form-group textarea{
     min-height:110px;
     resize:vertical;
 }
 
-.form-grid{
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    border-color:var(--primary);
+}
+
+.form-row{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:14px;
+    grid-template-columns:1fr;
+    gap:12px;
 }
 
-.form-section{
-    margin:22px 0 12px;
-    padding-bottom:8px;
-    border-bottom:2px solid #e4eee9;
-    color:#006b3c;
-}
+/* =========================
+   ALERT
+========================= */
 
-.checkbox{
-    display:flex;
-    gap:8px;
-    align-items:flex-start;
-}
-
-.checkbox input{
-    width:auto;
-    margin-top:4px;
-}
-
-/* MESSAGES */
-
-.message{
-    padding:12px;
-    border-radius:8px;
+.alert{
+    padding:12px 14px;
+    border-radius:9px;
     margin-bottom:15px;
+    font-size:14px;
 }
 
-.success{
-    background:#e4f6ec;
-    color:#126b3b;
+.alert-info{
+    background:#e9f5f3;
+    color:var(--primary-dark);
 }
 
-.error{
-    background:#fde8e7;
-    color:#a11b12;
+.alert-success{
+    background:#e8f7ed;
+    color:#126338;
 }
 
-.notice{
-    background:#fff7df;
-    color:#705400;
+.alert-danger{
+    background:#fdecec;
+    color:#9b2020;
 }
 
-/* DASHBOARD */
+.alert-warning{
+    background:#fff6dc;
+    color:#795d00;
+}
 
-.dashboard-header{
-    background:white;
-    border-radius:15px;
-    padding:20px;
+/* =========================
+   PROFILE / ID
+========================= */
+
+.profile-header{
+    display:flex;
+    align-items:center;
+    gap:15px;
     margin-bottom:18px;
 }
 
-.dashboard-header h2{
-    color:#006b3c;
-    margin-bottom:6px;
-}
-
-.dashboard-card{
-    min-height:160px;
-}
-
-.dashboard-card button{
-    margin-top:12px;
-}
-
-/* DIGITAL ID */
-
-.digital-id{
-    max-width:500px;
-    margin:20px auto;
-    background:linear-gradient(135deg,#006b3c,#008f55);
+.avatar{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:var(--primary);
     color:white;
-    border-radius:18px;
-    padding:25px;
-    box-shadow:0 6px 20px rgba(0,0,0,.2);
-}
-
-.digital-id-top{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    margin-bottom:20px;
+    justify-content:center;
+    font-weight:bold;
+    font-size:23px;
+    overflow:hidden;
 }
 
-.digital-id-photo{
-    width:90px;
-    height:90px;
-    border-radius:10px;
-    background:#fff;
+.avatar img{
+    width:100%;
+    height:100%;
     object-fit:cover;
-    border:3px solid white;
 }
 
-.digital-id-info{
-    line-height:1.8;
+.profile-header h2{
+    color:var(--primary);
 }
 
-.digital-id-info strong{
-    color:#fff;
+.profile-header p{
+    color:var(--muted);
 }
 
-/* ITEMS */
-
-.item{
-    border:1px solid #e0e9e5;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:10px;
-    background:#fff;
-}
-
-.item h4{
-    color:#006b3c;
-    margin-bottom:6px;
-}
-
-.badge{
-    display:inline-block;
-    padding:5px 9px;
+.id-card{
+    max-width:450px;
+    margin:15px auto;
     border-radius:20px;
-    background:#e6f4ec;
-    color:#08733f;
-    font-size:12px;
+    overflow:hidden;
+    background:white;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    border:1px solid var(--border);
+}
+
+.id-top{
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:white;
+    padding:18px;
+    text-align:center;
+}
+
+.id-top h2{
+    font-size:18px;
+}
+
+.id-top p{
+    font-size:11px;
+}
+
+.id-body{
+    padding:20px;
+}
+
+.id-photo{
+    width:100px;
+    height:100px;
+    margin:0 auto 15px;
+    border-radius:50%;
+    background:#e7efed;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    font-size:30px;
+    color:var(--primary);
     font-weight:bold;
 }
 
-.badge-pending{
-    background:#fff2cc;
-    color:#805f00;
+.id-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
-.badge-rejected{
-    background:#fde4e4;
-    color:#a51c1c;
+.id-info{
+    text-align:center;
 }
 
-/* PROFILE */
-
-.profile-row{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    border-bottom:1px solid #e8eeeb;
-    padding:10px 0;
+.id-info h3{
+    color:var(--primary);
+    margin-bottom:4px;
 }
 
-.profile-row:last-child{
-    border-bottom:none;
-}
-
-.profile-row span:first-child{
+.membership-number{
     font-weight:bold;
-    color:#52665e;
-}
-
-/* SEARCH */
-
-.search-row{
-    display:grid;
-    grid-template-columns:1fr auto;
-    gap:10px;
-    margin-bottom:15px;
-}
-
-/* ADMIN */
-
-.admin-member{
-    border:1px solid #dce7e2;
-    border-radius:12px;
-    padding:15px;
-    margin-bottom:12px;
-}
-
-.admin-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-    margin-top:12px;
-}
-
-/* PAYMENT */
-
-.payment-method{
-    border:1px solid #dce7e2;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:10px;
-}
-
-.payment-method h4{
-    color:#006b3c;
-}
-
-.payment-status{
+    color:var(--accent);
+    background:var(--primary);
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
     margin-top:8px;
 }
 
-/* NAV */
+/* =========================
+   STATUS
+========================= */
+
+.status{
+    display:inline-block;
+    padding:4px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+    text-transform:capitalize;
+}
+
+.status-pending{
+    background:#fff3cd;
+    color:#7a5b00;
+}
+
+.status-approved,
+.status-verified{
+    background:#dff4e7;
+    color:#146c39;
+}
+
+.status-rejected{
+    background:#fde2e2;
+    color:#9c2020;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.welcome-box{
+    background:white;
+    padding:18px;
+    border-radius:15px;
+    margin-bottom:15px;
+    border-left:5px solid var(--primary);
+}
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.dashboard-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:15px;
+    min-height:125px;
+    box-shadow:0 3px 10px rgba(0,0,0,.04);
+}
+
+.dashboard-card .icon{
+    font-size:25px;
+    margin-bottom:7px;
+}
+
+.dashboard-card h3{
+    font-size:15px;
+    color:var(--primary);
+    margin-bottom:4px;
+}
+
+.dashboard-card p{
+    font-size:12px;
+    color:var(--muted);
+}
+
+/* =========================
+   LISTS
+========================= */
+
+.list-item{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:10px;
+}
+
+.list-item h3{
+    color:var(--primary);
+    margin-bottom:5px;
+}
+
+.list-item small{
+    color:var(--muted);
+}
+
+.list-item p{
+    margin-top:7px;
+    color:#42514e;
+}
+
+/* =========================
+   ADMIN
+========================= */
+
+.admin-table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+
+.admin-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:700px;
+}
+
+.admin-table th,
+.admin-table td{
+    border-bottom:1px solid var(--border);
+    padding:10px;
+    text-align:left;
+    font-size:13px;
+}
+
+.admin-table th{
+    background:#edf6f4;
+    color:var(--primary);
+}
+
+.admin-tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.admin-tools input,
+.admin-tools select{
+    border:1px solid var(--border);
+    padding:9px;
+    border-radius:8px;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
 
 .bottom-nav{
     position:fixed;
     bottom:0;
     left:0;
     right:0;
-    height:65px;
     background:white;
-    border-top:1px solid #dce5e1;
-    display:flex;
-    justify-content:center;
-    z-index:2000;
-    box-shadow:0 -2px 10px rgba(0,0,0,.08);
+    border-top:1px solid var(--border);
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    z-index:1500;
+    box-shadow:0 -3px 15px rgba(0,0,0,.08);
 }
 
-.nav-inner{
-    width:100%;
-    max-width:900px;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-}
-
-.nav-btn{
-    border:none;
-    background:none;
-    color:#587068;
+.bottom-nav button{
+    border:0;
+    background:white;
+    padding:8px 3px;
+    color:#6b7774;
     font-size:11px;
-    padding:8px;
 }
 
-.nav-btn.active{
-    color:#007a43;
+.bottom-nav button span{
+    display:block;
+    font-size:20px;
+    margin-bottom:2px;
+}
+
+.bottom-nav button.active{
+    color:var(--primary);
     font-weight:bold;
 }
 
-/* LOADING */
+/* =========================
+   FOOTER
+========================= */
 
-.loading{
+footer{
     text-align:center;
-    padding:25px;
-    color:#63756e;
+    padding:25px 15px 90px;
+    color:var(--muted);
+    font-size:12px;
 }
 
-/* MOBILE */
+/* =========================
+   LOADING
+========================= */
 
-@media(max-width:700px){
+.loading{
+    padding:25px;
+    text-align:center;
+    color:var(--muted);
+}
 
-    .form-grid{
-        grid-template-columns:1fr;
+.spinner{
+    width:28px;
+    height:28px;
+    border:3px solid #d7e5e2;
+    border-top-color:var(--primary);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+    margin:0 auto 10px;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg);}
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+    z-index:3000;
+}
+
+.modal-content{
+    background:white;
+    width:100%;
+    max-width:500px;
+    max-height:90vh;
+    overflow:auto;
+    border-radius:16px;
+    padding:20px;
+}
+
+.modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.close-btn{
+    border:0;
+    background:#eee;
+    border-radius:50%;
+    width:32px;
+    height:32px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(min-width:700px){
+
+    .menu-btn{
+        display:none;
     }
 
-    .hero h2{
-        font-size:24px;
+    .desktop-nav{
+        display:flex;
+        gap:5px;
     }
 
-    .brand-text h1{
-        font-size:15px;
+    .desktop-nav button{
+        border:0;
+        background:white;
+        color:var(--dark);
+        padding:9px 10px;
+        border-radius:8px;
     }
 
-    .brand-text p{
-        font-size:9px;
+    .desktop-nav button:hover{
+        background:#edf6f4;
+        color:var(--primary);
     }
 
-    .logo{
-        width:44px;
-        height:44px;
+    .grid{
+        grid-template-columns:repeat(3,1fr);
     }
 
-    .profile-row{
-        flex-direction:column;
-        gap:3px;
+    .form-row{
+        grid-template-columns:1fr 1fr;
     }
 
-    .search-row{
-        grid-template-columns:1fr;
+    .dashboard-grid{
+        grid-template-columns:repeat(3,1fr);
     }
 
     .bottom-nav{
-        height:62px;
+        display:none;
     }
 
-    .nav-btn{
-        font-size:9px;
+    main{
+        padding-bottom:40px;
+    }
+
+    footer{
+        padding-bottom:25px;
     }
 }
 </style>
@@ -531,94 +788,138 @@ textarea{
 
 <body>
 
+<div class="topbar">
+    <strong>PEACE • UNITY • PROGRESS</strong>
+</div>
+
 <header>
     <div class="header-inner">
 
-        <div class="brand">
-            <div class="logo">RB</div>
-
+        <div class="brand" onclick="openScreen('home')">
+            <div class="logo">RIBA<br>COM</div>
             <div class="brand-text">
                 <h1>RIBACOM</h1>
                 <p>Rivers Bayelsa Community The Gambia</p>
             </div>
         </div>
 
-        <button class="btn btn-light" onclick="openScreen('home')">
-            Home
-        </button>
+        <nav class="desktop-nav">
+            <button onclick="openScreen('home')">Home</button>
+            <button onclick="openScreen('about')">About</button>
+            <button onclick="openScreen('membership')">Membership</button>
+            <button onclick="openScreen('events')">Events</button>
+            <button onclick="openScreen('announcements')">News</button>
+            <button id="desktopLoginBtn" onclick="openScreen('login')">Login</button>
+        </nav>
 
+        <button class="menu-btn" onclick="toggleMobileMenu()">☰</button>
+
+    </div>
+
+    <div id="mobileMenu" class="hidden" style="padding:10px 15px 15px;background:white;border-top:1px solid var(--border);">
+        <button class="btn btn-block" onclick="openScreen('home');toggleMobileMenu()">Home</button>
+        <br>
+        <button class="btn btn-block btn-secondary" onclick="openScreen('about');toggleMobileMenu()">About</button>
+        <br>
+        <button class="btn btn-block btn-secondary" onclick="openScreen('membership');toggleMobileMenu()">Membership</button>
+        <br>
+        <button class="btn btn-block btn-secondary" onclick="openScreen('events');toggleMobileMenu()">Events</button>
+        <br>
+        <button class="btn btn-block btn-secondary" onclick="openScreen('announcements');toggleMobileMenu()">Announcements</button>
+        <br>
+        <button class="btn btn-block btn-secondary" onclick="openScreen(currentUser?'dashboard':'login');toggleMobileMenu()">Account</button>
     </div>
 </header>
 
 <main>
 
-<!-- HOME -->
+<!-- =========================
+     HOME
+========================= -->
 
 <section id="home" class="screen active">
 
     <div class="hero">
-
-        <h2>Rivers Bayelsa Community</h2>
-
-        <p>
-            RIVERS BAYELSA COMMUNITY IN DIASPORA – THE GAMBIA
-        </p>
+        <h2>Rivers Bayelsa Community in Diaspora</h2>
 
         <p>
-            <strong>PEACE • UNITY • PROGRESS</strong>
+            Welcome to the official digital platform of the Rivers Bayelsa
+            Community in Diaspora – The Gambia (RIBACOM).
+            Connecting our people through peace, unity and progress.
         </p>
 
-        <div style="margin-top:18px">
-
-            <button class="btn btn-light"
-                    onclick="openScreen('register')">
+        <div class="hero-buttons">
+            <button class="btn btn-accent" onclick="openScreen('registration')">
                 Become a Member
             </button>
 
-            <button class="btn"
-                    onclick="openScreen('login')">
-                Member Login
+            <button class="btn btn-secondary" onclick="openScreen('about')">
+                Learn About RIBACOM
             </button>
-
         </div>
-
     </div>
+
+    <h2 class="section-title">Our Community</h2>
 
     <div class="grid">
 
         <div class="card">
-            <h3>About RIBACOM</h3>
+            <div class="feature-icon">🤝</div>
+            <h3>Unity</h3>
             <p>
-                RIBACOM brings together Rivers and Bayelsa people
-                living in The Gambia for peace, unity, welfare,
-                cultural preservation and community development.
+                Bringing Rivers and Bayelsa people together as one community
+                in The Gambia.
             </p>
-            <button class="btn"
-                    onclick="openScreen('about')">
-                Learn More
-            </button>
         </div>
+
+        <div class="card">
+            <div class="feature-icon">🕊️</div>
+            <h3>Peace</h3>
+            <p>
+                Promoting peaceful coexistence, respect and cooperation
+                among members.
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="feature-icon">🌱</div>
+            <h3>Progress</h3>
+            <p>
+                Supporting the welfare, development and advancement of our
+                community and members.
+            </p>
+        </div>
+
+    </div>
+
+    <h2 class="section-title">What You Can Do</h2>
+
+    <div class="grid">
 
         <div class="card">
             <h3>Membership</h3>
-            <p>
-                Join the community and access your digital
-                membership services.
-            </p>
-            <button class="btn"
-                    onclick="openScreen('membership')">
-                Membership Information
+            <p>Register and become an active member of RIBACOM.</p>
+            <br>
+            <button class="btn" onclick="openScreen('registration')">
+                Register
             </button>
         </div>
 
         <div class="card">
-            <h3>Constitution</h3>
-            <p>
-                Read the governing constitution of RIBACOM.
-            </p>
-            <button class="btn"
-                    onclick="openScreen('constitution')">
-                View Constitution
+            <h3>Community Events</h3>
+            <p>Stay informed about meetings, programmes and activities.</p>
+            <br>
+            <button class="btn" onclick="openScreen('events')">
+                View Events
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>Welfare</h3>
+            <p>Access the community welfare support system.</p>
+            <br>
+            <button class="btn" onclick="requireLogin('welfare')">
+                Welfare
             </button>
         </div>
 
@@ -627,32 +928,34 @@ textarea{
 </section>
 
 
-<!-- ABOUT -->
+<!-- =========================
+     ABOUT
+========================= -->
 
 <section id="about" class="screen">
 
     <div class="card">
-
-        <h2>About RIBACOM</h2>
+        <h2 class="section-title">About RIBACOM</h2>
 
         <p>
-            <strong>
-                RIVERS BAYELSA COMMUNITY IN DIASPORA – THE GAMBIA
-            </strong>
+            <strong>RIVERS BAYELSA COMMUNITY IN DIASPORA – THE GAMBIA
+            (RIBACOM)</strong> is a community organisation bringing together
+            people of Rivers and Bayelsa heritage living in The Gambia.
         </p>
 
         <br>
 
         <p>
-            RIBACOM is a community organization bringing together
-            people of Rivers and Bayelsa origin residing in The Gambia.
+            RIBACOM promotes peaceful coexistence, unity, cultural identity,
+            welfare and community development.
         </p>
 
         <br>
 
         <p>
-            The community promotes peace, unity, progress, welfare,
-            cultural identity and mutual support among its members.
+            The organisation provides a platform through which members can
+            participate in community activities, support one another and
+            contribute positively to society.
         </p>
 
         <br>
@@ -663,44 +966,66 @@ textarea{
             <strong>PEACE • UNITY • PROGRESS</strong>
         </p>
 
+        <br>
+
+        <h3>Our Core Principles</h3>
+
+        <ul style="padding-left:20px;">
+            <li>Unity and solidarity</li>
+            <li>Peaceful coexistence</li>
+            <li>Transparency and accountability</li>
+            <li>Respect for members</li>
+            <li>Community welfare</li>
+            <li>Cultural identity</li>
+            <li>Development and progress</li>
+        </ul>
+
     </div>
 
 </section>
 
 
-<!-- MEMBERSHIP INFORMATION -->
+<!-- =========================
+     MEMBERSHIP
+========================= -->
 
 <section id="membership" class="screen">
 
     <div class="card">
+        <h2 class="section-title">Membership Information</h2>
 
-        <h2>Membership Information</h2>
+        <p>
+            Membership is open to eligible Rivers and Bayelsa people and
+            persons recognised under the community's approved membership
+            arrangements.
+        </p>
 
         <br>
 
-        <h3>Membership Benefits</h3>
+        <h3>Membership Dues</h3>
 
-        <ul style="line-height:1.9;padding-left:20px">
-            <li>Digital membership identification</li>
-            <li>Community welfare support</li>
-            <li>Access to community information</li>
-            <li>Participation in community activities</li>
-            <li>Access to events and announcements</li>
-            <li>Participation in community development</li>
+        <p>Monthly membership dues: <strong>D50</strong></p>
+
+        <br>
+
+        <h3>Welfare Levy</h3>
+
+        <p>Welfare levy: <strong>D200</strong></p>
+
+        <br>
+
+        <h3>Welfare Benefits</h3>
+
+        <ul style="padding-left:20px;">
+            <li>Wedding support: D1,000</li>
+            <li>Birth support: D500</li>
+            <li>Loss of parent, spouse or child: D1,500</li>
         </ul>
 
         <br>
 
-        <h3>Registration</h3>
-
-        <p>
-            Complete the registration form and accept the
-            RIBACOM Constitution before submitting your application.
-        </p>
-
-        <button class="btn"
-                onclick="openScreen('register')">
-            Register Now
+        <button class="btn" onclick="openScreen('registration')">
+            Register for Membership
         </button>
 
     </div>
@@ -708,785 +1033,491 @@ textarea{
 </section>
 
 
-<!-- REGISTRATION -->
+<!-- =========================
+     REGISTRATION
+========================= -->
 
-<section id="register" class="screen">
+<section id="registration" class="screen">
 
-    <div class="card">
+    <div class="form-card">
 
-        <h2>RIBACOM Membership Registration</h2>
+        <h2 class="section-title">Membership Registration</h2>
 
         <div id="registrationMessage"></div>
 
         <form id="registrationForm">
 
-            <div class="form-section">
-                Personal Information
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input id="regName" type="text" required>
             </div>
 
-            <div class="form-grid">
+            <div class="form-row">
 
                 <div class="form-group">
-                    <label>Full Name *</label>
-                    <input id="regFullName" required>
+                    <label>Phone Number *</label>
+                    <input id="regPhone" type="tel" required>
                 </div>
 
                 <div class="form-group">
                     <label>Email *</label>
-                    <input id="regEmail"
-                           type="email"
-                           required>
+                    <input id="regEmail" type="email" required>
                 </div>
 
-                <div class="form-group">
-                    <label>Password *</label>
-                    <input id="regPassword"
-                           type="password"
-                           minlength="6"
-                           required>
-                </div>
+            </div>
+
+            <div class="form-row">
 
                 <div class="form-group">
-                    <label>Phone</label>
-                    <input id="regPhone">
-                </div>
+                    <label>State of Origin</label>
 
-                <div class="form-group">
-                    <label>WhatsApp</label>
-                    <input id="regWhatsapp">
-                </div>
-
-                <div class="form-group">
-                    <label>Gender</label>
-                    <select id="regGender">
-                        <option value="">Select</option>
-                        <option>Male</option>
-                        <option>Female</option>
+                    <select id="regState">
+                        <option value="">Select State</option>
+                        <option>Rivers State</option>
+                        <option>Bayelsa State</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Date of Birth</label>
-                    <input id="regDob"
-                           type="date">
-                </div>
-
-                <div class="form-group">
-                    <label>Nationality</label>
-                    <input id="regNationality"
-                           value="Nigerian">
-                </div>
-
-                <div class="form-group">
-                    <label>Marital Status</label>
-                    <select id="regMarital">
-                        <option value="">Select</option>
-                        <option>Single</option>
-                        <option>Married</option>
-                        <option>Divorced</option>
-                        <option>Widowed</option>
-                    </select>
+                    <label>Community / LGA</label>
+                    <input id="regCommunity" type="text">
                 </div>
 
             </div>
 
-
-            <div class="form-section">
-                Rivers / Bayelsa Information
+            <div class="form-group">
+                <label>Password *</label>
+                <input id="regPassword" type="password" minlength="6" required>
             </div>
 
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>State of Origin *</label>
-
-                    <select id="regState" required>
-
-                        <option value="">
-                            Select State
-                        </option>
-
-                        <option value="Rivers">
-                            Rivers State
-                        </option>
-
-                        <option value="Bayelsa">
-                            Bayelsa State
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-                    <label>Local Government</label>
-                    <input id="regLga">
-                </div>
-
-                <div class="form-group">
-                    <label>Community / Village</label>
-                    <input id="regCommunityVillage">
-                </div>
-
-                <div class="form-group">
-                    <label>Clan / Family</label>
-                    <input id="regClanFamily">
-                </div>
-
-                <div class="form-group">
-                    <label>Other Community Information</label>
-                    <input id="regOtherCommunityInfo">
-                </div>
-
-            </div>
-
-
-            <div class="form-section">
-                Contact Information in The Gambia
-            </div>
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>Town / Area</label>
-                    <input id="regTownArea">
-                </div>
-
-                <div class="form-group">
-                    <label>Address</label>
-                    <input id="regAddress">
-                </div>
-
-            </div>
-
-
-            <div class="form-section">
-                Emergency Contact
-            </div>
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label>Emergency Contact</label>
-                    <input id="regEmergency">
-                </div>
-
-                <div class="form-group">
-                    <label>Emergency Phone</label>
-                    <input id="regEmergencyPhone">
-                </div>
-
-                <div class="form-group">
-                    <label>Next of Kin</label>
-                    <input id="regNextOfKin">
-                </div>
-
-                <div class="form-group">
-                    <label>Next of Kin Phone</label>
-                    <input id="regNextOfKinPhone">
-                </div>
-
-            </div>
-
-
-            <div class="form-section">
-                Membership
-            </div>
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>Membership Category</label>
-
-                    <select id="regMembershipCategory">
-
-                        <option value="">
-                            Select
-                        </option>
-
-                        <option>
-                            Regular Member
-                        </option>
-
-                        <option>
-                            Youth Member
-                        </option>
-
-                        <option>
-                            Elder Member
-                        </option>
-
-                        <option>
-                            Family Member
-                        </option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Previous Membership</label>
-
-                    <input id="regPreviousMembership">
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Payment Method</label>
-
-                    <select id="regPaymentMethod">
-
-                        <option value="">
-                            Select
-                        </option>
-
-                        <option>Wave</option>
-                        <option>APS Wallet</option>
-                        <option>Afrimoney</option>
-                        <option>QMoney</option>
-                        <option>Bank Transfer</option>
-                        <option>Cash</option>
-
-                    </select>
-
-                </div>
-
-            </div>
-
-
-            <div class="form-section">
-                Constitution Acceptance
-            </div>
-
-            <div class="checkbox">
-
-                <input type="checkbox"
-                       id="regConstitution"
-                       required>
-
-                <label for="regConstitution">
-                    I have read and agree to abide by the
-                    RIBACOM Constitution.
-                </label>
-
-            </div>
-
-            <br>
-
-            <button class="btn btn-full"
-                    type="submit">
-
-                Submit Registration
-
+            <button class="btn btn-block" type="submit">
+                Create Membership Account
             </button>
 
         </form>
 
         <br>
 
-        <button class="btn btn-secondary"
+        <p style="text-align:center;">
+            Already registered?
+            <button
+                class="btn btn-small btn-secondary"
                 onclick="openScreen('login')">
-
-            Already Registered? Login
-
-        </button>
+                Login
+            </button>
+        </p>
 
     </div>
 
 </section>
 
 
-<!-- LOGIN -->
+<!-- =========================
+     LOGIN
+========================= -->
 
 <section id="login" class="screen">
 
-    <div class="card">
+    <div class="form-card">
 
-        <h2>Member Login</h2>
+        <h2 class="section-title">Member Login</h2>
 
         <div id="loginMessage"></div>
 
         <form id="loginForm">
 
             <div class="form-group">
-
                 <label>Email</label>
-
-                <input id="loginEmail"
-                       type="email"
-                       required>
-
+                <input id="loginEmail" type="email" required>
             </div>
 
             <div class="form-group">
-
                 <label>Password</label>
-
-                <input id="loginPassword"
-                       type="password"
-                       required>
-
+                <input id="loginPassword" type="password" required>
             </div>
 
-            <button class="btn btn-full"
-                    type="submit">
-
+            <button class="btn btn-block" type="submit">
                 Login
-
             </button>
 
         </form>
 
         <br>
 
-        <button class="btn btn-secondary"
-                onclick="openScreen('register')">
-
-            Create Account
-
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- DASHBOARD -->
-
-<section id="dashboard" class="screen">
-
-    <div class="dashboard-header">
-
-        <h2 id="dashboardGreeting">
-            Welcome to RIBACOM
-        </h2>
-
-        <p id="dashboardStatus">
-            Membership status
+        <p style="text-align:center;">
+            Don't have an account?
+            <button
+                class="btn btn-small btn-secondary"
+                onclick="openScreen('registration')">
+                Register
+            </button>
         </p>
 
     </div>
 
+</section>
 
-    <div class="grid">
 
-        <div class="card dashboard-card">
+<!-- =========================
+     DASHBOARD
+========================= -->
 
+<section id="dashboard" class="screen">
+
+    <div id="dashboardWelcome" class="welcome-box">
+        <h2>Member Dashboard</h2>
+        <p>Welcome to your RIBACOM account.</p>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card" onclick="openScreen('digitalId')">
+            <div class="icon">🪪</div>
             <h3>Digital ID</h3>
-
-            <p>
-                View your digital RIBACOM membership ID.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('digitalID')">
-
-                Open Digital ID
-
-            </button>
-
+            <p>View your digital membership card.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('profile')">
+            <div class="icon">👤</div>
             <h3>My Profile</h3>
-
-            <p>
-                View your registered information.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('profile')">
-
-                My Profile
-
-            </button>
-
+            <p>View your membership information.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('payments')">
+            <div class="icon">💳</div>
             <h3>Dues & Payments</h3>
-
-            <p>
-                View and manage your community payments.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('payments')">
-
-                Payments
-
-            </button>
-
+            <p>View and submit payment records.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('welfare')">
+            <div class="icon">❤️</div>
             <h3>Welfare</h3>
-
-            <p>
-                Submit and track welfare requests.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('welfare')">
-
-                Welfare
-
-            </button>
-
+            <p>Submit and monitor welfare requests.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('events')">
+            <div class="icon">📅</div>
             <h3>Events</h3>
-
-            <p>
-                View upcoming community events.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('events')">
-
-                Events
-
-            </button>
-
+            <p>View community events.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('announcements')">
+            <div class="icon">📢</div>
             <h3>Announcements</h3>
-
-            <p>
-                Read community announcements.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('announcements')">
-
-                Announcements
-
-            </button>
-
+            <p>Read community announcements.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('notifications')">
+            <div class="icon">🔔</div>
             <h3>Notifications</h3>
-
-            <p>
-                View your community notifications.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('notifications')">
-
-                Notifications
-
-            </button>
-
+            <p>View important account information.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('constitution')">
+            <div class="icon">📖</div>
             <h3>Constitution</h3>
-
-            <p>
-                Read the RIBACOM Constitution.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('constitution')">
-
-                Constitution
-
-            </button>
-
+            <p>View the governing framework.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('leadership')">
+            <div class="icon">👥</div>
             <h3>Leadership</h3>
-
-            <p>
-                View RIBACOM leadership information.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('leadership')">
-
-                Leadership
-
-            </button>
-
+            <p>Community leadership information.</p>
         </div>
 
-
-        <div class="card dashboard-card">
-
+        <div class="dashboard-card" onclick="openScreen('youth')">
+            <div class="icon">🌍</div>
             <h3>Youth</h3>
-
-            <p>
-                Youth activities, programmes and announcements.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('youth')">
-
-                Youth
-
-            </button>
-
+            <p>Youth activities and programmes.</p>
         </div>
 
-
-        <div class="card dashboard-card hidden"
-             id="adminDashboardCard">
-
+        <div class="dashboard-card hidden" id="adminDashboardCard">
             <h3>Administration</h3>
-
-            <p>
-                Manage members and community administration.
-            </p>
-
-            <button class="btn"
-                    onclick="openScreen('admin')">
-
+            <p>Manage members and community administration.</p>
+            <br>
+            <button class="btn" onclick="openScreen('admin')">
                 Admin Panel
-
             </button>
-
         </div>
 
     </div>
 
+    <br>
+
+    <button class="btn btn-danger" onclick="logout()">
+        Logout
+    </button>
+
 </section>
 
 
-<!-- DIGITAL ID -->
+<!-- =========================
+     DIGITAL ID
+========================= -->
 
-<section id="digitalID" class="screen">
+<section id="digitalId" class="screen">
 
-    <div class="card">
+    <h2 class="section-title">Digital Membership ID</h2>
 
-        <h2>Digital Membership ID</h2>
-
-        <div id="digitalIDContent">
-
-            <div class="loading">
-                Loading Digital ID...
-            </div>
-
+    <div id="digitalIdContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading membership ID...
         </div>
-
     </div>
 
+    <br>
+
+    <button class="btn btn-secondary" onclick="openScreen('dashboard')">
+        ← Back to Dashboard
+    </button>
+
 </section>
 
 
-<!-- PROFILE -->
+<!-- =========================
+     PROFILE
+========================= -->
 
 <section id="profile" class="screen">
 
-    <div class="card">
+    <h2 class="section-title">My Profile</h2>
 
-        <h2>My Profile</h2>
-
-        <div id="profileContent">
-
-            <div class="loading">
-                Loading profile...
-            </div>
-
+    <div id="profileContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading profile...
         </div>
-
     </div>
 
 </section>
 
 
-<!-- PAYMENTS -->
+<!-- =========================
+     PAYMENTS
+========================= -->
 
 <section id="payments" class="screen">
 
+    <h2 class="section-title">Dues & Payments</h2>
+
+    <div id="paymentMessage"></div>
+
     <div class="card">
 
-        <h2>Dues & Payments</h2>
+        <h3>Membership Dues</h3>
 
-        <div id="paymentMessage"></div>
+        <p>
+            Monthly membership dues:
+            <strong>D50</strong>
+        </p>
+
+        <br>
+
+        <h3>Available Payment Methods</h3>
 
         <div id="paymentMethods">
-
             <div class="loading">
                 Loading payment methods...
             </div>
-
         </div>
 
-        <hr style="margin:20px 0;border:none;border-top:1px solid #ddd">
+    </div>
 
-        <h3>My Payments</h3>
+    <br>
 
-        <div id="myPayments">
+    <div class="form-card">
 
-            <div class="loading">
-                Loading payments...
+        <h3>Submit Payment</h3>
+
+        <form id="paymentForm">
+
+            <div class="form-group">
+                <label>Payment Type</label>
+
+                <select id="paymentType" required>
+                    <option value="membership_dues">
+                        Membership Dues
+                    </option>
+                    <option value="welfare_levy">
+                        Welfare Levy
+                    </option>
+                    <option value="other">
+                        Other
+                    </option>
+                </select>
             </div>
 
-        </div>
+            <div class="form-group">
+                <label>Amount (D)</label>
+                <input id="paymentAmount" type="number" min="1" step="0.01" required>
+            </div>
 
+            <div class="form-group">
+                <label>Payment Method</label>
+                <select id="paymentMethod" required>
+                    <option value="">Select method</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Reference / Transaction Number</label>
+                <input id="paymentReference" type="text">
+            </div>
+
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea id="paymentNotes"></textarea>
+            </div>
+
+            <button class="btn btn-block" type="submit">
+                Submit Payment
+            </button>
+
+        </form>
+
+    </div>
+
+    <br>
+
+    <div class="card">
+        <h3>My Payment Records</h3>
+        <div id="myPayments">
+            <div class="loading">Loading payment records...</div>
+        </div>
     </div>
 
 </section>
 
 
-<!-- WELFARE -->
+<!-- =========================
+     WELFARE
+========================= -->
 
 <section id="welfare" class="screen">
 
+    <h2 class="section-title">Welfare</h2>
+
     <div class="card">
 
-        <h2>Welfare</h2>
+        <h3>Welfare Support</h3>
+
+        <p>
+            RIBACOM welfare support is intended to assist eligible members
+            according to the community's approved welfare provisions.
+        </p>
+
+        <br>
+
+        <ul style="padding-left:20px;">
+            <li>Wedding support — D1,000</li>
+            <li>Birth support — D500</li>
+            <li>Loss of parent, spouse or child — D1,500</li>
+        </ul>
+
+    </div>
+
+    <br>
+
+    <div class="form-card">
+
+        <h3>Submit Welfare Request</h3>
 
         <div id="welfareMessage"></div>
 
         <form id="welfareForm">
 
             <div class="form-group">
-
                 <label>Request Type</label>
 
                 <select id="welfareType" required>
-
-                    <option value="">
-                        Select
-                    </option>
-
-                    <option value="Wedding">
-                        Wedding
-                    </option>
-
-                    <option value="Birth">
-                        Birth
-                    </option>
-
-                    <option value="Bereavement">
-                        Bereavement
-                    </option>
-
-                    <option value="Other">
-                        Other Welfare Request
-                    </option>
-
+                    <option value="">Select</option>
+                    <option value="wedding">Wedding</option>
+                    <option value="birth">Birth</option>
+                    <option value="loss_of_parent">Loss of Parent</option>
+                    <option value="loss_of_spouse">Loss of Spouse</option>
+                    <option value="loss_of_child">Loss of Child</option>
+                    <option value="other">Other</option>
                 </select>
-
             </div>
 
             <div class="form-group">
-
                 <label>Description</label>
-
-                <textarea id="welfareDescription"
-                          required></textarea>
-
+                <textarea id="welfareDescription" required></textarea>
             </div>
 
-            <button class="btn"
-                    type="submit">
-
+            <button class="btn btn-block" type="submit">
                 Submit Welfare Request
-
             </button>
 
         </form>
 
     </div>
 
+    <br>
 
     <div class="card">
-
         <h3>My Welfare Requests</h3>
-
         <div id="myWelfareRequests">
-
-            <div class="loading">
-                Loading...
-            </div>
-
+            <div class="loading">Loading welfare requests...</div>
         </div>
-
     </div>
 
 </section>
 
 
-<!-- EVENTS -->
+<!-- =========================
+     EVENTS
+========================= -->
 
 <section id="events" class="screen">
 
-    <div class="card">
+    <h2 class="section-title">Community Events</h2>
 
-        <h2>Community Events</h2>
-
-        <div id="eventsList">
-
-            <div class="loading">
-                Loading events...
-            </div>
-
+    <div id="eventsList">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading events...
         </div>
-
     </div>
 
 </section>
 
 
-<!-- ANNOUNCEMENTS -->
+<!-- =========================
+     ANNOUNCEMENTS
+========================= -->
 
 <section id="announcements" class="screen">
 
-    <div class="card">
+    <h2 class="section-title">Announcements</h2>
 
-        <h2>Announcements</h2>
-
-        <div id="announcementsList">
-
-            <div class="loading">
-                Loading announcements...
-            </div>
-
+    <div id="announcementsList">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading announcements...
         </div>
-
     </div>
 
 </section>
 
 
-<!-- NOTIFICATIONS -->
+<!-- =========================
+     NOTIFICATIONS
+========================= -->
 
 <section id="notifications" class="screen">
 
+    <h2 class="section-title">Notifications</h2>
+
     <div class="card">
 
-        <h2>Notifications</h2>
+        <h3>Account Notifications</h3>
 
-        <div class="notice">
-
-            Your community notifications will appear here.
-
+        <div id="notificationsList">
+            <div class="alert alert-info">
+                Your important RIBACOM account updates will appear here.
+            </div>
         </div>
 
     </div>
@@ -1494,42 +1525,68 @@ textarea{
 </section>
 
 
-<!-- CONSTITUTION -->
+<!-- =========================
+     CONSTITUTION
+========================= -->
 
 <section id="constitution" class="screen">
 
     <div class="card">
 
-        <h2>RIBACOM Constitution</h2>
+        <h2 class="section-title">RIBACOM Constitution</h2>
+
+        <div class="alert alert-info">
+            The approved RIBACOM Constitution governs the organisation,
+            membership, leadership, welfare and community administration.
+        </div>
+
+        <h3>Organisational Structure</h3>
 
         <p>
-            The RIBACOM Constitution is the governing document
-            of the Rivers Bayelsa Community in Diaspora – The Gambia.
+            RIBACOM is governed through its approved constitutional
+            structures and democratic community processes.
         </p>
 
         <br>
 
-        <h3>Core Values</h3>
+        <h3>Executive Committee</h3>
+
+        <ol style="padding-left:20px;">
+            <li>Chairman</li>
+            <li>Vice-Chairman</li>
+            <li>Secretary General</li>
+            <li>Assistant Secretary General</li>
+            <li>Treasurer</li>
+            <li>Public Relations Officer</li>
+            <li>Welfare Officer / Provost</li>
+        </ol>
+
+        <br>
+
+        <h3>Oversight Committee</h3>
 
         <p>
-            Peace • Unity • Progress
+            The oversight structure provides advisory support in the areas
+            of Legal, Protocol, Youth and Cultural matters.
         </p>
 
         <br>
 
-        <h3>Membership</h3>
+        <h3>Council of Elders</h3>
 
         <p>
-            Members are expected to respect the Constitution,
-            community decisions and the principles of peaceful
-            community participation.
+            The Council of Elders provides experience, guidance and
+            community counsel in accordance with the constitution.
         </p>
 
         <br>
 
+        <h3>General Meetings</h3>
+
         <p>
-            The full approved Constitution should be made
-            available here as the official community document.
+            The regular general meeting is held on the last Sunday of the
+            month at 4:00 PM, subject to the approved constitutional
+            arrangements.
         </p>
 
     </div>
@@ -1537,251 +1594,171 @@ textarea{
 </section>
 
 
-<!-- LEADERSHIP -->
+<!-- =========================
+     LEADERSHIP
+========================= -->
 
 <section id="leadership" class="screen">
 
+    <h2 class="section-title">RIBACOM Leadership</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <h3>Chairman</h3>
+            <p>Community Executive Leadership</p>
+        </div>
+
+        <div class="card">
+            <h3>Vice-Chairman</h3>
+            <p>Community Executive Leadership</p>
+        </div>
+
+        <div class="card">
+            <h3>Secretary General</h3>
+            <p>Administration and records</p>
+        </div>
+
+        <div class="card">
+            <h3>Assistant Secretary General</h3>
+            <p>Administrative support</p>
+        </div>
+
+        <div class="card">
+            <h3>Treasurer</h3>
+            <p>Financial administration</p>
+        </div>
+
+        <div class="card">
+            <h3>Public Relations Officer</h3>
+            <p>Communication and public relations</p>
+        </div>
+
+        <div class="card">
+            <h3>Welfare Officer / Provost</h3>
+            <p>Member welfare and community support</p>
+        </div>
+
+    </div>
+
+    <br>
+
     <div class="card">
-
-        <h2>RIBACOM Leadership</h2>
-
+        <h3>Tenure</h3>
         <p>
-            The RIBACOM Executive consists of seven positions:
+            Executive tenure is two years in accordance with the approved
+            RIBACOM constitutional arrangement.
         </p>
-
-        <br>
-
-        <div class="item">
-            <h4>Chairman</h4>
-            <p>Community Executive</p>
-        </div>
-
-        <div class="item">
-            <h4>Vice-Chairman</h4>
-            <p>Community Executive</p>
-        </div>
-
-        <div class="item">
-            <h4>Secretary General</h4>
-            <p>Community Executive</p>
-        </div>
-
-        <div class="item">
-            <h4>Assistant Secretary General</h4>
-            <p>Community Executive</p>
-        </div>
-
-        <div class="item">
-            <h4>Treasurer</h4>
-            <p>Community Executive</p>
-        </div>
-
-        <div class="item">
-            <h4>Public Relations Officer</h4>
-            <p>Community Executive</p>
-        </div>
-
-        <div class="item">
-            <h4>Welfare Officer / Provost</h4>
-            <p>Community Executive</p>
-        </div>
-
     </div>
 
 </section>
 
 
-<!-- YOUTH -->
+<!-- =========================
+     YOUTH
+========================= -->
 
 <section id="youth" class="screen">
 
     <div class="card">
 
-        <h2>RIBACOM Youth</h2>
+        <h2 class="section-title">RIBACOM Youth</h2>
 
         <p>
-            The Youth section provides information about youth
-            activities and opportunities within RIBACOM.
+            The RIBACOM Youth platform provides a space for young members
+            to participate in community activities, programmes and
+            development initiatives.
         </p>
 
-        <br>
+    </div>
 
-        <h3>Activities</h3>
+    <br>
 
-        <p>
-            Youth activities and community programmes will be
-            published here.
-        </p>
+    <div class="grid">
 
-        <br>
+        <div class="card">
+            <h3>Activities</h3>
+            <p>Youth-focused community activities and participation.</p>
+        </div>
 
-        <h3>Events & Programmes</h3>
+        <div class="card">
+            <h3>Events & Programmes</h3>
+            <p>Information about youth events and programmes.</p>
+        </div>
 
-        <p>
-            Upcoming youth events and programmes will appear here.
-        </p>
+        <div class="card">
+            <h3>Announcements</h3>
+            <p>Youth-related community announcements.</p>
+        </div>
 
-        <br>
-
-        <h3>Announcements</h3>
-
-        <p>
-            Youth announcements will be published here.
-        </p>
+        <div class="card">
+            <h3>Participation</h3>
+            <p>Opportunities for young members to contribute to RIBACOM.</p>
+        </div>
 
     </div>
 
 </section>
 
 
-<!-- ADMINISTRATION -->
+<!-- =========================
+     ADMIN
+========================= -->
 
 <section id="admin" class="screen">
 
     <div class="card">
 
-        <h2>Administration</h2>
+        <h2 class="section-title">Administration</h2>
 
-        <p>
-            RIBACOM administrative control panel.
-        </p>
+        <div id="adminAccessMessage"></div>
 
-    </div>
+        <div class="admin-tools">
 
+            <input
+                id="memberSearch"
+                type="search"
+                placeholder="Search members..."
+                oninput="filterAdminMembers()">
 
-    <div class="stat-grid">
+            <select id="memberStatusFilter" onchange="filterAdminMembers()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+            </select>
 
-        <div class="stat">
-            <strong id="adminTotalMembers">0</strong>
-            <span>Total Members</span>
-        </div>
-
-        <div class="stat">
-            <strong id="adminPendingMembers">0</strong>
-            <span>Pending</span>
-        </div>
-
-        <div class="stat">
-            <strong id="adminApprovedMembers">0</strong>
-            <span>Approved</span>
-        </div>
-
-        <div class="stat">
-            <strong id="adminRejectedMembers">0</strong>
-            <span>Rejected</span>
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Membership Applications</h3>
-
-        <div class="search-row">
-
-            <input id="adminSearch"
-                   placeholder="Search members...">
-
-            <button class="btn"
-                    onclick="loadAdminMembers()">
-
-                Search
-
+            <button class="btn btn-small" onclick="loadAdminMembers()">
+                Refresh
             </button>
 
         </div>
 
-        <div class="form-grid">
-
-            <div class="form-group">
-
-                <label>Status</label>
-
-                <select id="adminStatusFilter"
-                        onchange="loadAdminMembers()">
-
-                    <option value="">
-                        All
-                    </option>
-
-                    <option value="pending">
-                        Pending
-                    </option>
-
-                    <option value="approved">
-                        Approved
-                    </option>
-
-                    <option value="rejected">
-                        Rejected
-                    </option>
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>State</label>
-
-                <select id="adminStateFilter"
-                        onchange="loadAdminMembers()">
-
-                    <option value="">
-                        All States
-                    </option>
-
-                    <option value="Rivers">
-                        Rivers
-                    </option>
-
-                    <option value="Bayelsa">
-                        Bayelsa
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-        <div id="adminMembersList">
-
+        <div id="adminMembers">
             <div class="loading">
+                <div class="spinner"></div>
                 Loading members...
             </div>
-
         </div>
 
     </div>
 
+    <br>
 
     <div class="card">
 
         <h3>Payment Administration</h3>
 
-        <div id="adminPaymentsList">
+        <button class="btn btn-small" onclick="loadAdminPayments()">
+            Load Payments
+        </button>
 
-            <div class="loading">
-                Loading payments...
+        <br><br>
+
+        <div id="adminPayments">
+            <div class="alert alert-info">
+                Select "Load Payments" to view payment records.
             </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="card">
-
-        <h3>Payment Settings</h3>
-
-        <div id="adminPaymentSettings">
-
-            <div class="loading">
-                Loading payment settings...
-            </div>
-
         </div>
 
     </div>
@@ -1791,54 +1768,105 @@ textarea{
 </main>
 
 
-<!-- BOTTOM NAVIGATION -->
+<footer>
+
+    <strong>RIVERS BAYELSA COMMUNITY THE GAMBIA</strong>
+
+    <br>
+
+    RIBACOM
+
+    <br><br>
+
+    PEACE • UNITY • PROGRESS
+
+    <br><br>
+
+    Contact:
+    <a href="mailto:ribacom_gambia@gmail.com">
+        ribacom_gambia@gmail.com
+    </a>
+
+    <br><br>
+
+    © <span id="currentYear"></span> RIBACOM. All rights reserved.
+
+</footer>
+
+
+<!-- =========================
+     BOTTOM NAV
+========================= -->
 
 <nav class="bottom-nav">
 
-    <div class="nav-inner">
+    <button id="navHome" onclick="openScreen('home')">
+        <span>🏠</span>
+        Home
+    </button>
 
-        <button class="nav-btn"
-                onclick="openScreen('home')">
-            Home
-        </button>
+    <button id="navEvents" onclick="openScreen('events')">
+        <span>📅</span>
+        Events
+    </button>
 
-        <button class="nav-btn"
-                onclick="openScreen('membership')">
-            Membership
-        </button>
+    <button id="navDashboard" onclick="openScreen(currentUser?'dashboard':'login')">
+        <span>👤</span>
+        Account
+    </button>
 
-        <button class="nav-btn"
-                onclick="openScreen('events')">
-            Events
-        </button>
-
-        <button class="nav-btn"
-                onclick="openScreen('announcements')">
-            News
-        </button>
-
-        <button class="nav-btn"
-                id="accountNavBtn"
-                onclick="handleAccountNav()">
-            Account
-        </button>
-
-    </div>
+    <button id="navAbout" onclick="openScreen('about')">
+        <span>ℹ️</span>
+        About
+    </button>
 
 </nav>
 
 
+<!-- =========================
+     MODAL
+========================= -->
+
+<div id="modal" class="modal hidden">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h3 id="modalTitle">RIBACOM</h3>
+
+            <button class="close-btn" onclick="closeModal()">
+                ×
+            </button>
+
+        </div>
+
+        <div id="modalBody"></div>
+
+    </div>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 
 /* ============================================================
-   SUPABASE
+   RIBACOM MASTER JAVASCRIPT
+============================================================ */
+
+
+/* ============================================================
+   SUPABASE CONFIGURATION
 ============================================================ */
 
 const SUPABASE_URL =
     "https://ugxszhbdcnfcnkwapgnd.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_TnhJlJErycLtPHL3nbtMA_Oe34G_ks";
+    "sb_publishable_TnhJlJErycLtPHL3JnbtMA_Oe34G_ks";
 
 const supabaseClient =
     window.supabase.createClient(
@@ -1853,26 +1881,157 @@ const supabaseClient =
 
 let currentUser = null;
 let currentMember = null;
+let adminMembers = [];
+let paymentMethods = [];
 
 
 /* ============================================================
-   SCREEN NAVIGATION
+   BASIC UTILITIES
+============================================================ */
+
+function escapeHtml(value){
+
+    if(value === null || value === undefined){
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+
+function formatDate(value){
+
+    if(!value){
+        return "Not available";
+    }
+
+    const date = new Date(value);
+
+    if(isNaN(date.getTime())){
+        return escapeHtml(value);
+    }
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            year:"numeric",
+            month:"short",
+            day:"numeric"
+        }
+    );
+}
+
+
+function formatDateTime(value){
+
+    if(!value){
+        return "Not available";
+    }
+
+    const date = new Date(value);
+
+    if(isNaN(date.getTime())){
+        return escapeHtml(value);
+    }
+
+    return date.toLocaleString(
+        undefined,
+        {
+            year:"numeric",
+            month:"short",
+            day:"numeric",
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+
+function initials(name){
+
+    if(!name){
+        return "R";
+    }
+
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0,2)
+        .map(x => x.charAt(0))
+        .join("")
+        .toUpperCase();
+}
+
+
+function statusBadge(status){
+
+    const safeStatus =
+        String(status || "pending")
+            .toLowerCase();
+
+    return `
+        <span class="status status-${escapeHtml(safeStatus)}">
+            ${escapeHtml(status || "pending")}
+        </span>
+    `;
+}
+
+
+function showMessage(
+    elementId,
+    message,
+    type = "info"
+){
+
+    const el =
+        document.getElementById(elementId);
+
+    if(!el){
+        return;
+    }
+
+    el.innerHTML =
+        `<div class="alert alert-${type}">
+            ${escapeHtml(message)}
+        </div>`;
+}
+
+
+function clearMessage(elementId){
+
+    const el =
+        document.getElementById(elementId);
+
+    if(el){
+        el.innerHTML = "";
+    }
+}
+
+
+/* ============================================================
+   NAVIGATION
 ============================================================ */
 
 function openScreen(screenId){
-
-    document.querySelectorAll(".screen")
-        .forEach(function(screen){
-            screen.classList.remove("active");
-        });
 
     const target =
         document.getElementById(screenId);
 
     if(!target){
-        console.error("Screen not found:",screenId);
         return;
     }
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(
+            screen =>
+                screen.classList.remove("active")
+        );
 
     target.classList.add("active");
 
@@ -1881,25 +2040,27 @@ function openScreen(screenId){
         behavior:"smooth"
     });
 
+    updateBottomNav(screenId);
 
     if(screenId === "dashboard"){
-        loadDashboard();
+        renderDashboard();
     }
 
-    if(screenId === "digitalID"){
-        loadDigitalID();
+    if(screenId === "digitalId"){
+        renderDigitalId();
     }
 
     if(screenId === "profile"){
-        loadProfile();
+        renderProfile();
     }
 
     if(screenId === "payments"){
-        loadPayments();
+        loadPaymentMethods();
+        loadMyPayments();
     }
 
     if(screenId === "welfare"){
-        loadWelfare();
+        loadMyWelfareRequests();
     }
 
     if(screenId === "events"){
@@ -1911,29 +2072,124 @@ function openScreen(screenId){
     }
 
     if(screenId === "admin"){
-        loadAdmin();
+        loadAdminPage();
     }
 
+    if(screenId === "notifications"){
+        loadNotifications();
+    }
+}
+
+
+function updateBottomNav(screenId){
+
+    document
+        .querySelectorAll(".bottom-nav button")
+        .forEach(
+            button =>
+                button.classList.remove("active")
+        );
+
+    if(screenId === "home"){
+        document
+            .getElementById("navHome")
+            ?.classList.add("active");
+    }
+
+    if(screenId === "events"){
+        document
+            .getElementById("navEvents")
+            ?.classList.add("active");
+    }
+
+    if(
+        [
+            "dashboard",
+            "digitalId",
+            "profile",
+            "payments",
+            "welfare",
+            "notifications",
+            "admin"
+        ].includes(screenId)
+    ){
+        document
+            .getElementById("navDashboard")
+            ?.classList.add("active");
+    }
+
+    if(
+        [
+            "about",
+            "membership",
+            "constitution",
+            "leadership",
+            "youth"
+        ].includes(screenId)
+    ){
+        document
+            .getElementById("navAbout")
+            ?.classList.add("active");
+    }
+}
+
+
+function toggleMobileMenu(){
+
+    const menu =
+        document.getElementById("mobileMenu");
+
+    if(menu){
+        menu.classList.toggle("hidden");
+    }
+}
+
+
+function requireLogin(screenId){
+
+    if(!currentUser){
+        showMessage(
+            "loginMessage",
+            "Please login to access your member account.",
+            "warning"
+        );
+
+        openScreen("login");
+        return;
+    }
+
+    openScreen(screenId);
 }
 
 
 /* ============================================================
-   ACCOUNT NAV
+   MODAL
 ============================================================ */
 
-function handleAccountNav(){
+function openModal(title,body){
 
-    if(currentUser){
-        openScreen("dashboard");
-    }else{
-        openScreen("login");
-    }
+    document.getElementById("modalTitle")
+        .textContent = title;
 
+    document.getElementById("modalBody")
+        .innerHTML = body;
+
+    document
+        .getElementById("modal")
+        .classList.remove("hidden");
+}
+
+
+function closeModal(){
+
+    document
+        .getElementById("modal")
+        .classList.add("hidden");
 }
 
 
 /* ============================================================
-   MEMBER LOADING
+   CURRENT MEMBER
 ============================================================ */
 
 async function loadCurrentMember(){
@@ -1944,7 +2200,10 @@ async function loadCurrentMember(){
         return null;
     }
 
-    const {data,error} =
+    const {
+        data,
+        error
+    } =
         await supabaseClient
             .from("members")
             .select("*")
@@ -1958,20 +2217,20 @@ async function loadCurrentMember(){
             error
         );
 
+        currentMember = null;
+        updateAccountUI();
+
         return null;
     }
 
-    currentMember = data || null;
+    currentMember =
+        data || null;
 
     updateAccountUI();
 
     return currentMember;
 }
 
-
-/* ============================================================
-   ACCOUNT UI
-============================================================ */
 
 function updateAccountUI(){
 
@@ -1980,13 +2239,14 @@ function updateAccountUI(){
             "adminDashboardCard"
         );
 
-    if(!adminCard) return;
+    if(!adminCard){
+        return;
+    }
 
     if(
         currentMember &&
-        String(
-            currentMember.role || ""
-        ).toLowerCase() === "admin"
+        String(currentMember.role || "")
+            .toLowerCase() === "admin"
     ){
 
         adminCard.classList.remove("hidden");
@@ -1994,331 +2254,42 @@ function updateAccountUI(){
     }else{
 
         adminCard.classList.add("hidden");
-
     }
 
+    const desktopLoginBtn =
+        document.getElementById(
+            "desktopLoginBtn"
+        );
+
+    if(desktopLoginBtn){
+
+        if(currentUser){
+
+            desktopLoginBtn.textContent =
+                "Dashboard";
+
+            desktopLoginBtn.onclick =
+                () => openScreen("dashboard");
+
+        }else{
+
+            desktopLoginBtn.textContent =
+                "Login";
+
+            desktopLoginBtn.onclick =
+                () => openScreen("login");
+        }
+    }
 }
 
-
-/* ============================================================
-   ADMIN CHECK
-============================================================ */
 
 function isAdmin(){
 
     return !!(
         currentMember &&
-        String(
-            currentMember.role || ""
-        ).toLowerCase() === "admin"
+        String(currentMember.role || "")
+            .toLowerCase() === "admin"
     );
-
-}
-
-
-/* ============================================================
-   REGISTRATION
-============================================================ */
-
-document
-.getElementById("registrationForm")
-.addEventListener("submit",async function(event){
-
-    event.preventDefault();
-
-    const message =
-        document.getElementById(
-            "registrationMessage"
-        );
-
-    message.innerHTML =
-        '<div class="message notice">Creating your account...</div>';
-
-
-    const full_name =
-        document.getElementById("regFullName").value.trim();
-
-    const email =
-        document.getElementById("regEmail").value.trim();
-
-    const password =
-        document.getElementById("regPassword").value;
-
-    const phone =
-        document.getElementById("regPhone").value.trim();
-
-    const whatsapp =
-        document.getElementById("regWhatsapp").value.trim();
-
-    const gender =
-        document.getElementById("regGender").value;
-
-    const date_of_birth =
-        document.getElementById("regDob").value || null;
-
-    const nationality =
-        document.getElementById("regNationality").value.trim();
-
-    const marital_status =
-        document.getElementById("regMarital").value;
-
-    const state =
-        document.getElementById("regState").value;
-
-    const local_government =
-        document.getElementById("regLga").value.trim();
-
-    const community_village =
-        document.getElementById(
-            "regCommunityVillage"
-        ).value.trim();
-
-    const clan_family =
-        document.getElementById(
-            "regClanFamily"
-        ).value.trim();
-
-    const other_community_info =
-        document.getElementById(
-            "regOtherCommunityInfo"
-        ).value.trim();
-
-    const town_area =
-        document.getElementById(
-            "regTownArea"
-        ).value.trim();
-
-    const address =
-        document.getElementById(
-            "regAddress"
-        ).value.trim();
-
-    const emergency_contact =
-        document.getElementById(
-            "regEmergency"
-        ).value.trim();
-
-    const emergency_phone =
-        document.getElementById(
-            "regEmergencyPhone"
-        ).value.trim();
-
-    const next_of_kin =
-        document.getElementById(
-            "regNextOfKin"
-        ).value.trim();
-
-    const next_of_kin_phone =
-        document.getElementById(
-            "regNextOfKinPhone"
-        ).value.trim();
-
-    const membership_category =
-        document.getElementById(
-            "regMembershipCategory"
-        ).value;
-
-    const previous_membership =
-        document.getElementById(
-            "regPreviousMembership"
-        ).value.trim();
-
-    const payment_method =
-        document.getElementById(
-            "regPaymentMethod"
-        ).value;
-
-    const constitution_accepted =
-        document.getElementById(
-            "regConstitution"
-        ).checked;
-
-
-    const {data,error} =
-        await supabaseClient.auth.signUp({
-
-            email:email,
-
-            password:password,
-
-            options:{
-                data:{
-                    full_name,
-                    phone,
-                    state,
-                    community:community_village,
-                    whatsapp,
-                    gender,
-                    date_of_birth,
-                    nationality,
-                    marital_status,
-                    local_government,
-                    community_village,
-                    clan_family,
-                    other_community_info,
-                    town_area,
-                    address,
-                    emergency_contact,
-                    emergency_phone,
-                    next_of_kin,
-                    next_of_kin_phone,
-                    membership_category,
-                    previous_membership,
-                    payment_method,
-                    constitution_accepted
-                }
-            }
-
-        });
-
-
-    if(error){
-
-        message.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
-
-        return;
-    }
-
-
-    if(data?.user){
-
-        /*
-          The trigger creates the basic member record.
-          The additional fields are updated here.
-        */
-
-        await supabaseClient
-            .from("members")
-            .update({
-
-                whatsapp,
-                gender,
-                date_of_birth,
-                nationality,
-                marital_status,
-                local_government,
-                community_village,
-                clan_family,
-                other_community_info,
-                town_area,
-                address,
-                emergency_contact,
-                emergency_phone,
-                next_of_kin,
-                next_of_kin_phone,
-                membership_category,
-                previous_membership,
-                payment_method,
-                constitution_accepted,
-                application_date:new Date().toISOString()
-
-            })
-            .eq("id",data.user.id);
-
-
-        message.innerHTML =
-            '<div class="message success">' +
-            'Registration successful. Your application is pending approval.' +
-            '</div>';
-
-
-        document
-            .getElementById("registrationForm")
-            .reset();
-
-
-        setTimeout(function(){
-            openScreen("login");
-        },1500);
-
-    }
-
-});
-
-
-/* ============================================================
-   LOGIN
-============================================================ */
-
-document
-.getElementById("loginForm")
-.addEventListener("submit",async function(event){
-
-    event.preventDefault();
-
-    const message =
-        document.getElementById(
-            "loginMessage"
-        );
-
-    message.innerHTML =
-        '<div class="message notice">Signing in...</div>';
-
-
-    const email =
-        document.getElementById(
-            "loginEmail"
-        ).value.trim();
-
-    const password =
-        document.getElementById(
-            "loginPassword"
-        ).value;
-
-
-    const {data,error} =
-        await supabaseClient.auth.signInWithPassword({
-
-            email,
-            password
-
-        });
-
-
-    if(error){
-
-        message.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
-
-        return;
-    }
-
-
-    currentUser =
-        data?.user || null;
-
-    await loadCurrentMember();
-
-    message.innerHTML =
-        '<div class="message success">' +
-        'Login successful.' +
-        '</div>';
-
-    openScreen("dashboard");
-
-});
-
-
-/* ============================================================
-   LOGOUT
-============================================================ */
-
-async function logout(){
-
-    await supabaseClient.auth.signOut();
-
-    currentUser = null;
-    currentMember = null;
-
-    updateAccountUI();
-
-    openScreen("home");
-
 }
 
 
@@ -2339,193 +2310,471 @@ supabaseClient.auth.onAuthStateChange(
         }else{
 
             currentMember = null;
+
             updateAccountUI();
-
         }
-
     }
 );
+
+
+/* ============================================================
+   INITIAL SESSION
+============================================================ */
+
+async function initialiseApp(){
+
+    document.getElementById("currentYear")
+        .textContent =
+        new Date().getFullYear();
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+    if(error){
+
+        console.error(
+            "Session error:",
+            error
+        );
+
+        return;
+    }
+
+    currentUser =
+        data?.session?.user || null;
+
+    if(currentUser){
+        await loadCurrentMember();
+    }
+
+    updateAccountUI();
+}
+
+
+/* ============================================================
+   REGISTRATION
+============================================================ */
+
+document
+    .getElementById("registrationForm")
+    ?.addEventListener(
+        "submit",
+        async function(event){
+
+            event.preventDefault();
+
+            clearMessage("registrationMessage");
+
+            const fullName =
+                document
+                    .getElementById("regName")
+                    .value
+                    .trim();
+
+            const phone =
+                document
+                    .getElementById("regPhone")
+                    .value
+                    .trim();
+
+            const email =
+                document
+                    .getElementById("regEmail")
+                    .value
+                    .trim();
+
+            const state =
+                document
+                    .getElementById("regState")
+                    .value;
+
+            const community =
+                document
+                    .getElementById("regCommunity")
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById("regPassword")
+                    .value;
+
+            if(!fullName || !email || !password){
+
+                showMessage(
+                    "registrationMessage",
+                    "Please complete all required fields.",
+                    "danger"
+                );
+
+                return;
+            }
+
+            const submitButton =
+                event.target.querySelector(
+                    "button[type='submit']"
+                );
+
+            submitButton.disabled = true;
+            submitButton.textContent =
+                "Creating account...";
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient.auth.signUp({
+
+                    email,
+
+                    password,
+
+                    options:{
+                        data:{
+                            full_name:fullName,
+                            phone:phone,
+                            state:state,
+                            community:community
+                        }
+                    }
+                });
+
+            submitButton.disabled = false;
+            submitButton.textContent =
+                "Create Membership Account";
+
+            if(error){
+
+                console.error(
+                    "Registration error:",
+                    error
+                );
+
+                showMessage(
+                    "registrationMessage",
+                    error.message,
+                    "danger"
+                );
+
+                return;
+            }
+
+            showMessage(
+                "registrationMessage",
+                "Registration successful. Your membership is now pending approval by RIBACOM administration.",
+                "success"
+            );
+
+            event.target.reset();
+
+            if(data?.session){
+
+                currentUser =
+                    data.user || data.session.user;
+
+                await loadCurrentMember();
+            }
+
+        }
+    );
+
+
+/* ============================================================
+   LOGIN
+============================================================ */
+
+document
+    .getElementById("loginForm")
+    ?.addEventListener(
+        "submit",
+        async function(event){
+
+            event.preventDefault();
+
+            clearMessage("loginMessage");
+
+            const email =
+                document
+                    .getElementById("loginEmail")
+                    .value
+                    .trim();
+
+            const password =
+                document
+                    .getElementById("loginPassword")
+                    .value;
+
+            const button =
+                event.target.querySelector(
+                    "button[type='submit']"
+                );
+
+            button.disabled = true;
+            button.textContent =
+                "Logging in...";
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient.auth
+                    .signInWithPassword({
+                        email,
+                        password
+                    });
+
+            button.disabled = false;
+            button.textContent = "Login";
+
+            if(error){
+
+                console.error(
+                    "Login error:",
+                    error
+                );
+
+                showMessage(
+                    "loginMessage",
+                    error.message,
+                    "danger"
+                );
+
+                return;
+            }
+
+            currentUser =
+                data?.user || null;
+
+            await loadCurrentMember();
+
+            showMessage(
+                "loginMessage",
+                "Login successful.",
+                "success"
+            );
+
+            setTimeout(
+                () => openScreen("dashboard"),
+                400
+            );
+        }
+    );
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+async function logout(){
+
+    await supabaseClient.auth.signOut();
+
+    currentUser = null;
+    currentMember = null;
+
+    updateAccountUI();
+
+    openScreen("home");
+}
 
 
 /* ============================================================
    DASHBOARD
 ============================================================ */
 
-async function loadDashboard(){
+function renderDashboard(){
+
+    const welcome =
+        document.getElementById(
+            "dashboardWelcome"
+        );
+
+    if(!welcome){
+        return;
+    }
 
     if(!currentUser){
 
-        openScreen("login");
-        return;
-
-    }
-
-    if(!currentMember){
-
-        await loadCurrentMember();
-
-    }
-
-    if(!currentMember){
+        welcome.innerHTML = `
+            <h2>Member Dashboard</h2>
+            <p>Please login to access your account.</p>
+        `;
 
         return;
-
     }
 
+    const name =
+        currentMember?.full_name ||
+        currentUser.email ||
+        "Member";
 
-    document
-        .getElementById(
-            "dashboardGreeting"
-        )
-        .textContent =
-        "Welcome, " +
-        (
-            currentMember.full_name ||
-            "RIBACOM Member"
-        );
+    const status =
+        currentMember?.status ||
+        "pending";
 
+    welcome.innerHTML = `
+        <h2>Welcome, ${escapeHtml(name)}</h2>
 
-    document
-        .getElementById(
-            "dashboardStatus"
-        )
-        .textContent =
-        "Membership status: " +
-        (
-            currentMember.status ||
-            "pending"
-        );
+        <p>
+            RIBACOM Member Account
+        </p>
 
+        <br>
 
-    updateAccountUI();
+        <p>
+            Membership status:
+            ${statusBadge(status)}
+        </p>
 
+        ${
+            currentMember?.membership_number
+            ?
+            `<p style="margin-top:7px;">
+                Membership Number:
+                <strong>
+                    ${escapeHtml(currentMember.membership_number)}
+                </strong>
+            </p>`
+            :
+            ""
+        }
+    `;
 }
 
 
 /* ============================================================
-   DIGITAL ID
+   DIGITAL MEMBERSHIP ID
 ============================================================ */
 
-async function loadDigitalID(){
+function renderDigitalId(){
 
     const container =
         document.getElementById(
-            "digitalIDContent"
+            "digitalIdContainer"
         );
+
+    if(!container){
+        return;
+    }
 
     if(!currentUser){
 
-        container.innerHTML =
-            '<div class="message error">' +
-            'Please login first.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Please login to view your membership ID.
+            </div>
+        `;
 
         return;
-
     }
-
 
     if(!currentMember){
 
-        await loadCurrentMember();
-
-    }
-
-
-    if(!currentMember){
-
-        container.innerHTML =
-            '<div class="message error">' +
-            'Member information could not be loaded.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Your membership record could not be loaded.
+            </div>
+        `;
 
         return;
-
     }
 
+    const name =
+        currentMember.full_name ||
+        currentUser.email;
 
     const photo =
-        currentMember.photo_url ||
-        "";
-
+        currentMember.photo_url
+        ?
+        `<img src="${escapeHtml(currentMember.photo_url)}" alt="Member photo">`
+        :
+        initials(name);
 
     container.innerHTML = `
 
-        <div class="digital-id">
+        <div class="id-card">
 
-            <div class="digital-id-top">
+            <div class="id-top">
 
-                <div>
+                <h2>
+                    RIVERS BAYELSA COMMUNITY
+                </h2>
 
-                    <strong>RIBACOM</strong>
+                <p>
+                    THE GAMBIA
+                </p>
+
+                <p>
+                    RIBACOM
+                </p>
+
+            </div>
+
+            <div class="id-body">
+
+                <div class="id-photo">
+                    ${photo}
+                </div>
+
+                <div class="id-info">
+
+                    <h3>
+                        ${escapeHtml(name)}
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(
+                            currentMember.state ||
+                            "Rivers / Bayelsa"
+                        )}
+                    </p>
+
+                    <p>
+                        ${escapeHtml(
+                            currentMember.community ||
+                            ""
+                        )}
+                    </p>
+
+                    ${
+                        currentMember.membership_number
+                        ?
+                        `<div class="membership-number">
+                            ${escapeHtml(
+                                currentMember.membership_number
+                            )}
+                        </div>`
+                        :
+                        `<div class="alert alert-warning" style="margin-top:12px;">
+                            Membership number will appear after approval.
+                        </div>`
+                    }
 
                     <br>
 
-                    <small>
-                        Digital Membership ID
-                    </small>
+                    ${statusBadge(
+                        currentMember.status
+                    )}
 
                 </div>
-
-                ${
-                    photo
-                    ?
-                    `<img class="digital-id-photo"
-                          src="${escapeAttr(photo)}"
-                          alt="Member Photo">`
-                    :
-                    `<div class="digital-id-photo"
-                          style="display:flex;align-items:center;justify-content:center;color:#006b3c;font-weight:bold;">
-                          R
-                     </div>`
-                }
 
             </div>
 
-
-            <div class="digital-id-info">
-
-                <div>
-                    <strong>Name:</strong>
-                    ${escapeHtml(
-                        currentMember.full_name || "-"
-                    )}
-                </div>
-
-                <div>
-                    <strong>Membership No:</strong>
-                    ${escapeHtml(
-                        currentMember.membership_number || "Pending approval"
-                    )}
-                </div>
-
-                <div>
-                    <strong>Community:</strong>
-                    ${escapeHtml(
-                        currentMember.community || "-"
-                    )}
-                </div>
-
-                <div>
-                    <strong>State:</strong>
-                    ${escapeHtml(
-                        currentMember.state || "-"
-                    )}
-                </div>
-
-                <div>
-                    <strong>Status:</strong>
-                    ${escapeHtml(
-                        currentMember.status || "-"
-                    )}
-                </div>
-
+            <div style="
+                background:#f4f8f7;
+                text-align:center;
+                padding:10px;
+                font-size:11px;
+                color:#667774;
+            ">
+                PEACE • UNITY • PROGRESS
             </div>
 
         </div>
-
     `;
-
 }
 
 
@@ -2533,473 +2782,751 @@ async function loadDigitalID(){
    PROFILE
 ============================================================ */
 
-async function loadProfile(){
+function renderProfile(){
 
     const container =
         document.getElementById(
-            "profileContent"
+            "profileContainer"
         );
 
+    if(!container){
+        return;
+    }
 
     if(!currentUser){
 
-        container.innerHTML =
-            '<div class="message error">Please login first.</div>';
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Please login to view your profile.
+            </div>
+        `;
 
         return;
-
     }
-
 
     if(!currentMember){
 
-        await loadCurrentMember();
-
-    }
-
-
-    if(!currentMember){
-
-        container.innerHTML =
-            '<div class="message error">' +
-            'Profile unavailable.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Member profile not found.
+            </div>
+        `;
 
         return;
-
     }
 
+    const name =
+        currentMember.full_name ||
+        currentUser.email;
 
-    const fields = [
+    const avatar =
+        currentMember.photo_url
+        ?
+        `<img src="${escapeHtml(currentMember.photo_url)}" alt="Profile">`
+        :
+        initials(name);
 
-        ["Full Name","full_name"],
-        ["Email","email"],
-        ["Phone","phone"],
-        ["WhatsApp","whatsapp"],
-        ["Gender","gender"],
-        ["Date of Birth","date_of_birth"],
-        ["Nationality","nationality"],
-        ["Marital Status","marital_status"],
-        ["State of Origin","state"],
-        ["Local Government","local_government"],
-        ["Community / Village","community_village"],
-        ["Clan / Family","clan_family"],
-        ["Town / Area","town_area"],
-        ["Address","address"],
-        ["Emergency Contact","emergency_contact"],
-        ["Emergency Phone","emergency_phone"],
-        ["Next of Kin","next_of_kin"],
-        ["Next of Kin Phone","next_of_kin_phone"],
-        ["Membership Category","membership_category"],
-        ["Membership Number","membership_number"],
-        ["Status","status"]
+    container.innerHTML = `
 
-    ];
+        <div class="card">
 
+            <div class="profile-header">
 
-    container.innerHTML =
-        fields.map(function(field){
-
-            return `
-
-                <div class="profile-row">
-
-                    <span>
-                        ${escapeHtml(field[0])}
-                    </span>
-
-                    <span>
-                        ${escapeHtml(
-                            currentMember[field[1]] || "-"
-                        )}
-                    </span>
-
+                <div class="avatar">
+                    ${avatar}
                 </div>
 
-            `;
+                <div>
+                    <h2>${escapeHtml(name)}</h2>
+                    <p>${escapeHtml(currentUser.email)}</p>
+                </div>
 
-        }).join("");
+            </div>
 
+            <div class="grid">
+
+                <div class="card">
+                    <h3>Membership Number</h3>
+                    <p>
+                        ${
+                            currentMember.membership_number
+                            ?
+                            escapeHtml(
+                                currentMember.membership_number
+                            )
+                            :
+                            "Pending approval"
+                        }
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Status</h3>
+                    <p>
+                        ${statusBadge(
+                            currentMember.status
+                        )}
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Phone</h3>
+                    <p>
+                        ${escapeHtml(
+                            currentMember.phone ||
+                            "Not provided"
+                        )}
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Email</h3>
+                    <p>
+                        ${escapeHtml(
+                            currentMember.email ||
+                            currentUser.email ||
+                            "Not provided"
+                        )}
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>State</h3>
+                    <p>
+                        ${escapeHtml(
+                            currentMember.state ||
+                            "Not provided"
+                        )}
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Community</h3>
+                    <p>
+                        ${escapeHtml(
+                            currentMember.community ||
+                            "Not provided"
+                        )}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    `;
 }
 
 
 /* ============================================================
-   PAYMENTS
+   PAYMENT METHODS
 ============================================================ */
 
-async function loadPayments(){
+async function loadPaymentMethods(){
 
-    const methodsContainer =
+    const container =
         document.getElementById(
             "paymentMethods"
         );
 
-    const paymentsContainer =
+    const select =
+        document.getElementById(
+            "paymentMethod"
+        );
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML =
+        `<div class="loading">
+            Loading payment methods...
+        </div>`;
+
+    if(select){
+
+        select.innerHTML =
+            `<option value="">
+                Select method
+            </option>`;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("payment_settings")
+            .select("*")
+            .order("id",{ascending:true});
+
+    if(error){
+
+        console.error(
+            "Payment settings error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Payment methods could not be loaded at this time.
+            </div>
+        `;
+
+        return;
+    }
+
+    paymentMethods =
+        (data || [])
+            .filter(
+                method =>
+                    method.enabled === true
+            );
+
+    if(paymentMethods.length === 0){
+
+        container.innerHTML = `
+            <div class="alert alert-info">
+                No payment methods are currently enabled.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        paymentMethods
+            .map(
+                method => `
+
+                    <div class="list-item">
+
+                        <h3>
+                            ${escapeHtml(
+                                method.method_name ||
+                                method.name ||
+                                "Payment Method"
+                            )}
+                        </h3>
+
+                        ${
+                            method.account_name
+                            ?
+                            `<p>
+                                Account Name:
+                                <strong>
+                                    ${escapeHtml(
+                                        method.account_name
+                                    )}
+                                </strong>
+                            </p>`
+                            :
+                            ""
+                        }
+
+                        ${
+                            method.account_number
+                            ?
+                            `<p>
+                                Account / Number:
+                                <strong>
+                                    ${escapeHtml(
+                                        method.account_number
+                                    )}
+                                </strong>
+                            </p>`
+                            :
+                            ""
+                        }
+
+                        ${
+                            method.instructions
+                            ?
+                            `<p>
+                                ${escapeHtml(
+                                    method.instructions
+                                )}
+                            </p>`
+                            :
+                            ""
+                        }
+
+                    </div>
+                `
+            )
+            .join("");
+
+    if(select){
+
+        paymentMethods.forEach(
+            method => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value =
+                    method.id ??
+                    method.method_name ??
+                    method.name;
+
+                option.textContent =
+                    method.method_name ||
+                    method.name ||
+                    "Payment Method";
+
+                select.appendChild(option);
+            }
+        );
+    }
+}
+
+
+/* ============================================================
+   SUBMIT PAYMENT
+============================================================ */
+
+document
+    .getElementById("paymentForm")
+    ?.addEventListener(
+        "submit",
+        async function(event){
+
+            event.preventDefault();
+
+            clearMessage("paymentMessage");
+
+            if(!currentUser){
+
+                showMessage(
+                    "paymentMessage",
+                    "Please login before submitting a payment.",
+                    "warning"
+                );
+
+                return;
+            }
+
+            const paymentType =
+                document
+                    .getElementById("paymentType")
+                    .value;
+
+            const amount =
+                Number(
+                    document
+                        .getElementById("paymentAmount")
+                        .value
+                );
+
+            const method =
+                document
+                    .getElementById("paymentMethod")
+                    .value;
+
+            const reference =
+                document
+                    .getElementById("paymentReference")
+                    .value
+                    .trim();
+
+            const notes =
+                document
+                    .getElementById("paymentNotes")
+                    .value
+                    .trim();
+
+            if(!amount || amount <= 0){
+
+                showMessage(
+                    "paymentMessage",
+                    "Please enter a valid payment amount.",
+                    "danger"
+                );
+
+                return;
+            }
+
+            const button =
+                event.target.querySelector(
+                    "button[type='submit']"
+                );
+
+            button.disabled = true;
+            button.textContent =
+                "Submitting...";
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient.rpc(
+                    "submit_payment",
+                    {
+                        p_payment_type:paymentType,
+                        p_amount:amount,
+                        p_payment_method:method,
+                        p_reference:reference,
+                        p_notes:notes
+                    }
+                );
+
+            button.disabled = false;
+            button.textContent =
+                "Submit Payment";
+
+            if(error){
+
+                console.error(
+                    "Payment submission error:",
+                    error
+                );
+
+                showMessage(
+                    "paymentMessage",
+                    error.message,
+                    "danger"
+                );
+
+                return;
+            }
+
+            showMessage(
+                "paymentMessage",
+                "Payment submitted successfully and is awaiting verification.",
+                "success"
+            );
+
+            event.target.reset();
+
+            await loadMyPayments();
+        }
+    );
+
+
+/* ============================================================
+   MY PAYMENTS
+============================================================ */
+
+async function loadMyPayments(){
+
+    const container =
         document.getElementById(
             "myPayments"
         );
 
-
-    methodsContainer.innerHTML =
-        '<div class="loading">Loading payment methods...</div>';
-
-    paymentsContainer.innerHTML =
-        '<div class="loading">Loading payments...</div>';
-
-
-    try{
-
-        const {data,error} =
-            await supabaseClient
-                .from("payment_settings")
-                .select("*")
-                .eq("enabled",true)
-                .order("id");
-
-
-        if(error){
-
-            console.error(error);
-
-            methodsContainer.innerHTML =
-                '<div class="message error">' +
-                escapeHtml(error.message) +
-                '</div>';
-
-        }else if(!data || data.length === 0){
-
-            methodsContainer.innerHTML =
-                '<div class="notice message">' +
-                'No payment methods are currently enabled.' +
-                '</div>';
-
-        }else{
-
-            methodsContainer.innerHTML =
-                data.map(function(method){
-
-                    return `
-
-                        <div class="payment-method">
-
-                            <h4>
-                                ${escapeHtml(
-                                    method.method_name ||
-                                    method.name ||
-                                    "-"
-                                )}
-                            </h4>
-
-                            <p>
-                                ${escapeHtml(
-                                    method.account_name ||
-                                    method.details ||
-                                    ""
-                                )}
-                            </p>
-
-                            ${
-                                method.account_number
-                                ?
-                                `<p>
-                                    <strong>Account:</strong>
-                                    ${escapeHtml(
-                                        method.account_number
-                                    )}
-                                </p>`
-                                :
-                                ""
-                            }
-
-                        </div>
-
-                    `;
-
-                }).join("");
-
-        }
-
-
-    }catch(error){
-
-        console.error(error);
-
-        methodsContainer.innerHTML =
-            '<div class="message error">' +
-            'Unable to load payment methods.' +
-            '</div>';
-
+    if(!container || !currentUser){
+        return;
     }
 
+    container.innerHTML =
+        `<div class="loading">
+            Loading payment records...
+        </div>`;
 
-    try{
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.rpc(
+            "my_payments"
+        );
 
-        if(!currentUser){
+    if(error){
 
-            paymentsContainer.innerHTML =
-                '<div class="notice message">' +
-                'Please login to view your payments.' +
-                '</div>';
+        console.error(
+            "My payments error:",
+            error
+        );
 
-            return;
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Payment records could not be loaded.
+            </div>
+        `;
 
-        }
+        return;
+    }
 
+    if(!data || data.length === 0){
 
-        const {data,error} =
-            await supabaseClient.rpc(
-                "my_payments"
-            );
+        container.innerHTML = `
+            <div class="alert alert-info">
+                You have no payment records yet.
+            </div>
+        `;
 
+        return;
+    }
 
-        if(error){
+    container.innerHTML =
+        data
+            .map(
+                payment => `
 
-            console.error(error);
+                    <div class="list-item">
 
-            paymentsContainer.innerHTML =
-                '<div class="message error">' +
-                escapeHtml(error.message) +
-                '</div>';
-
-            return;
-
-        }
-
-
-        if(!data || data.length === 0){
-
-            paymentsContainer.innerHTML =
-                '<div class="notice message">' +
-                'No payment records found.' +
-                '</div>';
-
-            return;
-
-        }
-
-
-        paymentsContainer.innerHTML =
-            data.map(function(payment){
-
-                return `
-
-                    <div class="item">
-
-                        <h4>
-                            Payment #${escapeHtml(
-                                payment.id
+                        <h3>
+                            ${escapeHtml(
+                                payment.payment_type ||
+                                "Payment"
                             )}
-                        </h4>
+                        </h3>
 
                         <p>
                             Amount:
-                            ${escapeHtml(
-                                payment.amount || "-"
-                            )}
+                            <strong>
+                                D${escapeHtml(
+                                    payment.amount
+                                )}
+                            </strong>
                         </p>
 
                         <p>
                             Method:
                             ${escapeHtml(
-                                payment.payment_method || "-"
+                                payment.payment_method ||
+                                ""
+                            )}
+                        </p>
+
+                        ${
+                            payment.reference
+                            ?
+                            `<p>
+                                Reference:
+                                ${escapeHtml(
+                                    payment.reference
+                                )}
+                            </p>`
+                            :
+                            ""
+                        }
+
+                        <p>
+                            Date:
+                            ${formatDateTime(
+                                payment.created_at
                             )}
                         </p>
 
                         <p>
                             Status:
-                            ${escapeHtml(
-                                payment.status || "-"
+                            ${statusBadge(
+                                payment.status ||
+                                "pending"
                             )}
                         </p>
 
                     </div>
-
-                `;
-
-            }).join("");
-
-
-    }catch(error){
-
-        console.error(error);
-
-        paymentsContainer.innerHTML =
-            '<div class="message error">' +
-            'Unable to load payment records.' +
-            '</div>';
-
-    }
-
+                `
+            )
+            .join("");
 }
 
 
 /* ============================================================
-   WELFARE
+   WELFARE SUBMISSION
 ============================================================ */
 
 document
-.getElementById("welfareForm")
-.addEventListener("submit",async function(event){
+    .getElementById("welfareForm")
+    ?.addEventListener(
+        "submit",
+        async function(event){
 
-    event.preventDefault();
+            event.preventDefault();
+
+            clearMessage("welfareMessage");
+
+            if(!currentUser){
+
+                showMessage(
+                    "welfareMessage",
+                    "Please login first.",
+                    "warning"
+                );
+
+                return;
+            }
+
+            const requestType =
+                document
+                    .getElementById("welfareType")
+                    .value;
+
+            const description =
+                document
+                    .getElementById("welfareDescription")
+                    .value
+                    .trim();
+
+            if(!requestType || !description){
+
+                showMessage(
+                    "welfareMessage",
+                    "Please complete the welfare request.",
+                    "danger"
+                );
+
+                return;
+            }
+
+            const button =
+                event.target.querySelector(
+                    "button[type='submit']"
+                );
+
+            button.disabled = true;
+            button.textContent =
+                "Submitting...";
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from("welfare_requests")
+                    .insert({
+
+                        member_id:
+                            currentUser.id,
+
+                        request_type:
+                            requestType,
+
+                        description:
+                            description,
+
+                        status:
+                            "pending"
+                    });
+
+            button.disabled = false;
+            button.textContent =
+                "Submit Welfare Request";
+
+            if(error){
+
+                console.error(
+                    "Welfare submission error:",
+                    error
+                );
+
+                showMessage(
+                    "welfareMessage",
+                    error.message,
+                    "danger"
+                );
+
+                return;
+            }
+
+            showMessage(
+                "welfareMessage",
+                "Your welfare request has been submitted successfully.",
+                "success"
+            );
+
+            event.target.reset();
+
+            await loadMyWelfareRequests();
+        }
+    );
 
 
-    if(!currentUser){
+/* ============================================================
+   MY WELFARE REQUESTS
+============================================================ */
 
-        openScreen("login");
-        return;
-
-    }
-
-
-    const message =
-        document.getElementById(
-            "welfareMessage"
-        );
-
-
-    const request_type =
-        document.getElementById(
-            "welfareType"
-        ).value;
-
-    const description =
-        document.getElementById(
-            "welfareDescription"
-        ).value.trim();
-
-
-    message.innerHTML =
-        '<div class="message notice">' +
-        'Submitting request...' +
-        '</div>';
-
-
-    const {error} =
-        await supabaseClient
-            .from("welfare_requests")
-            .insert({
-
-                member_id:currentUser.id,
-                request_type,
-                description
-
-            });
-
-
-    if(error){
-
-        message.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
-
-        return;
-
-    }
-
-
-    message.innerHTML =
-        '<div class="message success">' +
-        'Welfare request submitted successfully.' +
-        '</div>';
-
-
-    document
-        .getElementById("welfareForm")
-        .reset();
-
-
-    loadWelfare();
-
-});
-
-
-async function loadWelfare(){
+async function loadMyWelfareRequests(){
 
     const container =
         document.getElementById(
             "myWelfareRequests"
         );
 
-
-    if(!currentUser){
-
-        container.innerHTML =
-            '<div class="notice message">' +
-            'Please login to view welfare requests.' +
-            '</div>';
-
+    if(!container || !currentUser){
         return;
-
     }
 
+    container.innerHTML =
+        `<div class="loading">
+            Loading welfare requests...
+        </div>`;
 
-    const {data,error} =
+    const {
+        data,
+        error
+    } =
         await supabaseClient
             .from("welfare_requests")
             .select("*")
             .eq("member_id",currentUser.id)
             .order("created_at",{ascending:false});
 
-
     if(error){
 
-        container.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
+        console.error(
+            "Welfare loading error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Welfare records could not be loaded.
+            </div>
+        `;
 
         return;
-
     }
-
 
     if(!data || data.length === 0){
 
-        container.innerHTML =
-            '<div class="notice message">' +
-            'No welfare requests found.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-info">
+                You have not submitted any welfare requests.
+            </div>
+        `;
 
         return;
-
     }
 
-
     container.innerHTML =
-        data.map(function(item){
+        data
+            .map(
+                request => `
 
-            return `
+                    <div class="list-item">
 
-                <div class="item">
+                        <h3>
+                            ${escapeHtml(
+                                request.request_type
+                            )}
+                        </h3>
 
-                    <h4>
-                        ${escapeHtml(
-                            item.request_type || "Welfare"
+                        <p>
+                            ${escapeHtml(
+                                request.description
+                            )}
+                        </p>
+
+                        <br>
+
+                        <small>
+                            Submitted:
+                            ${formatDateTime(
+                                request.created_at
+                            )}
+                        </small>
+
+                        <br><br>
+
+                        ${statusBadge(
+                            request.status
                         )}
-                    </h4>
 
-                    <p>
-                        ${escapeHtml(
-                            item.description || ""
-                        )}
-                    </p>
-
-                    <br>
-
-                    <span class="badge">
-                        ${escapeHtml(
-                            item.status || "pending"
-                        )}
-                    </span>
-
-                </div>
-
-            `;
-
-        }).join("");
-
+                    </div>
+                `
+            )
+            .join("");
 }
 
 
@@ -3014,79 +3541,107 @@ async function loadEvents(){
             "eventsList"
         );
 
+    if(!container){
+        return;
+    }
 
-    const {data,error} =
+    container.innerHTML =
+        `<div class="loading">
+            <div class="spinner"></div>
+            Loading events...
+        </div>`;
+
+    const {
+        data,
+        error
+    } =
         await supabaseClient
             .from("events")
             .select("*")
             .order("event_date",{ascending:true});
 
-
     if(error){
 
-        container.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
+        console.error(
+            "Events error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Events could not be loaded.
+            </div>
+        `;
 
         return;
-
     }
-
 
     if(!data || data.length === 0){
 
-        container.innerHTML =
-            '<div class="notice message">' +
-            'No events have been published yet.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-info">
+                No community events have been published yet.
+            </div>
+        `;
 
         return;
-
     }
 
-
     container.innerHTML =
-        data.map(function(event){
+        data
+            .map(
+                event => `
 
-            return `
+                    <div class="list-item">
 
-                <div class="item">
+                        <h3>
+                            ${escapeHtml(
+                                event.title
+                            )}
+                        </h3>
 
-                    <h4>
-                        ${escapeHtml(
-                            event.title
-                        )}
-                    </h4>
-
-                    <p>
-                        ${escapeHtml(
-                            event.description || ""
-                        )}
-                    </p>
-
-                    <br>
-
-                    <p>
-                        <strong>Venue:</strong>
-                        ${escapeHtml(
-                            event.venue || "-"
-                        )}
-                    </p>
-
-                    <p>
-                        <strong>Date:</strong>
-                        ${formatDate(
+                        ${
                             event.event_date
-                        )}
-                    </p>
+                            ?
+                            `<small>
+                                📅
+                                ${formatDateTime(
+                                    event.event_date
+                                )}
+                            </small>`
+                            :
+                            ""
+                        }
 
-                </div>
+                        ${
+                            event.venue
+                            ?
+                            `<p>
+                                📍
+                                ${escapeHtml(
+                                    event.venue
+                                )}
+                            </p>`
+                            :
+                            ""
+                        }
 
-            `;
+                        ${
+                            event.description
+                            ?
+                            `<p>
+                                ${escapeHtml(
+                                    event.description
+                                )}
+                            </p>`
+                            :
+                            ""
+                        }
 
-        }).join("");
-
+                    </div>
+                `
+            )
+            .join("");
 }
 
 
@@ -3101,112 +3656,211 @@ async function loadAnnouncements(){
             "announcementsList"
         );
 
+    if(!container){
+        return;
+    }
 
-    const {data,error} =
+    container.innerHTML =
+        `<div class="loading">
+            <div class="spinner"></div>
+            Loading announcements...
+        </div>`;
+
+    const {
+        data,
+        error
+    } =
         await supabaseClient
             .from("announcements")
             .select("*")
             .order("created_at",{ascending:false});
 
-
     if(error){
 
-        container.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
+        console.error(
+            "Announcements error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Announcements could not be loaded.
+            </div>
+        `;
 
         return;
-
     }
-
 
     if(!data || data.length === 0){
 
-        container.innerHTML =
-            '<div class="notice message">' +
-            'No announcements have been published yet.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-info">
+                No announcements have been published yet.
+            </div>
+        `;
 
         return;
-
     }
 
-
     container.innerHTML =
-        data.map(function(item){
+        data
+            .map(
+                announcement => `
 
-            return `
+                    <div class="list-item">
 
-                <div class="item">
+                        <h3>
+                            ${escapeHtml(
+                                announcement.title
+                            )}
+                        </h3>
 
-                    <h4>
-                        ${escapeHtml(
-                            item.title
-                        )}
-                    </h4>
+                        <small>
+                            ${formatDateTime(
+                                announcement.created_at
+                            )}
+                        </small>
 
-                    <p>
-                        ${escapeHtml(
-                            item.message
-                        )}
-                    </p>
+                        <p>
+                            ${escapeHtml(
+                                announcement.message
+                            )}
+                        </p>
 
-                    <br>
-
-                    <small>
-                        ${formatDate(
-                            item.created_at
-                        )}
-                    </small>
-
-                </div>
-
-            `;
-
-        }).join("");
-
+                    </div>
+                `
+            )
+            .join("");
 }
 
 
 /* ============================================================
-   ADMIN
+   NOTIFICATIONS
 ============================================================ */
 
-async function loadAdmin(){
+function loadNotifications(){
+
+    const container =
+        document.getElementById(
+            "notificationsList"
+        );
+
+    if(!container){
+        return;
+    }
 
     if(!currentUser){
 
-        openScreen("login");
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                Please login to view account notifications.
+            </div>
+        `;
+
         return;
-
     }
 
+    let message =
+        "Your RIBACOM account is active.";
 
-    if(!currentMember){
+    if(
+        currentMember &&
+        currentMember.status === "pending"
+    ){
 
-        await loadCurrentMember();
+        message =
+            "Your membership registration is currently pending approval by RIBACOM administration.";
 
+    }else if(
+        currentMember &&
+        currentMember.status === "approved"
+    ){
+
+        message =
+            "Your RIBACOM membership has been approved.";
+
+    }else if(
+        currentMember &&
+        currentMember.status === "rejected"
+    ){
+
+        message =
+            "Your membership application has been rejected. Please contact RIBACOM administration for clarification.";
     }
 
+    container.innerHTML = `
+        <div class="list-item">
+
+            <h3>Membership Status</h3>
+
+            <p>
+                ${escapeHtml(message)}
+            </p>
+
+            <small>
+                Current status:
+                ${statusBadge(
+                    currentMember?.status ||
+                    "pending"
+                )}
+            </small>
+
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   ADMIN ACCESS
+============================================================ */
+
+async function loadAdminPage(){
+
+    const access =
+        document.getElementById(
+            "adminAccessMessage"
+        );
+
+    if(!currentUser){
+
+        if(access){
+
+            access.innerHTML = `
+                <div class="alert alert-warning">
+                    Please login as an administrator.
+                </div>
+            `;
+        }
+
+        return;
+    }
+
+    await loadCurrentMember();
 
     if(!isAdmin()){
 
-        alert(
-            "Administrator access required."
-        );
+        if(access){
 
-        openScreen("dashboard");
+            access.innerHTML = `
+                <div class="alert alert-danger">
+                    You do not have permission to access the administration panel.
+                </div>
+            `;
+        }
 
         return;
-
     }
 
+    if(access){
+
+        access.innerHTML = `
+            <div class="alert alert-success">
+                Administrator access confirmed.
+            </div>
+        `;
+    }
 
     await loadAdminMembers();
-    await loadAdminPayments();
-    await loadAdminPaymentSettings();
-
 }
 
 
@@ -3216,294 +3870,271 @@ async function loadAdmin(){
 
 async function loadAdminMembers(){
 
-    if(!isAdmin()) return;
+    if(!isAdmin()){
 
+        showMessage(
+            "adminAccessMessage",
+            "Administrator access required.",
+            "danger"
+        );
+
+        return;
+    }
 
     const container =
         document.getElementById(
-            "adminMembersList"
+            "adminMembers"
         );
 
+    if(!container){
+        return;
+    }
 
     container.innerHTML =
-        '<div class="loading">Loading members...</div>';
+        `<div class="loading">
+            <div class="spinner"></div>
+            Loading members...
+        </div>`;
 
-
-    const search =
-        (
-            document.getElementById(
-                "adminSearch"
-            )?.value || ""
-        ).trim().toLowerCase();
-
-
-    const status =
-        document.getElementById(
-            "adminStatusFilter"
-        )?.value || "";
-
-
-    const state =
-        document.getElementById(
-            "adminStateFilter"
-        )?.value || "";
-
-
-    const {data,error} =
+    const {
+        data,
+        error
+    } =
         await supabaseClient.rpc(
             "admin_list_members"
         );
 
-
     if(error){
 
-        console.error(error);
+        console.error(
+            "Admin members error:",
+            error
+        );
 
-        container.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
 
         return;
-
     }
 
+    adminMembers =
+        data || [];
 
-    let members =
-        Array.isArray(data)
-        ? data
-        : [];
-
-
-    if(search){
-
-        members =
-            members.filter(function(member){
-
-                const text =
-                    [
-                        member.full_name,
-                        member.email,
-                        member.phone,
-                        member.membership_number,
-                        member.community,
-                        member.state
-                    ]
-                    .join(" ")
-                    .toLowerCase();
-
-                return text.includes(search);
-
-            });
-
-    }
-
-
-    if(status){
-
-        members =
-            members.filter(function(member){
-
-                return String(
-                    member.status || ""
-                ).toLowerCase() ===
-                status.toLowerCase();
-
-            });
-
-    }
-
-
-    if(state){
-
-        members =
-            members.filter(function(member){
-
-                return String(
-                    member.state || ""
-                ).toLowerCase() ===
-                state.toLowerCase();
-
-            });
-
-    }
-
-
-    updateAdminStatistics(
-        Array.isArray(data) ? data : []
+    renderAdminMembers(
+        adminMembers
     );
-
-
-    if(members.length === 0){
-
-        container.innerHTML =
-            '<div class="notice message">' +
-            'No members found.' +
-            '</div>';
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        members.map(function(member){
-
-            const memberId =
-                member.id;
-
-
-            const memberStatus =
-                String(
-                    member.status || "pending"
-                ).toLowerCase();
-
-
-            return `
-
-                <div class="admin-member">
-
-                    <h3>
-                        ${escapeHtml(
-                            member.full_name || "Unnamed Member"
-                        )}
-                    </h3>
-
-                    <p>
-                        <strong>Email:</strong>
-                        ${escapeHtml(
-                            member.email || "-"
-                        )}
-                    </p>
-
-                    <p>
-                        <strong>Phone:</strong>
-                        ${escapeHtml(
-                            member.phone || "-"
-                        )}
-                    </p>
-
-                    <p>
-                        <strong>State:</strong>
-                        ${escapeHtml(
-                            member.state || "-"
-                        )}
-                    </p>
-
-                    <p>
-                        <strong>Community:</strong>
-                        ${escapeHtml(
-                            member.community || "-"
-                        )}
-                    </p>
-
-                    <p>
-                        <strong>Membership No:</strong>
-                        ${escapeHtml(
-                            member.membership_number ||
-                            "Not generated"
-                        )}
-                    </p>
-
-                    <br>
-
-                    <span class="badge ${
-                        memberStatus === "pending"
-                        ? "badge-pending"
-                        : memberStatus === "rejected"
-                        ? "badge-rejected"
-                        : ""
-                    }">
-
-                        ${escapeHtml(
-                            member.status || "pending"
-                        )}
-
-                    </span>
-
-
-                    <div class="admin-actions">
-
-                        ${
-                            memberStatus === "pending"
-                            ?
-                            `
-                            <button class="btn"
-                                onclick="approveMember('${escapeAttr(memberId)}')">
-
-                                Approve
-
-                            </button>
-
-                            <button class="btn btn-danger"
-                                onclick="rejectMember('${escapeAttr(memberId)}')">
-
-                                Reject
-
-                            </button>
-                            `
-                            :
-                            ""
-                        }
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }).join("");
-
 }
 
 
 /* ============================================================
-   ADMIN STATISTICS
+   RENDER ADMIN MEMBERS
 ============================================================ */
 
-function updateAdminStatistics(members){
+function renderAdminMembers(members){
 
-    const total =
-        members.length;
+    const container =
+        document.getElementById(
+            "adminMembers"
+        );
 
-    const pending =
-        members.filter(function(m){
-            return String(
-                m.status || ""
-            ).toLowerCase() === "pending";
-        }).length;
+    if(!container){
+        return;
+    }
 
-    const approved =
-        members.filter(function(m){
-            return String(
-                m.status || ""
-            ).toLowerCase() === "approved";
-        }).length;
+    if(!members || members.length === 0){
 
-    const rejected =
-        members.filter(function(m){
-            return String(
-                m.status || ""
-            ).toLowerCase() === "rejected";
-        }).length;
+        container.innerHTML = `
+            <div class="alert alert-info">
+                No members found.
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML = `
+
+        <div class="admin-table-wrap">
+
+            <table class="admin-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>State</th>
+                        <th>Membership No.</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${members.map(member => `
+
+                        <tr>
+
+                            <td>
+                                ${escapeHtml(
+                                    member.full_name
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    member.phone || ""
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    member.email || ""
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    member.state || ""
+                                )}
+                            </td>
+
+                            <td>
+                                ${
+                                    member.membership_number
+                                    ?
+                                    escapeHtml(
+                                        member.membership_number
+                                    )
+                                    :
+                                    "-"
+                                }
+                            </td>
+
+                            <td>
+                                ${statusBadge(
+                                    member.status
+                                )}
+                            </td>
+
+                            <td>
+
+                                ${
+                                    String(
+                                        member.status
+                                    ).toLowerCase()
+                                    === "pending"
+
+                                    ?
+
+                                    `
+                                    <button
+                                        class="btn btn-small btn-success"
+                                        onclick="approveMember('${member.id}')">
+                                        Approve
+                                    </button>
+
+                                    <button
+                                        class="btn btn-small btn-danger"
+                                        onclick="rejectMember('${member.id}')">
+                                        Reject
+                                    </button>
+                                    `
+
+                                    :
+
+                                    `
+                                    <button
+                                        class="btn btn-small btn-secondary"
+                                        onclick="viewMember('${member.id}')">
+                                        View
+                                    </button>
+                                    `
+                                }
+
+                            </td>
+
+                        </tr>
+
+                    `).join("")}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    `;
+}
 
 
-    document.getElementById(
-        "adminTotalMembers"
-    ).textContent = total;
+/* ============================================================
+   ADMIN MEMBER FILTER
+============================================================ */
 
-    document.getElementById(
-        "adminPendingMembers"
-    ).textContent = pending;
+function filterAdminMembers(){
 
-    document.getElementById(
-        "adminApprovedMembers"
-    ).textContent = approved;
+    const search =
+        (
+            document
+                .getElementById(
+                    "memberSearch"
+                )
+                ?.value ||
+            ""
+        )
+        .toLowerCase()
+        .trim();
 
-    document.getElementById(
-        "adminRejectedMembers"
-    ).textContent = rejected;
+    const status =
+        document
+            .getElementById(
+                "memberStatusFilter"
+            )
+            ?.value ||
+        "";
 
+    const filtered =
+        adminMembers.filter(
+            member => {
+
+                const text =
+                    [
+                        member.full_name,
+                        member.phone,
+                        member.email,
+                        member.state,
+                        member.community,
+                        member.membership_number
+                    ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                const matchesSearch =
+                    !search ||
+                    text.includes(search);
+
+                const matchesStatus =
+                    !status ||
+                    String(
+                        member.status || ""
+                    ).toLowerCase()
+                    === status;
+
+                return (
+                    matchesSearch &&
+                    matchesStatus
+                );
+            }
+        );
+
+    renderAdminMembers(filtered);
 }
 
 
@@ -3514,23 +4145,22 @@ function updateAdminStatistics(members){
 async function approveMember(targetId){
 
     if(!isAdmin()){
-
-        alert("Administrator access required.");
         return;
-
     }
 
+    const confirmed =
+        confirm(
+            "Approve this membership?"
+        );
 
-    if(!confirm(
-        "Approve this membership application?"
-    )){
-
+    if(!confirmed){
         return;
-
     }
 
-
-    const {data,error} =
+    const {
+        data,
+        error
+    } =
         await supabaseClient.rpc(
             "admin_approve_member",
             {
@@ -3538,22 +4168,23 @@ async function approveMember(targetId){
             }
         );
 
-
     if(error){
 
+        console.error(
+            "Approve member error:",
+            error
+        );
+
         alert(error.message);
+
         return;
-
     }
-
 
     alert(
         "Member approved successfully."
     );
 
-
     await loadAdminMembers();
-
 }
 
 
@@ -3564,23 +4195,21 @@ async function approveMember(targetId){
 async function rejectMember(targetId){
 
     if(!isAdmin()){
-
-        alert("Administrator access required.");
         return;
-
     }
 
+    const confirmed =
+        confirm(
+            "Reject this membership?"
+        );
 
-    if(!confirm(
-        "Reject this membership application?"
-    )){
-
+    if(!confirmed){
         return;
-
     }
 
-
-    const {error} =
+    const {
+        error
+    } =
         await supabaseClient.rpc(
             "admin_reject_member",
             {
@@ -3588,22 +4217,154 @@ async function rejectMember(targetId){
             }
         );
 
-
     if(error){
 
-        alert(error.message);
-        return;
+        console.error(
+            "Reject member error:",
+            error
+        );
 
+        alert(error.message);
+
+        return;
     }
 
-
     alert(
-        "Member rejected."
+        "Membership rejected."
     );
 
-
     await loadAdminMembers();
+}
 
+
+/* ============================================================
+   VIEW MEMBER
+============================================================ */
+
+function viewMember(targetId){
+
+    const member =
+        adminMembers.find(
+            item =>
+                String(item.id) ===
+                String(targetId)
+        );
+
+    if(!member){
+        return;
+    }
+
+    openModal(
+        "Member Details",
+        `
+
+        <div class="profile-header">
+
+            <div class="avatar">
+                ${
+                    member.photo_url
+                    ?
+                    `<img
+                        src="${escapeHtml(member.photo_url)}"
+                        alt="Member">`
+                    :
+                    initials(member.full_name)
+                }
+            </div>
+
+            <div>
+                <h2>
+                    ${escapeHtml(
+                        member.full_name
+                    )}
+                </h2>
+
+                ${statusBadge(
+                    member.status
+                )}
+            </div>
+
+        </div>
+
+        <div class="list-item">
+
+            <p>
+                <strong>Membership Number:</strong>
+                ${
+                    member.membership_number
+                    ?
+                    escapeHtml(
+                        member.membership_number
+                    )
+                    :
+                    "Not assigned"
+                }
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                ${escapeHtml(
+                    member.phone || ""
+                )}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                ${escapeHtml(
+                    member.email || ""
+                )}
+            </p>
+
+            <p>
+                <strong>State:</strong>
+                ${escapeHtml(
+                    member.state || ""
+                )}
+            </p>
+
+            <p>
+                <strong>Community:</strong>
+                ${escapeHtml(
+                    member.community || ""
+                )}
+            </p>
+
+            ${
+                member.association_basis
+                ?
+                `<p>
+                    <strong>Association Basis:</strong>
+                    ${escapeHtml(
+                        member.association_basis
+                    )}
+                </p>`
+                :
+                ""
+            }
+
+            ${
+                member.association_details
+                ?
+                `<p>
+                    <strong>Details:</strong>
+                    ${escapeHtml(
+                        member.association_details
+                    )}
+                </p>`
+                :
+                ""
+            }
+
+            <p>
+                <strong>Registered:</strong>
+                ${formatDateTime(
+                    member.created_at
+                )}
+            </p>
+
+        </div>
+        `
+    );
 }
 
 
@@ -3613,124 +4374,190 @@ async function rejectMember(targetId){
 
 async function loadAdminPayments(){
 
-    if(!isAdmin()) return;
-
-
     const container =
         document.getElementById(
-            "adminPaymentsList"
+            "adminPayments"
         );
 
+    if(!container){
+        return;
+    }
+
+    if(!isAdmin()){
+
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                Administrator access required.
+            </div>
+        `;
+
+        return;
+    }
 
     container.innerHTML =
-        '<div class="loading">Loading payments...</div>';
+        `<div class="loading">
+            <div class="spinner"></div>
+            Loading payments...
+        </div>`;
 
-
-    const {data,error} =
+    const {
+        data,
+        error
+    } =
         await supabaseClient.rpc(
             "admin_list_payments"
         );
 
-
     if(error){
 
-        container.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
+        console.error(
+            "Admin payments error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                ${escapeHtml(
+                    error.message
+                )}
+            </div>
+        `;
 
         return;
-
     }
-
 
     if(!data || data.length === 0){
 
-        container.innerHTML =
-            '<div class="notice message">' +
-            'No payment records found.' +
-            '</div>';
+        container.innerHTML = `
+            <div class="alert alert-info">
+                No payment records found.
+            </div>
+        `;
 
         return;
-
     }
 
+    container.innerHTML = `
 
-    container.innerHTML =
-        data.map(function(payment){
+        <div class="admin-table-wrap">
 
-            return `
+            <table class="admin-table">
 
-                <div class="admin-member">
+                <thead>
 
-                    <h4>
-                        Payment #${escapeHtml(
-                            payment.id
-                        )}
-                    </h4>
+                    <tr>
+                        <th>Member</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
 
-                    <p>
-                        Member:
-                        ${escapeHtml(
-                            payment.member_id || "-"
-                        )}
-                    </p>
+                </thead>
 
-                    <p>
-                        Amount:
-                        ${escapeHtml(
-                            payment.amount || "-"
-                        )}
-                    </p>
+                <tbody>
 
-                    <p>
-                        Method:
-                        ${escapeHtml(
-                            payment.payment_method || "-"
-                        )}
-                    </p>
+                    ${data.map(payment => `
 
-                    <p>
-                        Status:
-                        ${escapeHtml(
-                            payment.status || "-"
-                        )}
-                    </p>
+                        <tr>
 
-                    <div class="admin-actions">
+                            <td>
+                                ${escapeHtml(
+                                    payment.full_name ||
+                                    payment.member_name ||
+                                    payment.email ||
+                                    ""
+                                )}
+                            </td>
 
-                        ${
-                            String(
-                                payment.status || ""
-                            ).toLowerCase() === "pending"
-                            ?
-                            `
-                            <button class="btn"
-                                onclick="verifyPayment(${Number(payment.id)})">
+                            <td>
+                                ${escapeHtml(
+                                    payment.payment_type ||
+                                    ""
+                                )}
+                            </td>
 
-                                Verify
+                            <td>
+                                D${escapeHtml(
+                                    payment.amount ||
+                                    ""
+                                )}
+                            </td>
 
-                            </button>
+                            <td>
+                                ${escapeHtml(
+                                    payment.payment_method ||
+                                    ""
+                                )}
+                            </td>
 
-                            <button class="btn btn-danger"
-                                onclick="rejectPayment(${Number(payment.id)})">
+                            <td>
+                                ${escapeHtml(
+                                    payment.reference ||
+                                    "-"
+                                )}
+                            </td>
 
-                                Reject
+                            <td>
+                                ${formatDate(
+                                    payment.created_at
+                                )}
+                            </td>
 
-                            </button>
-                            `
-                            :
-                            ""
-                        }
+                            <td>
+                                ${statusBadge(
+                                    payment.status ||
+                                    "pending"
+                                )}
+                            </td>
 
-                    </div>
+                            <td>
 
-                </div>
+                                ${
+                                    String(
+                                        payment.status ||
+                                        ""
+                                    ).toLowerCase()
+                                    === "pending"
 
-            `;
+                                    ?
 
-        }).join("");
+                                    `
 
+                                    <button
+                                        class="btn btn-small btn-success"
+                                        onclick="verifyPayment('${payment.id}')">
+                                        Verify
+                                    </button>
+
+                                    <button
+                                        class="btn btn-small btn-danger"
+                                        onclick="rejectPayment('${payment.id}')">
+                                        Reject
+                                    </button>
+
+                                    `
+
+                                    :
+
+                                    "-"
+                                }
+
+                            </td>
+
+                        </tr>
+
+                    `).join("")}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    `;
 }
 
 
@@ -3740,15 +4567,21 @@ async function loadAdminPayments(){
 
 async function verifyPayment(paymentId){
 
-    if(!isAdmin()) return;
+    if(!isAdmin()){
+        return;
+    }
 
+    if(
+        !confirm(
+            "Verify this payment?"
+        )
+    ){
+        return;
+    }
 
-    if(!confirm(
-        "Verify this payment?"
-    )) return;
-
-
-    const {error} =
+    const {
+        error
+    } =
         await supabaseClient.rpc(
             "admin_verify_payment",
             {
@@ -3756,22 +4589,23 @@ async function verifyPayment(paymentId){
             }
         );
 
-
     if(error){
 
+        console.error(
+            "Verify payment error:",
+            error
+        );
+
         alert(error.message);
+
         return;
-
     }
-
 
     alert(
         "Payment verified successfully."
     );
 
-
-    loadAdminPayments();
-
+    await loadAdminPayments();
 }
 
 
@@ -3781,15 +4615,21 @@ async function verifyPayment(paymentId){
 
 async function rejectPayment(paymentId){
 
-    if(!isAdmin()) return;
+    if(!isAdmin()){
+        return;
+    }
 
+    if(
+        !confirm(
+            "Reject this payment?"
+        )
+    ){
+        return;
+    }
 
-    if(!confirm(
-        "Reject this payment?"
-    )) return;
-
-
-    const {error} =
+    const {
+        error
+    } =
         await supabaseClient.rpc(
             "admin_reject_payment",
             {
@@ -3797,234 +4637,31 @@ async function rejectPayment(paymentId){
             }
         );
 
-
     if(error){
 
+        console.error(
+            "Reject payment error:",
+            error
+        );
+
         alert(error.message);
+
         return;
-
     }
-
 
     alert(
         "Payment rejected."
     );
 
-
-    loadAdminPayments();
-
+    await loadAdminPayments();
 }
 
 
 /* ============================================================
-   ADMIN PAYMENT SETTINGS
+   START APPLICATION
 ============================================================ */
 
-async function loadAdminPaymentSettings(){
-
-    if(!isAdmin()) return;
-
-
-    const container =
-        document.getElementById(
-            "adminPaymentSettings"
-        );
-
-
-    container.innerHTML =
-        '<div class="loading">Loading settings...</div>';
-
-
-    const {data,error} =
-        await supabaseClient.rpc(
-            "admin_payment_settings"
-        );
-
-
-    if(error){
-
-        container.innerHTML =
-            '<div class="message error">' +
-            escapeHtml(error.message) +
-            '</div>';
-
-        return;
-
-    }
-
-
-    if(!data || data.length === 0){
-
-        container.innerHTML =
-            '<div class="notice message">' +
-            'No payment settings found.' +
-            '</div>';
-
-        return;
-
-    }
-
-
-    container.innerHTML =
-        data.map(function(setting){
-
-            const enabled =
-                !!setting.enabled;
-
-
-            return `
-
-                <div class="item">
-
-                    <h4>
-                        ${escapeHtml(
-                            setting.method_name ||
-                            setting.name ||
-                            "-"
-                        )}
-                    </h4>
-
-                    <p>
-                        Status:
-                        <strong>
-                            ${enabled
-                                ? "Enabled"
-                                : "Disabled"}
-                        </strong>
-                    </p>
-
-                    <button class="btn"
-                        onclick="togglePaymentSetting(
-                            ${Number(setting.id)},
-                            ${enabled}
-                        )">
-
-                        ${enabled
-                            ? "Disable"
-                            : "Enable"}
-
-                    </button>
-
-                </div>
-
-            `;
-
-        }).join("");
-
-}
-
-
-/* ============================================================
-   TOGGLE PAYMENT SETTING
-============================================================ */
-
-async function togglePaymentSetting(
-    settingId,
-    currentEnabled
-){
-
-    if(!isAdmin()) return;
-
-
-    const {error} =
-        await supabaseClient.rpc(
-            "admin_update_payment_setting",
-            {
-                setting_id:settingId,
-                enabled:!currentEnabled
-            }
-        );
-
-
-    if(error){
-
-        alert(error.message);
-        return;
-
-    }
-
-
-    loadAdminPaymentSettings();
-
-}
-
-
-/* ============================================================
-   SESSION INITIALIZATION
-============================================================ */
-
-async function initializeApp(){
-
-    const {data} =
-        await supabaseClient.auth.getSession();
-
-
-    currentUser =
-        data?.session?.user || null;
-
-
-    if(currentUser){
-
-        await loadCurrentMember();
-
-    }
-
-
-    updateAccountUI();
-
-}
-
-
-/* ============================================================
-   UTILITIES
-============================================================ */
-
-function escapeHtml(value){
-
-    if(value === null || value === undefined){
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
-
-
-function escapeAttr(value){
-
-    return escapeHtml(value);
-
-}
-
-
-function formatDate(value){
-
-    if(!value){
-        return "-";
-    }
-
-    const date =
-        new Date(value);
-
-    if(Number.isNaN(date.getTime())){
-        return "-";
-    }
-
-    return date.toLocaleString();
-
-}
-
-
-/* ============================================================
-   START
-============================================================ */
-
-initializeApp();
+initialiseApp();
 
 </script>
 
