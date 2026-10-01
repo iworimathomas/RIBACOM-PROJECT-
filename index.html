@@ -5232,7 +5232,274 @@ document
     }
 
 })();
+    /* ============================================================
+       RIBACOM 2026 UPGRADE PACK
+       TRUTH • UNITY • SERVICE
+    ============================================================ */
 
+    (function () {
+        "use strict";
+
+        const RIBACOM_UPGRADE = {
+            version: "2026.10",
+            motto: "TRUTH • UNITY • SERVICE"
+        };
+
+        window.RIBACOM_UPGRADE = RIBACOM_UPGRADE;
+
+        /* --------------------------------------------------------
+           1. MOBILE / ACCESSIBILITY IMPROVEMENTS
+        -------------------------------------------------------- */
+
+        document.documentElement.style.scrollBehavior = "smooth";
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                const homeButton =
+                    document.querySelector('[data-screen="home"]') ||
+                    document.querySelector('[onclick*="home"]');
+
+                if (homeButton) {
+                    try {
+                        homeButton.click();
+                    } catch (e) {}
+                }
+            }
+        });
+
+        /* --------------------------------------------------------
+           2. PREVENT DOUBLE FORM SUBMISSIONS
+        -------------------------------------------------------- */
+
+        document.addEventListener("submit", function (event) {
+            const form = event.target;
+
+            if (!form || form.dataset.ribacomProtected === "true") {
+                return;
+            }
+
+            form.dataset.ribacomProtected = "true";
+
+            setTimeout(function () {
+                form.dataset.ribacomProtected = "false";
+            }, 5000);
+        }, true);
+
+        /* --------------------------------------------------------
+           3. PASSWORD MATCH VALIDATION
+        -------------------------------------------------------- */
+
+        function checkPasswordMatch() {
+            const passwords = Array.from(
+                document.querySelectorAll('input[type="password"]')
+            );
+
+            if (passwords.length < 2) return true;
+
+            const first = passwords[0];
+            const second = passwords[1];
+
+            if (!first.value || !second.value) {
+                second.setCustomValidity("");
+                return true;
+            }
+
+            if (first.value !== second.value) {
+                second.setCustomValidity("Passwords do not match.");
+                return false;
+            }
+
+            second.setCustomValidity("");
+            return true;
+        }
+
+        document.addEventListener("input", function (event) {
+            if (
+                event.target &&
+                event.target.matches('input[type="password"]')
+            ) {
+                checkPasswordMatch();
+            }
+        });
+
+        /* --------------------------------------------------------
+           4. ONLINE / OFFLINE STATUS
+        -------------------------------------------------------- */
+
+        function showConnectionNotice(message) {
+            if (typeof window.showToast === "function") {
+                try {
+                    window.showToast(message);
+                    return;
+                } catch (e) {}
+            }
+
+            const existing = document.getElementById(
+                "ribacom-connection-notice"
+            );
+
+            if (existing) {
+                existing.textContent = message;
+                existing.style.display = "block";
+
+                clearTimeout(existing._timer);
+
+                existing._timer = setTimeout(function () {
+                    existing.style.display = "none";
+                }, 3500);
+
+                return;
+            }
+
+            const notice = document.createElement("div");
+
+            notice.id = "ribacom-connection-notice";
+            notice.textContent = message;
+
+            notice.style.cssText = `
+                position:fixed;
+                left:50%;
+                bottom:90px;
+                transform:translateX(-50%);
+                z-index:99999;
+                padding:12px 18px;
+                border-radius:12px;
+                background:#123;
+                color:#fff;
+                font-size:14px;
+                font-weight:600;
+                box-shadow:0 8px 30px rgba(0,0,0,.20);
+                max-width:90%;
+                text-align:center;
+            `;
+
+            document.body.appendChild(notice);
+
+            notice._timer = setTimeout(function () {
+                notice.remove();
+            }, 3500);
+        }
+
+        window.addEventListener("offline", function () {
+            showConnectionNotice(
+                "You are offline. Some RIBACOM features may be temporarily unavailable."
+            );
+        });
+
+        window.addEventListener("online", function () {
+            showConnectionNotice(
+                "Internet connection restored."
+            );
+        });
+
+        /* --------------------------------------------------------
+           5. IMAGE PERFORMANCE
+        -------------------------------------------------------- */
+
+        function optimizeImages() {
+            document.querySelectorAll("img").forEach(function (img) {
+                if (!img.hasAttribute("loading")) {
+                    img.setAttribute("loading", "lazy");
+                }
+
+                if (!img.hasAttribute("decoding")) {
+                    img.setAttribute("decoding", "async");
+                }
+            });
+        }
+
+        optimizeImages();
+
+        const imageObserver = new MutationObserver(function () {
+            optimizeImages();
+        });
+
+        imageObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        /* --------------------------------------------------------
+           6. IMPROVE MOBILE TOUCH TARGETS
+        -------------------------------------------------------- */
+
+        function improveTouchTargets() {
+            document.querySelectorAll("button, a, input, select, textarea").forEach(
+                function (element) {
+                    if (
+                        element.tagName === "BUTTON" ||
+                        element.tagName === "A"
+                    ) {
+                        element.style.touchAction = "manipulation";
+                    }
+                }
+            );
+        }
+
+        improveTouchTargets();
+
+        /* --------------------------------------------------------
+           7. KEEP THE OFFICIAL MOTTO AVAILABLE GLOBALLY
+        -------------------------------------------------------- */
+
+        document.querySelectorAll(
+            "body *"
+        ).forEach(function (element) {
+            if (
+                element.childNodes.length === 1 &&
+                element.childNodes[0].nodeType === Node.TEXT_NODE &&
+                element.textContent.trim() ===
+                    "Peace • Unity • Progress"
+            ) {
+                element.textContent =
+                    "TRUTH • UNITY • SERVICE";
+            }
+        });
+
+        /* --------------------------------------------------------
+           8. MOBILE VIEWPORT SAFETY
+        -------------------------------------------------------- */
+
+        const viewport = document.querySelector(
+            'meta[name="viewport"]'
+        );
+
+        if (viewport) {
+            viewport.setAttribute(
+                "content",
+                "width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover"
+            );
+        }
+
+        /* --------------------------------------------------------
+           9. ACCESSIBLE IMAGE ALT TEXT
+        -------------------------------------------------------- */
+
+        document.querySelectorAll("img").forEach(function (img) {
+            if (!img.getAttribute("alt")) {
+                img.setAttribute("alt", "RIBACOM");
+            }
+        });
+
+        /* --------------------------------------------------------
+           10. REDUCED MOTION SUPPORT
+        -------------------------------------------------------- */
+
+        if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+            document.documentElement.style.scrollBehavior = "auto";
+        }
+
+        console.log(
+            "RIBACOM Upgrade " +
+            RIBACOM_UPGRADE.version +
+            " loaded — " +
+            RIBACOM_UPGRADE.motto
+        );
+
+    })();
 </script>
 
 </body>
