@@ -5501,6 +5501,171 @@ document
 
     })();
 </script>
+/* ============================================================
+   RIBACOM 2026 — DIGITAL ID ENHANCEMENT
+   TRUTH • UNITY • SERVICE
+============================================================ */
 
+(function () {
+    "use strict";
+
+    const ID_UPGRADE_VERSION = "2026.10-ID";
+
+    /* --------------------------------------------------------
+       DIGITAL ID STYLING
+    -------------------------------------------------------- */
+
+    const style = document.createElement("style");
+
+    style.textContent = `
+        .ribacom-id-enhanced {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.15);
+        }
+
+        .ribacom-id-enhanced::after {
+            content: "TRUTH • UNITY • SERVICE";
+            position: absolute;
+            right: -35px;
+            bottom: 18px;
+            transform: rotate(-35deg);
+            font-size: 10px;
+            font-weight: 800;
+            opacity: .10;
+            pointer-events: none;
+        }
+
+        .ribacom-id-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .ribacom-id-actions button {
+            min-height: 44px;
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            touch-action: manipulation;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+
+            .ribacom-print-id,
+            .ribacom-print-id * {
+                visibility: visible !important;
+            }
+
+            .ribacom-print-id {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+            }
+
+            .ribacom-id-actions {
+                display: none !important;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+
+    /* --------------------------------------------------------
+       FIND DIGITAL ID AREAS WITHOUT CHANGING EXISTING HTML
+    -------------------------------------------------------- */
+
+    function findDigitalID() {
+        const selectors = [
+            "#digital-id",
+            "#digitalID",
+            ".digital-id",
+            ".digital-id-card",
+            ".id-card",
+            "[data-digital-id]",
+            "[data-id-card]"
+        ];
+
+        for (const selector of selectors) {
+            const element = document.querySelector(selector);
+
+            if (element) {
+                return element;
+            }
+        }
+
+        return null;
+    }
+
+    /* --------------------------------------------------------
+       ADD PRINT / SAVE FUNCTIONALITY
+    -------------------------------------------------------- */
+
+    function enhanceDigitalID() {
+        const idCard = findDigitalID();
+
+        if (!idCard) {
+            return;
+        }
+
+        idCard.classList.add("ribacom-id-enhanced");
+
+        if (idCard.dataset.ribacomIdEnhanced === "true") {
+            return;
+        }
+
+        idCard.dataset.ribacomIdEnhanced = "true";
+
+        const actions = document.createElement("div");
+
+        actions.className = "ribacom-id-actions";
+
+        const printButton = document.createElement("button");
+
+        printButton.type = "button";
+        printButton.textContent = "🖨️ Print / Save ID";
+        printButton.onclick = function () {
+            idCard.classList.add("ribacom-print-id");
+
+            window.print();
+
+            setTimeout(function () {
+                idCard.classList.remove("ribacom-print-id");
+            }, 1000);
+        };
+
+        actions.appendChild(printButton);
+        idCard.appendChild(actions);
+    }
+
+    /* --------------------------------------------------------
+       MEMBERSHIP STATUS HELPERS
+    -------------------------------------------------------- */
+
+    window.RIBACOM_ID = {
+
+        version: ID_UPGRADE_VERSION,
+
+        motto: "TRUTH • UNITY • SERVICE",
+
+        print: function () {
+            const idCard = findDigitalID();
+
+            if (!idCard) {
+                if (typeof window.showToast === "function") {
+                    window.showToast(
+                        "Digital ID is not currently available."
+                    );
+                }
+
+               
 </body>
 </html>
