@@ -866,3 +866,1314 @@ footer small {
     box-shadow: none;
   }
 }
+/* =========================================================
+   RIBACOM MODULAR APP
+   Main Application Controller
+   TRUTH • UNITY • SERVICE
+========================================================= */
+
+const RIBACOM = {
+  name: "Rivers Bayelsa Community in Diaspora The Gambia",
+  shortName: "RIBACOM",
+  motto: "TRUTH • UNITY • SERVICE"
+};
+
+/* =========================================================
+   APPLICATION STATE
+========================================================= */
+
+const AppState = {
+  currentRoute: "home",
+  currentUser: null,
+  currentMember: null,
+  isAdmin: false,
+  initialized: false
+};
+
+/* =========================================================
+   APP ELEMENT
+========================================================= */
+
+const app = document.getElementById("app");
+
+/* =========================================================
+   ROUTES
+========================================================= */
+
+const routes = {
+  home: renderHome,
+  about: renderAbout,
+  leadership: renderLeadership,
+  constitution: renderConstitution,
+  announcements: renderAnnouncements,
+  events: renderEvents,
+  gallery: renderGallery,
+  publications: renderPublications,
+  membership: renderMembership,
+  digitalid: renderDigitalID,
+  welfare: renderWelfare,
+  youth: renderYouth,
+  advisers: renderAdvisers,
+  payments: renderPayments,
+  contact: renderContact,
+  login: renderLogin,
+  admin: renderAdmin
+};
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHTML(value) {
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function page(title, subtitle = "") {
+  return `
+    <section class="page">
+      <div class="page-header">
+        <h1>${escapeHTML(title)}</h1>
+        ${subtitle ? `<p>${escapeHTML(subtitle)}</p>` : ""}
+      </div>
+    </section>
+  `;
+}
+
+function loading(message = "Loading...") {
+  return `
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>${escapeHTML(message)}</p>
+    </div>
+  `;
+}
+
+function emptyState(message) {
+  return `
+    <div class="empty">
+      <p>${escapeHTML(message)}</p>
+    </div>
+  `;
+}
+
+function navigate(route) {
+  const cleanRoute = String(route || "home")
+    .replace("#", "")
+    .toLowerCase();
+
+  if (!routes[cleanRoute]) {
+    window.location.hash = "#home";
+    return;
+  }
+
+  if (window.location.hash !== `#${cleanRoute}`) {
+    window.location.hash = `#${cleanRoute}`;
+  } else {
+    renderRoute(cleanRoute);
+  }
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function setupNavigation() {
+  document.querySelectorAll("[data-route]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const route = link.dataset.route;
+
+      closeMobileMenu();
+
+      if (route) {
+        navigate(route);
+      }
+    });
+  });
+
+  const menuButton = document.getElementById("menuBtn");
+
+  if (menuButton) {
+    menuButton.addEventListener("click", toggleMobileMenu);
+  }
+
+  window.addEventListener("hashchange", () => {
+    const route =
+      window.location.hash.replace("#", "") || "home";
+
+    renderRoute(route);
+  });
+}
+
+function toggleMobileMenu() {
+  const nav = document.getElementById("mainNav");
+
+  if (!nav) {
+    return;
+  }
+
+  nav.classList.toggle("open");
+}
+
+function closeMobileMenu() {
+  const nav = document.getElementById("mainNav");
+
+  if (nav) {
+    nav.classList.remove("open");
+  }
+}
+
+function updateActiveNavigation(route) {
+  document.querySelectorAll("[data-route]").forEach((link) => {
+    link.classList.toggle(
+      "active",
+      link.dataset.route === route
+    );
+  });
+}
+
+/* =========================================================
+   ROUTER
+========================================================= */
+
+async function renderRoute(route) {
+  const cleanRoute =
+    String(route || "home").toLowerCase();
+
+  AppState.currentRoute =
+    routes[cleanRoute] ? cleanRoute : "home";
+
+  updateActiveNavigation(AppState.currentRoute);
+
+  const renderer =
+    routes[AppState.currentRoute];
+
+  if (!renderer) {
+    app.innerHTML = emptyState(
+      "Page not found."
+    );
+    return;
+  }
+
+  app.innerHTML = loading();
+
+  try {
+    await renderer();
+  } catch (error) {
+    console.error(
+      "RIBACOM route error:",
+      error
+    );
+
+    app.innerHTML = `
+      <section class="page">
+        <div class="alert alert-danger">
+          <strong>Unable to load this page.</strong>
+          <p>Please try again.</p>
+        </div>
+      </section>
+    `;
+  }
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+/* =========================================================
+   HOME
+========================================================= */
+
+async function renderHome() {
+  app.innerHTML = `
+    <section class="page">
+
+      <div class="hero">
+
+        <img
+          src="assets/ribacom-crest.png"
+          alt="RIBACOM Crest"
+          class="hero-logo"
+          onerror="this.style.display='none'"
+        >
+
+        <h1>
+          Rivers Bayelsa Community
+          in Diaspora The Gambia
+        </h1>
+
+        <p>
+          Welcome to the official digital platform
+          of Rivers Bayelsa Community in Diaspora
+          The Gambia.
+        </p>
+
+        <div class="motto">
+          ${RIBACOM.motto}
+        </div>
+
+        <div>
+          <a
+            href="#membership"
+            data-route="membership"
+            class="btn btn-primary"
+          >
+            Become a Member
+          </a>
+
+          <a
+            href="#about"
+            data-route="about"
+            class="btn btn-outline"
+          >
+            Learn About RIBACOM
+          </a>
+        </div>
+
+      </div>
+
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-icon">🤝</div>
+          <h3>Community</h3>
+          <p>
+            Building a united Rivers and Bayelsa
+            community in The Gambia.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">🕊️</div>
+          <h3>Unity</h3>
+          <p>
+            Promoting cooperation, friendship,
+            mutual support and belonging.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-icon">❤️</div>
+          <h3>Service</h3>
+          <p>
+            Serving members and supporting the
+            welfare of our community.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="section">
+
+        <h2 class="section-title">
+          RIBACOM Online Services
+        </h2>
+
+        <div class="grid grid-4">
+
+          ${homeCard(
+            "📢",
+            "Announcements",
+            "Community news and official notices.",
+            "announcements"
+          )}
+
+          ${homeCard(
+            "📅",
+            "Events",
+            "Meetings, programs and community events.",
+            "events"
+          )}
+
+          ${homeCard(
+            "🪪",
+            "Digital ID",
+            "Access your RIBACOM digital membership identity.",
+            "digitalid"
+          )}
+
+          ${homeCard(
+            "❤️",
+            "Welfare",
+            "Submit and follow welfare requests.",
+            "welfare"
+          )}
+
+        </div>
+
+      </div>
+
+    </section>
+  `;
+
+  setupDynamicLinks();
+}
+
+function homeCard(icon, title, description, route) {
+  return `
+    <a
+      href="#${route}"
+      data-route="${route}"
+      class="card"
+    >
+      <div class="card-icon">${icon}</div>
+      <h3>${escapeHTML(title)}</h3>
+      <p>${escapeHTML(description)}</p>
+    </a>
+  `;
+}
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+async function renderAbout() {
+  app.innerHTML = `
+    ${page(
+      "About RIBACOM",
+      "Rivers Bayelsa Community in Diaspora The Gambia"
+    )}
+
+    <section class="grid grid-2">
+
+      <article class="card">
+        <h2>Who We Are</h2>
+
+        <p>
+          Rivers Bayelsa Community in Diaspora
+          The Gambia, known as RIBACOM, is a
+          community organization bringing together
+          people of Rivers and Bayelsa heritage
+          living in The Gambia.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Our Motto</h2>
+
+        <p>
+          <strong>
+            TRUTH • UNITY • SERVICE
+          </strong>
+        </p>
+
+        <p>
+          Our motto represents the values that guide
+          the community and its service to members.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Our Purpose</h2>
+
+        <p>
+          To promote unity, welfare, cultural identity,
+          cooperation and responsible community service
+          among members.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Our Community</h2>
+
+        <p>
+          RIBACOM provides a platform through which
+          members can connect, participate in community
+          activities and access available services.
+        </p>
+      </article>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   LEADERSHIP
+========================================================= */
+
+async function renderLeadership() {
+  app.innerHTML = `
+    ${page(
+      "Leadership",
+      "RIBACOM Executive Committee"
+    )}
+
+    <div class="grid">
+
+      ${leaderCard(
+        "President",
+        "Iworima M. Thomas"
+      )}
+
+      ${leaderCard(
+        "Vice President",
+        "Odika Nnenne"
+      )}
+
+      ${leaderCard(
+        "Secretary General",
+        "Juliet Ejila"
+      )}
+
+      ${leaderCard(
+        "Treasurer",
+        "Ruth Doubra Julius"
+      )}
+
+      ${leaderCard(
+        "Public Relations Officer",
+        "Uche Destiny Chikezie"
+      )}
+
+      ${leaderCard(
+        "Welfare Officer / Provost",
+        "Emeka Thank God Elechi"
+      )}
+
+    </div>
+  `;
+}
+
+function leaderCard(role, name) {
+  return `
+    <article class="card leader-card">
+
+      <div class="leader-photo">
+        <span
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height:100%;
+            font-size:2rem;
+          "
+        >
+          👤
+        </span>
+      </div>
+
+      <h3>${escapeHTML(name)}</h3>
+
+      <div class="leader-role">
+        ${escapeHTML(role)}
+      </div>
+
+    </article>
+  `;
+}
+
+/* =========================================================
+   CONSTITUTION
+========================================================= */
+
+async function renderConstitution() {
+  app.innerHTML = `
+    ${page(
+      "RIBACOM Constitution",
+      "The governing framework of the community"
+    )}
+
+    <section class="card">
+
+      <h2>Master Constitution</h2>
+
+      <p>
+        The RIBACOM Constitution provides the governing
+        framework for the organization, its leadership,
+        membership, meetings, welfare and community
+        administration.
+      </p>
+
+      <div class="section">
+        <h3>Structure</h3>
+
+        <p>
+          The current Master Constitution contains
+          13 Chapters and 97 Articles.
+        </p>
+      </div>
+
+      <div class="section">
+        <h3>Executive Committee</h3>
+
+        <p>
+          The executive structure provides for the
+          approved community leadership offices and
+          responsibilities.
+        </p>
+      </div>
+
+      <div class="section">
+        <h3>Membership</h3>
+
+        <p>
+          Membership includes Regular Members and
+          Associate Members according to the approved
+          membership provisions.
+        </p>
+      </div>
+
+      <div class="alert alert-info">
+        The full constitution will be connected to
+        Supabase so authorized administrators can
+        update the published document without
+        changing this HTML file.
+      </div>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   ANNOUNCEMENTS
+========================================================= */
+
+async function renderAnnouncements() {
+  app.innerHTML = `
+    ${page(
+      "Announcements",
+      "Official RIBACOM community announcements"
+    )}
+
+    <div id="announcementsList">
+      ${loading("Loading announcements...")}
+    </div>
+  `;
+
+  /*
+    Supabase connection will be added later.
+    This placeholder keeps the application modular.
+  */
+
+  document.getElementById(
+    "announcementsList"
+  ).innerHTML = emptyState(
+    "Announcements will appear here."
+  );
+}
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+async function renderEvents() {
+  app.innerHTML = `
+    ${page(
+      "Events",
+      "RIBACOM meetings and community activities"
+    )}
+
+    <div id="eventsList">
+      ${emptyState(
+        "Community events will appear here."
+      )}
+    </div>
+  `;
+}
+
+/* =========================================================
+   GALLERY
+========================================================= */
+
+async function renderGallery() {
+  app.innerHTML = `
+    ${page(
+      "Gallery",
+      "RIBACOM community photographs"
+    )}
+
+    <div id="galleryList">
+      ${emptyState(
+        "Gallery photographs will appear here."
+      )}
+    </div>
+  `;
+}
+
+/* =========================================================
+   PUBLICATIONS
+========================================================= */
+
+async function renderPublications() {
+  app.innerHTML = `
+    ${page(
+      "Publications",
+      "RIBACOM documents and publications"
+    )}
+
+    <div id="publicationsList">
+      ${emptyState(
+        "Publications will appear here."
+      )}
+    </div>
+  `;
+}
+
+/* =========================================================
+   MEMBERSHIP
+========================================================= */
+
+async function renderMembership() {
+  app.innerHTML = `
+    ${page(
+      "Membership",
+      "Join and participate in RIBACOM"
+    )}
+
+    <section class="grid grid-2">
+
+      <article class="card">
+
+        <h2>Regular Member</h2>
+
+        <p>
+          Membership category for persons who qualify
+          through Rivers or Bayelsa ancestry or birth.
+        </p>
+
+        <br>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          onclick="showMembershipNotice('Regular Member')"
+        >
+          Apply
+        </button>
+
+      </article>
+
+      <article class="card">
+
+        <h2>Associate Member</h2>
+
+        <p>
+          Membership category available through
+          marriage and interest in identifying with
+          the community.
+        </p>
+
+        <br>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          onclick="showMembershipNotice('Associate Member')"
+        >
+          Apply
+        </button>
+
+      </article>
+
+    </section>
+
+    <section class="section">
+
+      <div class="alert alert-info">
+        Online membership registration will be
+        connected to Supabase in the next stage.
+      </div>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   DIGITAL ID
+========================================================= */
+
+async function renderDigitalID() {
+  app.innerHTML = `
+    ${page(
+      "Digital ID",
+      "RIBACOM digital membership identity"
+    )}
+
+    <section class="card">
+
+      <div class="digital-id">
+
+        <div class="digital-id-header">
+          <strong>
+            RIVERS BAYELSA COMMUNITY
+          </strong>
+
+          <small>
+            THE GAMBIA
+          </small>
+        </div>
+
+        <div class="digital-id-body">
+
+          <div class="digital-id-photo">
+            <span
+              style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                height:100%;
+                font-size:2rem;
+              "
+            >
+              👤
+            </span>
+          </div>
+
+          <p>
+            <strong>Name:</strong>
+            Member Name
+          </p>
+
+          <p>
+            <strong>Membership No:</strong>
+            RIBACOM-000000
+          </p>
+
+          <p>
+            <strong>Status:</strong>
+            <span class="badge badge-warning">
+              Pending
+            </span>
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <div class="alert alert-info">
+      Your real Digital ID will be generated from
+      your approved Supabase member profile.
+    </div>
+  `;
+}
+
+/* =========================================================
+   WELFARE
+========================================================= */
+
+async function renderWelfare() {
+  app.innerHTML = `
+    ${page(
+      "Welfare",
+      "Community welfare and member support"
+    )}
+
+    <section class="grid grid-2">
+
+      <article class="card">
+        <h2>Welfare Support</h2>
+
+        <p>
+          RIBACOM provides welfare support to eligible
+          members according to the community's approved
+          welfare provisions.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Submit a Request</h2>
+
+        <p>
+          Registered members will be able to submit
+          welfare requests securely through their
+          member account.
+        </p>
+
+        <br>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          onclick="showLoginNotice()"
+        >
+          Member Login
+        </button>
+      </article>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   YOUTH
+========================================================= */
+
+async function renderYouth() {
+  app.innerHTML = `
+    ${page(
+      "Youth",
+      "RIBACOM youth activities and information"
+    )}
+
+    <section class="card">
+
+      <h2>Youth Development</h2>
+
+      <p>
+        This section will provide information about
+        youth programs, activities, opportunities and
+        community initiatives.
+      </p>
+
+      <br>
+
+      <div class="alert alert-info">
+        Youth content will be managed through the
+        RIBACOM administration system.
+      </div>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   ADVISERS
+========================================================= */
+
+async function renderAdvisers() {
+  app.innerHTML = `
+    ${page(
+      "Advisers",
+      "RIBACOM advisory structure"
+    )}
+
+    <div class="grid grid-2">
+
+      ${adviserCard("Legal Adviser")}
+
+      ${adviserCard("Protocol Adviser")}
+
+      ${adviserCard("Youth Adviser")}
+
+      ${adviserCard("Cultural Adviser")}
+
+    </div>
+  `;
+}
+
+function adviserCard(role) {
+  return `
+    <article class="card">
+
+      <h3>${escapeHTML(role)}</h3>
+
+      <p>
+        Adviser information will be managed by
+        authorized administrators.
+      </p>
+
+    </article>
+  `;
+}
+
+/* =========================================================
+   PAYMENTS
+========================================================= */
+
+async function renderPayments() {
+  app.innerHTML = `
+    ${page(
+      "Payment Information",
+      "Approved RIBACOM payment channels"
+    )}
+
+    <section class="grid">
+
+      ${paymentCard("Wave")}
+
+      ${paymentCard("APS Wallet")}
+
+      ${paymentCard("Afrimoney")}
+
+      ${paymentCard("QMoney")}
+
+      ${paymentCard("Bank Transfer")}
+
+      ${paymentCard("Cash")}
+
+    </section>
+
+    <div class="alert alert-info">
+      Payment details will be loaded from the
+      RIBACOM payment settings stored in Supabase.
+    </div>
+  `;
+}
+
+function paymentCard(method) {
+  return `
+    <article class="card">
+      <h3>${escapeHTML(method)}</h3>
+      <p>
+        Payment information will appear here.
+      </p>
+    </article>
+  `;
+}
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+async function renderContact() {
+  app.innerHTML = `
+    ${page(
+      "Contact RIBACOM",
+      "Connect with the community"
+    )}
+
+    <section class="grid grid-2">
+
+      <article class="card">
+
+        <h2>RIBACOM</h2>
+
+        <p>
+          Rivers Bayelsa Community in Diaspora
+          The Gambia
+        </p>
+
+        <br>
+
+        <p>
+          <strong>Motto:</strong><br>
+          ${RIBACOM.motto}
+        </p>
+
+      </article>
+
+      <article class="card">
+
+        <h2>Send a Message</h2>
+
+        <form
+          class="form"
+          onsubmit="submitContactForm(event)"
+        >
+
+          <div class="form-group">
+            <label for="contactName">
+              Name
+            </label>
+
+            <input
+              id="contactName"
+              name="name"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="contactEmail">
+              Email
+            </label>
+
+            <input
+              id="contactEmail"
+              name="email"
+              type="email"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="contactMessage">
+              Message
+            </label>
+
+            <textarea
+              id="contactMessage"
+              name="message"
+              required
+            ></textarea>
+          </div>
+
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            Send Message
+          </button>
+
+        </form>
+
+      </article>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+async function renderLogin() {
+  app.innerHTML = `
+    ${page(
+      "Member Login",
+      "Access your RIBACOM account"
+    )}
+
+    <section class="card">
+
+      <form
+        class="form"
+        id="loginForm"
+        onsubmit="submitLogin(event)"
+      >
+
+        <div class="form-group">
+          <label for="loginEmail">
+            Email Address
+          </label>
+
+          <input
+            id="loginEmail"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">
+            Password
+          </label>
+
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button
+          class="btn btn-primary"
+          type="submit"
+        >
+          Login
+        </button>
+
+      </form>
+
+      <br>
+
+      <div class="alert alert-info">
+        Registration, password recovery and
+        Supabase authentication will be connected
+        in the authentication module.
+      </div>
+
+    </section>
+  `;
+}
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+async function renderAdmin() {
+  app.innerHTML = `
+    ${page(
+      "Administration",
+      "RIBACOM management dashboard"
+    )}
+
+    <div class="alert alert-warning">
+      Administrator access is restricted to
+      authorized RIBACOM administrators.
+    </div>
+
+    <div class="grid grid-4">
+
+      ${adminCard(
+        "👥",
+        "Members",
+        "Manage members"
+      )}
+
+      ${adminCard(
+        "📝",
+        "Applications",
+        "Review applications"
+      )}
+
+      ${adminCard(
+        "📢",
+        "Announcements",
+        "Manage announcements"
+      )}
+
+      ${adminCard(
+        "📅",
+        "Events",
+        "Manage events"
+      )}
+
+      ${adminCard(
+        "🖼️",
+        "Gallery",
+        "Manage gallery"
+      )}
+
+      ${adminCard(
+        "📚",
+        "Publications",
+        "Manage publications"
+      )}
+
+      ${adminCard(
+        "❤️",
+        "Welfare",
+        "Manage welfare requests"
+      )}
+
+      ${adminCard(
+        "⚙️",
+        "Settings",
+        "Manage app content"
+      )}
+
+    </div>
+  `;
+}
+
+function adminCard(icon, title, description) {
+  return `
+    <article class="card">
+
+      <div class="card-icon">
+        ${icon}
+      </div>
+
+      <h3>
+        ${escapeHTML(title)}
+      </h3>
+
+      <p>
+        ${escapeHTML(description)}
+      </p>
+
+    </article>
+  `;
+}
+
+/* =========================================================
+   INTERACTION HELPERS
+========================================================= */
+
+function showMembershipNotice(type) {
+  alert(
+    `${type} application will be connected to the RIBACOM membership system.`
+  );
+}
+
+function showLoginNotice() {
+  navigate("login");
+}
+
+function submitContactForm(event) {
+  event.preventDefault();
+
+  alert(
+    "The contact form will be connected to Supabase in the next stage."
+  );
+}
+
+function submitLogin(event) {
+  event.preventDefault();
+
+  alert(
+    "Authentication will be connected through the RIBACOM Supabase authentication module."
+  );
+}
+
+function setupDynamicLinks() {
+  document
+    .querySelectorAll("[data-route]")
+    .forEach((link) => {
+      link.addEventListener("click", () => {
+        const route = link.dataset.route;
+
+        closeMobileMenu();
+
+        if (route) {
+          navigate(route);
+        }
+      });
+    });
+}
+
+/* =========================================================
+   YEAR
+========================================================= */
+
+function updateYear() {
+  const yearElement =
+    document.getElementById("year");
+
+  if (yearElement) {
+    yearElement.textContent =
+      new Date().getFullYear();
+  }
+}
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+async function initApp() {
+  if (AppState.initialized) {
+    return;
+  }
+
+  AppState.initialized = true;
+
+  setupNavigation();
+  updateYear();
+
+  const route =
+    window.location.hash.replace("#", "") ||
+    "home";
+
+  await renderRoute(route);
+}
+
+/* =========================================================
+   START APPLICATION
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initApp
+);
+
+/* =========================================================
+   GLOBAL ACCESS
+========================================================= */
+
+window.RIBACOM = RIBACOM;
+window.AppState = AppState;
+window.navigate = navigate;
+window.showMembershipNotice =
+  showMembershipNotice;
+window.showLoginNotice =
+  showLoginNotice;
+window.submitContactForm =
+  submitContactForm;
+window.submitLogin =
+  submitLogin;
