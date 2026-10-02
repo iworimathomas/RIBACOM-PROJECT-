@@ -998,7 +998,7 @@ th{background:#f2f7f4}
       <label>
         Transaction / Reference Number
       </label>
-
+      
       <input id="paymentReference">
 
       <label>Payment Note</label>
@@ -1998,8 +1998,7 @@ async function loadCurrentMember(){
 
     updateAccountUI();
 
-
-    return currentMember;
+      return currentMember;
 
 }
 
@@ -2075,6 +2074,78 @@ supabaseClient
 
     }
 );
+
+
+/* ============================================================
+   MEMBERSHIP PROFILE SYNC
+   Creates the RIBACOM members record after Supabase signup.
+============================================================ */
+
+async function ensureMemberRecord(user, metadata){
+
+    if(!user){
+        return null;
+    }
+
+    const {
+        data: existing,
+        error: lookupError
+    } = await supabaseClient
+        .from("members")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    if(lookupError){
+        throw lookupError;
+    }
+
+    if(existing){
+        return existing;
+    }
+
+    const payload = {
+        id: user.id,
+        full_name: metadata.full_name || "",
+        phone: metadata.phone || "",
+        whatsapp: metadata.whatsapp || "",
+        gender: metadata.gender || "",
+        date_of_birth: metadata.date_of_birth || null,
+        state: metadata.state || "",
+        lga: metadata.lga || "",
+        town: metadata.town || "",
+        community: metadata.community || "",
+        address: metadata.address || "",
+        area: metadata.area || "",
+        occupation: metadata.occupation || "",
+        employer: metadata.employer || "",
+        passport_number: metadata.passport_number || "",
+        residence_permit: metadata.residence_permit || "",
+        membership_category: metadata.membership_category || "",
+        association_basis: metadata.association_basis || "",
+        association_details: metadata.association_details || "",
+        emergency_name: metadata.emergency_name || "",
+        emergency_phone: metadata.emergency_phone || "",
+        emergency_relationship: metadata.emergency_relationship || "",
+        status: "pending",
+        role: "member"
+    };
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("members")
+        .insert(payload)
+        .select("*")
+        .single();
+
+    if(error){
+        throw error;
+    }
+
+    return data;
+}
 
 
 /* ============================================================
@@ -2307,6 +2378,40 @@ document
         }
 
 
+        if(data?.user){
+
+            try{
+
+                await ensureMemberRecord(
+                    data.user,
+                    metadata
+                );
+
+                if(data?.session){
+
+                    currentUser = data.user;
+
+                    await loadCurrentMember();
+
+                }
+
+            }catch(memberError){
+
+                console.error(
+                    "Member profile creation error:",
+                    memberError
+                );
+
+                toast(
+                    "Your account was created, but the membership profile could not be created. Please contact RIBACOM administration."
+                );
+
+                return;
+            }
+
+        }
+
+
         toast(
             "Registration successful. Your application is pending approval."
         );
@@ -2317,19 +2422,11 @@ document
         .reset();
 
 
-        document
-        .getElementById("otherStateBox")
-        .classList
-        .add("hidden");
+        const otherStateBox =
+            document.getElementById("otherStateBox");
 
-
-        if(data?.session){
-
-            currentUser =
-                data.user;
-
-            await loadCurrentMember();
-
+        if(otherStateBox){
+            otherStateBox.classList.add("hidden");
         }
 
 
@@ -2397,8 +2494,24 @@ document
         await loadCurrentMember();
 
 
+        if(!currentMember){
+
+            await supabaseClient
+                .auth
+                .signOut();
+
+            currentUser = null;
+
+            toast(
+                "Your account is not yet linked to a RIBACOM membership application. Please contact RIBACOM administration."
+            );
+
+            return;
+        }
+
+
         if(
-            currentMember?.status ===
+            currentMember.status ===
             "rejected"
         ){
 
@@ -2885,8 +2998,7 @@ async function loadPayments(){
                         "option"
                     );
 
-
-                option.value =
+                          option.value =
                     item.method_name ||
                     item.name;
 
@@ -3884,7 +3996,9 @@ function showAdminSection(id){
         el=>el.classList.add(
             "hidden"
         )
-    );
+
+
+          );
 
 
     const target =
@@ -4884,8 +4998,7 @@ document
 
                     image_url:
                         imageUrl,
-
-                    caption,
+                                      caption,
 
                     created_by:
                         currentUser.id
@@ -5501,171 +5614,154 @@ document
 
     })();
 </script>
+
+<script>
 /* ============================================================
    RIBACOM 2026 — DIGITAL ID ENHANCEMENT
    TRUTH • UNITY • SERVICE
 ============================================================ */
 
-(function () {
+(function(){
     "use strict";
-
-    const ID_UPGRADE_VERSION = "2026.10-ID";
-
-    /* --------------------------------------------------------
-       DIGITAL ID STYLING
-    -------------------------------------------------------- */
 
     const style = document.createElement("style");
 
     style.textContent = `
-        .ribacom-id-enhanced {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 12px 35px rgba(0,0,0,.15);
+        .ribacom-id-enhanced{
+            position:relative;
+            overflow:hidden;
+            border-radius:20px;
+            box-shadow:0 12px 35px rgba(0,0,0,.15);
         }
-
-        .ribacom-id-enhanced::after {
-            content: "TRUTH • UNITY • SERVICE";
-            position: absolute;
-            right: -35px;
-            bottom: 18px;
-            transform: rotate(-35deg);
-            font-size: 10px;
-            font-weight: 800;
-            opacity: .10;
-            pointer-events: none;
+        .ribacom-id-enhanced::after{
+            content:"TRUTH • UNITY • SERVICE";
+            position:absolute;
+            right:-35px;
+            bottom:18px;
+            transform:rotate(-35deg);
+            font-size:10px;
+            font-weight:800;
+            opacity:.10;
+            pointer-events:none;
         }
-
-        .ribacom-id-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 14px;
+        .ribacom-id-actions{
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:14px;
         }
-
-        .ribacom-id-actions button {
-            min-height: 44px;
-            padding: 10px 16px;
-            border: 0;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            touch-action: manipulation;
+        .ribacom-id-actions button{
+            min-height:44px;
+            padding:10px 16px;
+            border:0;
+            border-radius:10px;
+            cursor:pointer;
+            font-weight:700;
+            touch-action:manipulation;
+            background:#087f5b;
+            color:#fff;
         }
-
-        @media print {
-            body * {
-                visibility: hidden !important;
-            }
-
+        @media print{
+            body *{visibility:hidden!important}
             .ribacom-print-id,
-            .ribacom-print-id * {
-                visibility: visible !important;
+            .ribacom-print-id *{visibility:visible!important}
+            .ribacom-print-id{
+                position:absolute!important;
+                left:0!important;
+                top:0!important;
+                width:100%!important;
             }
-
-            .ribacom-print-id {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-
-            .ribacom-id-actions {
-                display: none !important;
-            }
+            .ribacom-id-actions{display:none!important}
         }
     `;
 
     document.head.appendChild(style);
 
-    /* --------------------------------------------------------
-       FIND DIGITAL ID AREAS WITHOUT CHANGING EXISTING HTML
-    -------------------------------------------------------- */
+    function findDigitalID(){
+        const content = document.getElementById("digitalIdContent");
 
-    function findDigitalID() {
-        const selectors = [
-            "#digital-id",
-            "#digitalID",
-            ".digital-id",
-            ".digital-id-card",
-            ".id-card",
-            "[data-digital-id]",
-            "[data-id-card]"
-        ];
-
-        for (const selector of selectors) {
-            const element = document.querySelector(selector);
-
-            if (element) {
-                return element;
-            }
+        if(content){
+            const card = content.querySelector(".id-card");
+            if(card) return card;
         }
 
-        return null;
+        return document.querySelector(
+            "#digital-id, #digitalID, .digital-id, .digital-id-card, .id-card, [data-digital-id], [data-id-card]"
+        );
     }
 
-    /* --------------------------------------------------------
-       ADD PRINT / SAVE FUNCTIONALITY
-    -------------------------------------------------------- */
-
-    function enhanceDigitalID() {
+    function enhanceDigitalID(){
         const idCard = findDigitalID();
 
-        if (!idCard) {
+        if(!idCard || idCard.dataset.ribacomIdEnhanced === "true"){
             return;
         }
 
         idCard.classList.add("ribacom-id-enhanced");
-
-        if (idCard.dataset.ribacomIdEnhanced === "true") {
-            return;
-        }
-
         idCard.dataset.ribacomIdEnhanced = "true";
 
         const actions = document.createElement("div");
-
         actions.className = "ribacom-id-actions";
 
         const printButton = document.createElement("button");
-
         printButton.type = "button";
         printButton.textContent = "🖨️ Print / Save ID";
-        printButton.onclick = function () {
-            idCard.classList.add("ribacom-print-id");
 
+        printButton.onclick = function(){
+            idCard.classList.add("ribacom-print-id");
             window.print();
 
-            setTimeout(function () {
+            setTimeout(function(){
                 idCard.classList.remove("ribacom-print-id");
-            }, 1000);
+            },1000);
         };
 
         actions.appendChild(printButton);
         idCard.appendChild(actions);
     }
 
-    /* --------------------------------------------------------
-       MEMBERSHIP STATUS HELPERS
-    -------------------------------------------------------- */
-
     window.RIBACOM_ID = {
-
-        version: ID_UPGRADE_VERSION,
-
-        motto: "TRUTH • UNITY • SERVICE",
-
-        print: function () {
+        version:"2026.10-ID",
+        motto:"TRUTH • UNITY • SERVICE",
+        print:function(){
             const idCard = findDigitalID();
 
-            if (!idCard) {
-                if (typeof window.showToast === "function") {
-                    window.showToast(
-                        "Digital ID is not currently available."
-                    );
-                }
+            if(!idCard){
+                toast("Digital ID is not currently available.");
+                return;
+            }
 
-               
+            idCard.classList.add("ribacom-print-id");
+            window.print();
+
+            setTimeout(function(){
+                idCard.classList.remove("ribacom-print-id");
+            },1000);
+        }
+    };
+
+    const observer = new MutationObserver(function(){
+        enhanceDigitalID();
+    });
+
+    function start(){
+        enhanceDigitalID();
+
+        const content = document.getElementById("digitalIdContent");
+
+        if(content){
+            observer.observe(content,{childList:true,subtree:true});
+        }
+    }
+
+    if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded",start,{once:true});
+    }else{
+        start();
+    }
+
+})();
+</script>
+
 </body>
 </html>
