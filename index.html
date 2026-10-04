@@ -35333,3 +35333,849 @@ window.RIBACOM_MASTER_HEALTH = {
 <!-- =========================================================
      END SECTION 20
      ========================================================= --> 
+<!-- =========================================================
+     RIBACOM MASTER APPLICATION
+     SECTION 21 — ADMIN ROUTE & INTEGRATION FIX
+     ========================================================= -->
+
+<script>
+/* ---------------------------------------------------------
+   RIBACOM ADMIN ROUTE DISPATCHER
+   --------------------------------------------------------- */
+
+window.RIBACOM_ADMIN_ROUTE_INTEGRATION = {
+    active: true,
+    lastRoute: null,
+    lastSection: null,
+    errors: []
+};
+
+
+/* ---------------------------------------------------------
+   ADMIN ROUTE DEFINITIONS
+   --------------------------------------------------------- */
+
+const RIBACOM_MASTER_ADMIN_ROUTES = {
+
+    "admin": {
+        section: "dashboard",
+        functionName: "renderAdminDashboard"
+    },
+
+    "admin-dashboard": {
+        section: "dashboard",
+        functionName: "renderAdminDashboard"
+    },
+
+    "admin-members": {
+        section: "members",
+        functionName: "renderAdminMembers"
+    },
+
+    "admin-digital-ids": {
+        section: "digital-ids",
+        functionName: "renderAdminDigitalIDs"
+    },
+
+    "admin-leadership": {
+        section: "leadership",
+        functionName: "renderAdminLeadership"
+    },
+
+    "admin-advisers": {
+        section: "advisers",
+        functionName: "renderAdminAdvisers"
+    },
+
+    "admin-constitution": {
+        section: "constitution",
+        functionName: "renderAdminConstitution"
+    },
+
+    "admin-announcements": {
+        section: "announcements",
+        functionName: "renderAdminAnnouncements"
+    },
+
+    "admin-events": {
+        section: "events",
+        functionName: "renderAdminEvents"
+    },
+
+    "admin-gallery": {
+        section: "gallery",
+        functionName: "renderAdminGallery"
+    },
+
+    "admin-publications": {
+        section: "publications",
+        functionName: "renderAdminPublications"
+    },
+
+    "admin-youth": {
+        section: "youth",
+        functionName: "renderAdminYouth"
+    },
+
+    "admin-welfare": {
+        section: "welfare",
+        functionName: "renderAdminWelfare"
+    },
+
+    "admin-payments": {
+        section: "payments",
+        functionName: "renderAdminPayments"
+    },
+
+    "admin-about": {
+        section: "about",
+        functionName: "renderAdminAbout"
+    },
+
+    "admin-about-ribacom": {
+        section: "about",
+        functionName: "renderAdminAbout"
+    },
+
+    "admin-system": {
+        section: "system",
+        functionName: "renderRIBACOMMasterHealthPage"
+    },
+
+    "system-verification": {
+        section: "system",
+        functionName: "renderRIBACOMMasterHealthPage"
+    },
+
+    "admin-settings": {
+        section: "settings",
+        functionName: "renderAdminSettings"
+    }
+};
+
+
+/* ---------------------------------------------------------
+   FIND EXISTING ADMIN FUNCTION
+   --------------------------------------------------------- */
+
+function getRIBACOMAdminRouteFunction(functionName) {
+
+    if (
+        typeof window[functionName] === "function"
+    ) {
+        return window[functionName];
+    }
+
+    return null;
+}
+
+
+/* ---------------------------------------------------------
+   ADMIN ACCESS CHECK
+   --------------------------------------------------------- */
+
+async function verifyRIBACOMAdminRouteAccess() {
+
+    try {
+
+        if (
+            typeof requireRIBACOMAdmin === "function"
+        ) {
+
+            const allowed =
+                await requireRIBACOMAdmin();
+
+            return allowed !== false;
+        }
+
+        if (
+            typeof requireAdmin === "function"
+        ) {
+
+            const allowed =
+                await requireAdmin();
+
+            return allowed !== false;
+        }
+
+        if (
+            typeof isAdmin === "function"
+        ) {
+
+            return !!isAdmin();
+        }
+
+        return false;
+
+    } catch (error) {
+
+        console.error(
+            "RIBACOM admin access error:",
+            error
+        );
+
+        RIBACOM_ADMIN_ROUTE_INTEGRATION.errors.push(
+            error?.message || String(error)
+        );
+
+        return false;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   MAIN ADMIN ROUTE HANDLER
+   --------------------------------------------------------- */
+
+async function renderRIBACOMAdminRoute(route) {
+
+    const routeName =
+        String(route || "admin");
+
+    const definition =
+        RIBACOM_MASTER_ADMIN_ROUTES[routeName];
+
+    if (!definition) {
+
+        console.warn(
+            "Unknown RIBACOM admin route:",
+            routeName
+        );
+
+        if (
+            typeof showToast === "function"
+        ) {
+
+            showToast(
+                "Admin section not found.",
+                "error"
+            );
+        }
+
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       CHECK ADMIN ACCESS
+       ----------------------------------------------------- */
+
+    const allowed =
+        await verifyRIBACOMAdminRouteAccess();
+
+    if (!allowed) {
+        return;
+    }
+
+
+    /* -----------------------------------------------------
+       STORE CURRENT ADMIN SECTION
+       ----------------------------------------------------- */
+
+    if (
+        typeof state === "object" &&
+        state
+    ) {
+
+        state.adminSection =
+            definition.section;
+
+        state.adminEditingId =
+            null;
+    }
+
+
+    RIBACOM_ADMIN_ROUTE_INTEGRATION.lastRoute =
+        routeName;
+
+    RIBACOM_ADMIN_ROUTE_INTEGRATION.lastSection =
+        definition.section;
+
+
+    /* -----------------------------------------------------
+       SYSTEM VERIFICATION
+       ----------------------------------------------------- */
+
+    if (
+        definition.functionName ===
+        "renderRIBACOMMasterHealthPage"
+    ) {
+
+        return await renderRIBACOMMasterHealthPage();
+    }
+
+
+    /* -----------------------------------------------------
+       LOCATE EXISTING ADMIN FUNCTION
+       ----------------------------------------------------- */
+
+    const adminFunction =
+        getRIBACOMAdminRouteFunction(
+            definition.functionName
+        );
+
+
+    /* -----------------------------------------------------
+       FUNCTION EXISTS
+       ----------------------------------------------------- */
+
+    if (adminFunction) {
+
+        try {
+
+            return await adminFunction();
+
+        } catch (error) {
+
+            console.error(
+                "RIBACOM admin section error:",
+                definition.functionName,
+                error
+            );
+
+            RIBACOM_ADMIN_ROUTE_INTEGRATION.errors.push(
+                (
+                    definition.functionName +
+                    ": " +
+                    (
+                        error?.message ||
+                        String(error)
+                    )
+                )
+            );
+
+            if (
+                typeof showToast === "function"
+            ) {
+
+                showToast(
+                    "Unable to open this Admin section.",
+                    "error"
+                );
+            }
+
+            return;
+        }
+    }
+
+
+    /* -----------------------------------------------------
+       FUNCTION DOES NOT EXIST
+       ----------------------------------------------------- */
+
+    console.warn(
+        "RIBACOM Admin function is not available:",
+        definition.functionName
+    );
+
+    RIBACOM_ADMIN_ROUTE_INTEGRATION.errors.push(
+        "Missing Admin function: " +
+        definition.functionName
+    );
+
+
+    const app =
+        document.getElementById("app");
+
+    if (app) {
+
+        app.innerHTML = `
+
+            <section class="ribacom-admin-missing">
+
+                <div class="ribacom-admin-missing-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+
+                <h2>
+                    Admin Section Not Available
+                </h2>
+
+                <p>
+                    The application route is configured,
+                    but the corresponding Admin function
+                    could not be found.
+                </p>
+
+                <div class="ribacom-admin-missing-name">
+                    ${escapeHTML(
+                        definition.functionName
+                    )}
+                </div>
+
+                <button
+                    class="btn btn-primary"
+                    onclick="safeRIBACOMNavigate('admin')"
+                >
+                    <i class="fas fa-arrow-left"></i>
+                    Return to Admin
+                </button>
+
+            </section>
+
+        `;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   ADMIN MENU NAVIGATION
+   --------------------------------------------------------- */
+
+function navigateRIBACOMAdminSection(route) {
+
+    const target =
+        String(route || "admin");
+
+    if (
+        typeof safeRIBACOMNavigate === "function"
+    ) {
+
+        safeRIBACOMNavigate(target);
+
+    } else if (
+        typeof navigate === "function"
+    ) {
+
+        navigate(target);
+    }
+}
+
+
+/* ---------------------------------------------------------
+   PATCH THE ADMIN CONTROL CENTRE ROUTE
+   --------------------------------------------------------- */
+
+const ribacomPreviousRenderPageAfterSection20 =
+    window.renderPage;
+
+
+/* ---------------------------------------------------------
+   FINAL ADMIN ROUTE LAYER
+   --------------------------------------------------------- */
+
+if (
+    typeof ribacomPreviousRenderPageAfterSection20 ===
+    "function"
+) {
+
+    window.renderPage =
+        async function(page) {
+
+            const currentPage =
+                String(page || "");
+
+            if (
+                RIBACOM_MASTER_ADMIN_ROUTES[
+                    currentPage
+                ]
+            ) {
+
+                return await renderRIBACOMAdminRoute(
+                    currentPage
+                );
+            }
+
+            return await
+                ribacomPreviousRenderPageAfterSection20(
+                    currentPage
+                );
+        };
+}
+
+
+/* ---------------------------------------------------------
+   PATCH ADMIN MENU OPEN FUNCTION
+   --------------------------------------------------------- */
+
+window.openRIBACOMAdminSection =
+    function(route) {
+
+        const target =
+            String(route || "admin");
+
+        navigateRIBACOMAdminSection(target);
+    };
+
+
+/* ---------------------------------------------------------
+   ADMIN ROUTE VALIDATION
+   --------------------------------------------------------- */
+
+function verifyRIBACOMAdminRoutes() {
+
+    const results = [];
+
+    Object.keys(
+        RIBACOM_MASTER_ADMIN_ROUTES
+    ).forEach(function(route) {
+
+        const definition =
+            RIBACOM_MASTER_ADMIN_ROUTES[route];
+
+        const available =
+            definition.functionName ===
+                "renderRIBACOMMasterHealthPage"
+                ? typeof renderRIBACOMMasterHealthPage ===
+                    "function"
+                : typeof window[
+                    definition.functionName
+                ] === "function";
+
+        results.push({
+            route: route,
+            section: definition.section,
+            functionName: definition.functionName,
+            available: available
+        });
+    });
+
+    return results;
+}
+
+
+/* ---------------------------------------------------------
+   ADMIN ROUTE STATUS
+   --------------------------------------------------------- */
+
+window.RIBACOM_ADMIN_ROUTE_STATUS = {
+
+    getRoutes: function() {
+        return RIBACOM_MASTER_ADMIN_ROUTES;
+    },
+
+    verify: function() {
+        return verifyRIBACOMAdminRoutes();
+    },
+
+    getCurrent: function() {
+
+        return {
+            route:
+                RIBACOM_ADMIN_ROUTE_INTEGRATION.lastRoute,
+
+            section:
+                RIBACOM_ADMIN_ROUTE_INTEGRATION.lastSection,
+
+            errors:
+                RIBACOM_ADMIN_ROUTE_INTEGRATION.errors
+        };
+    }
+};
+
+
+/* ---------------------------------------------------------
+   ADMIN ROUTE STATUS CARD
+   --------------------------------------------------------- */
+
+function renderRIBACOMAdminRouteStatus() {
+
+    const results =
+        verifyRIBACOMAdminRoutes();
+
+    const available =
+        results.filter(
+            item => item.available
+        ).length;
+
+    const missing =
+        results.filter(
+            item => !item.available
+        );
+
+    return `
+
+        <div class="ribacom-admin-route-status">
+
+            <div class="ribacom-admin-route-status-header">
+
+                <div>
+                    <span class="ribacom-admin-status-kicker">
+                        ADMIN INTEGRATION
+                    </span>
+
+                    <h3>
+                        Admin Route Status
+                    </h3>
+                </div>
+
+                <div class="ribacom-admin-route-count">
+                    ${available}/${results.length}
+                </div>
+
+            </div>
+
+            <div class="ribacom-admin-route-list">
+
+                ${results.map(function(item) {
+
+                    return `
+                        <div
+                            class="
+                                ribacom-admin-route-item
+                                ${
+                                    item.available
+                                        ? "route-ok"
+                                        : "route-missing"
+                                }
+                            "
+                        >
+
+                            <span>
+                                <i class="fas ${
+                                    item.available
+                                        ? "fa-check-circle"
+                                        : "fa-times-circle"
+                                }"></i>
+
+                                ${escapeHTML(item.section)}
+                            </span>
+
+                            <small>
+                                ${escapeHTML(
+                                    item.functionName
+                                )}
+                            </small>
+
+                        </div>
+                    `;
+
+                }).join("")}
+
+            </div>
+
+            ${
+                missing.length
+                    ? `
+                        <div class="ribacom-admin-route-warning">
+
+                            <i class="fas fa-exclamation-triangle"></i>
+
+                            ${
+                                missing.length
+                            }
+                            Admin function(s) are not currently available.
+                            They will be identified during the final audit.
+
+                        </div>
+                    `
+                    : `
+                        <div class="ribacom-admin-route-success">
+
+                            <i class="fas fa-check-circle"></i>
+
+                            All configured Admin routes have
+                            corresponding functions.
+
+                        </div>
+                    `
+            }
+
+        </div>
+    `;
+}
+
+
+/* ---------------------------------------------------------
+   ADMIN ROUTE CSS
+   --------------------------------------------------------- */
+
+(function injectRIBACOMAdminRouteStyles() {
+
+    if (
+        document.getElementById(
+            "ribacom-admin-route-integration-styles"
+        )
+    ) {
+        return;
+    }
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "ribacom-admin-route-integration-styles";
+
+    style.textContent = `
+
+        .ribacom-admin-missing {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 35px 22px;
+            text-align: center;
+            border: 1px solid rgba(100,116,139,.18);
+            border-radius: 20px;
+            background: rgba(255,255,255,.8);
+            box-shadow: 0 12px 35px rgba(15,23,42,.07);
+        }
+
+        .ribacom-admin-missing-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(234,179,8,.12);
+            color: #a16207;
+            font-size: 28px;
+        }
+
+        .ribacom-admin-missing h2 {
+            margin: 0 0 10px;
+        }
+
+        .ribacom-admin-missing p {
+            line-height: 1.6;
+            opacity: .75;
+        }
+
+        .ribacom-admin-missing-name {
+            display: inline-block;
+            margin: 10px 0 20px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(100,116,139,.08);
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .ribacom-admin-route-status {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 18px;
+            border: 1px solid rgba(100,116,139,.16);
+            background: rgba(255,255,255,.75);
+        }
+
+        .ribacom-admin-route-status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .ribacom-admin-status-kicker {
+            display: block;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            opacity: .65;
+            margin-bottom: 4px;
+        }
+
+        .ribacom-admin-route-status-header h3 {
+            margin: 0;
+        }
+
+        .ribacom-admin-route-count {
+            min-width: 55px;
+            padding: 9px 12px;
+            text-align: center;
+            border-radius: 12px;
+            background: rgba(15,118,110,.1);
+            color: #0f766e;
+            font-weight: 800;
+        }
+
+        .ribacom-admin-route-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .ribacom-admin-route-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .ribacom-admin-route-item span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .ribacom-admin-route-item small {
+            opacity: .65;
+            font-family: monospace;
+            text-align: right;
+        }
+
+        .ribacom-admin-route-item.route-ok {
+            background: rgba(34,197,94,.07);
+        }
+
+        .ribacom-admin-route-item.route-ok i {
+            color: #15803d;
+        }
+
+        .ribacom-admin-route-item.route-missing {
+            background: rgba(239,68,68,.07);
+        }
+
+        .ribacom-admin-route-item.route-missing i {
+            color: #b91c1c;
+        }
+
+        .ribacom-admin-route-warning,
+        .ribacom-admin-route-success {
+            margin-top: 15px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .ribacom-admin-route-warning {
+            background: rgba(234,179,8,.10);
+            color: #92400e;
+        }
+
+        .ribacom-admin-route-success {
+            background: rgba(34,197,94,.08);
+            color: #166534;
+        }
+
+        @media (max-width: 650px) {
+
+            .ribacom-admin-route-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .ribacom-admin-route-item small {
+                text-align: left;
+            }
+
+        }
+
+    `;
+
+    document.head.appendChild(style);
+
+})();
+
+
+/* ---------------------------------------------------------
+   FINAL INTEGRATION MARKER
+   --------------------------------------------------------- */
+
+window.RIBACOM_ADMIN_ROUTE_INTEGRATION.active =
+    true;
+
+console.log(
+    "RIBACOM Section 21: Admin route integration loaded."
+);
+
+</script>
+
+<!-- =========================================================
+     END SECTION 21
+     ========================================================= -->
