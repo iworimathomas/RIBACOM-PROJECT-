@@ -1,0 +1,25 @@
+body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #008751;
+            border-radius: 4px;
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        .ribacom-header-gradient {
+            background: linear-gradient(135deg, #0A2540 0%, #008751 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+        }
