@@ -36179,3 +36179,69 @@ console.log(
 <!-- =========================================================
      END SECTION 21
      ========================================================= -->
+<!-- =========================================================
+     RIBACOM MASTER PATCH
+     TABLE MAPPING COMPATIBILITY
+     ========================================================= -->
+
+<script>
+/*
+ * Keep the original verified TABLES names.
+ * Add compatibility aliases for newer application modules.
+ * This does NOT create or rename any Supabase tables.
+ */
+
+TABLES.digitalIDs = TABLES.digital_ids;
+TABLES.youthContent = TABLES.youth_content;
+TABLES.welfareRequests = TABLES.welfare_requests;
+TABLES.paymentSettings = TABLES.payment_settings;
+TABLES.aboutContent = TABLES.ribacom_about_content;
+
+/*
+ * Additional explicit aliases for consistency.
+ */
+TABLES.ribacomAboutContent =
+    TABLES.ribacom_about_content;
+
+TABLES.digital_ids =
+    TABLES.digital_ids;
+
+TABLES.youth_content =
+    TABLES.youth_content;
+
+TABLES.welfare_requests =
+    TABLES.welfare_requests;
+
+TABLES.payment_settings =
+    TABLES.payment_settings;
+
+/*
+ * Verification marker.
+ */
+window.RIBACOM_TABLE_MAPPING_FIXED = true;
+
+console.log(
+    "RIBACOM: table mapping compatibility loaded.",
+    {
+        profiles: TABLES.profiles,
+        members: TABLES.members,
+        digitalIDs: TABLES.digitalIDs,
+        leadership: TABLES.leadership,
+        advisers: TABLES.advisers,
+        constitution: TABLES.constitution,
+        announcements: TABLES.announcements,
+        events: TABLES.events,
+        gallery: TABLES.gallery,
+        publications: TABLES.publications,
+        youthContent: TABLES.youthContent,
+        welfareRequests: TABLES.welfareRequests,
+        paymentSettings: TABLES.paymentSettings,
+        aboutContent: TABLES.aboutContent
+    }
+);
+</script>
+
+<!-- =========================================================
+     END TABLE MAPPING PATCH
+     ========================================================= -->
+    
