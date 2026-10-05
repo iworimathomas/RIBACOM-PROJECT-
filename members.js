@@ -43,10 +43,6 @@
     const {error:profileError}=await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
     if(profileError) console.warn('Profile upsert:',profileError.message);
 
-    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:photo||null,nationality:details.nationality,category,status:'pending'};
-    const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
-    if(memberError) return this.toast(memberError.message,'error');
-
     // Create the membership record even when Supabase requires email verification.
     // This keeps the application in Pending status instead of losing the application.
     const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:photo||null,nationality:details.nationality,category,status:'pending'};
