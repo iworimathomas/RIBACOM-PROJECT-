@@ -287,6 +287,22 @@
                         }
                         container.innerHTML = typeof this.renderFinanceView==='function' ? this.renderFinanceView() : '<div class="p-8 text-center">Finance module is loading.</div>';
                         break;
+                    case 'approval-center':
+                        if (!this.currentUser || !['admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'].includes(this.currentUser.roleKey)) {
+                            this.toast('Executive access required.', 'error');
+                            this.navigate('home');
+                            return;
+                        }
+                        container.innerHTML = typeof this.renderApprovalCenter==='function' ? this.renderApprovalCenter() : '<div class="p-8 text-center">Approval Centre is loading.</div>';
+                        break;
+                    case 'executive-work':
+                        if (!this.currentUser || !['admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'].includes(this.currentUser.roleKey)) {
+                            this.toast('Executive access required.', 'error');
+                            this.navigate('home');
+                            return;
+                        }
+                        container.innerHTML = typeof this.renderExecutiveWorkCenter==='function' ? this.renderExecutiveWorkCenter() : '<div class="p-8 text-center">Executive Work Centre is loading.</div>';
+                        break;
                     case 'admin-members':
                         if (!this.currentUser || !['admin','super_admin'].includes(this.currentUser.roleKey)) {
                             this.toast('Access denied. Administrator privileges required.', 'error');
