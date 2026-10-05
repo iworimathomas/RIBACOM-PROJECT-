@@ -164,12 +164,25 @@
     const {data:e,error}=await this.supabaseClient.from('elections').select('*').eq('id',id).single();
     if(error||!e){this.toast('Election could not be loaded.','error');return;}
     if(e.status!=='closed'){this.toast('Only closed elections can be submitted for publication.','warning');return;}
-    const {data:existing}=await this.supabaseClient.from('approval_requests').select('id,status').eq('content_type','election_results').eq('content_id',id).order('submitted_at',{ascending:false}).limit(1);
-    if(existing?.[0]?.status==='pending'||existing?.[0]?.status==='approved'){this.toast('Election results already have a publication request.','warning');return;}
-    const {data:req,error:re}=await this.supabaseClient.from('approval_requests').insert({content_type:'election_results',content_id:id,title:'Official Election Results — '+e.title,submitted_by:this.currentUser.id}).select().single();
-    if(re){this.toast('Could not submit results for publication: '+re.message,'error');return;}
-    await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'results_submitted_for_publication',details:{approval_request_id:req.id}});
-    this.toast('Election results submitted to the existing RIBACOM approval workflow.','success');
+    const {data:finalLog}=await this.supabaseClient.from('election_audit_logs').select('id,details,created_at').eq('election_id',id).eq('action','results_finalized').order('created_at',{ascending:false}).limit(1);
+    if(!finalLog?.length){this.toast('Finalize the official results before submitting them for publication.','warning');return;}
+    const {data:existing}=await this.supabaseClient.from('publications').select('id,approval_status,is_published').eq('source_type','election_results').eq('source_id',id).order('created_at',{ascending:false}).limit(1);
+    if(existing?.[0]?.approval_status==='pending'||existing?.[0]?.approval_status==='approved'){this.toast('Official results already have a publication record.','warning');return;}
+    const publicUrl=window.location.origin+window.location.pathname+'?election_results='+encodeURIComponent(id);
+    const {data:pub,error:pe}=await this.supabaseClient.from('publications').insert({
+      title:'Official Election Results — '+e.title,
+      description:'Official finalized results for the RIBACOM election. Published only after Presidential / Super Admin approval.',
+      file_url:publicUrl,
+      category:'election',
+      publication_date:new Date().toISOString().slice(0,10),
+      is_published:false,
+      source_type:'election_results',
+      source_id:id
+    }).select().single();
+    if(pe){this.toast('Could not create the official publication record: '+pe.message,'error');return;}
+    await this.supabaseClient.from('elections').update({results_publication_status:'pending',updated_at:new Date().toISOString()}).eq('id',id);
+    await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'results_submitted_for_publication',details:{publication_id:pub.id}});
+    this.toast('Official results submitted through the existing RIBACOM Presidential Approval workflow.','success');
     this.showElectionResults(id);
   };
 
