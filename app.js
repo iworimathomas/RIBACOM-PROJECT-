@@ -251,6 +251,10 @@
                         }
                         container.innerHTML = this.renderMemberDashboardView();
                         break;
+                    case 'ecosystem-activity':
+                        if (!this.currentUser) { this.toast('Please log in to view your activity centre.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
+                        container.innerHTML = this.renderEcosystemActivityView();
+                        break;
                     case 'digital-ecosystem':
                         container.innerHTML = this.renderDigitalEcosystemView();
                         break;
@@ -316,6 +320,70 @@
                 }
 
                 this.updateAuthHeaderUI();
+            }
+
+            renderEcosystemActivityView() {
+                const u=this.currentUser||{};
+                const role=(u.roleKey||'guest').toLowerCase();
+                const isAdmin=['admin','super_admin'].includes(role);
+                const isExec=['president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'].includes(role);
+                const items=[];
+                const push=(type,title,desc,action,icon,priority='Normal')=>items.push({type,title,desc,action,icon,priority});
+
+                const pendingApps=this.db.membershipApplications.filter(x=>x.status==='pending');
+                const pendingWelfare=this.db.welfareRequests.filter(x=>['pending','under_review'].includes(x.status));
+                const pendingApprovals=[...this.db.announcements,...this.db.events,...this.db.gallery,...this.db.publications]
+                    .filter(x=>x.approval_status==='pending');
+
+                if(isAdmin||['president','vice_president','secretary_general','assistant_secretary_general'].includes(role)) {
+                    if(pendingApps.length) push('Membership',pendingApps.length+' membership application'+(pendingApps.length===1?'':'s')+' awaiting review','New membership applications need attention.','admin-members','fa-user-plus','High');
+                }
+                if(isAdmin||['president','vice_president','welfare_officer'].includes(role)) {
+                    if(pendingWelfare.length) push('Welfare',pendingWelfare.length+' welfare request'+(pendingWelfare.length===1?'':'s')+' awaiting action','Review member welfare requests and update their status.','welfare','fa-hand-holding-heart','High');
+                }
+                if(isAdmin||isExec) {
+                    if(pendingApprovals.length) push('Approvals',pendingApprovals.length+' submission'+(pendingApprovals.length===1?'':'s')+' awaiting approval','Official content is waiting for executive review.','approval-center','fa-check-double','High');
+                }
+                if(['treasurer','admin','super_admin'].includes(role)) {
+                    const pendingFinance=this.db.financeTransactions.filter(x=>x.status==='pending');
+                    if(pendingFinance.length) push('Finance',pendingFinance.length+' finance transaction'+(pendingFinance.length===1?'':'s')+' pending confirmation','Review pending financial records and receipts.','finance','fa-coins','High');
+                }
+                if(role==='pro'||isAdmin) {
+                    const drafts=[...this.db.announcements,...this.db.events,...this.db.gallery,...this.db.publications].filter(x=>x.is_published===false);
+                    if(drafts.length) push('Communications',drafts.length+' communication item'+(drafts.length===1?'':'s')+' not yet published','Review content before publication.','announcements','fa-bullhorn','Normal');
+                }
+                if(u.memberId) {
+                    const mine=this.db.membershipApplications.filter(x=>x.user_id===u.id);
+                    if(mine.some(x=>x.status==='pending')) push('My Membership','Your membership application is under review','You will see the decision and reviewer note here when completed.','member-dashboard','fa-id-card','Normal');
+                    const myWelfare=this.db.welfareRequests.filter(x=>x.member_id===u.memberId && ['pending','under_review'].includes(x.status));
+                    if(myWelfare.length) push('My Welfare',myWelfare.length+' welfare request'+(myWelfare.length===1?'':'s')+' in progress','Track your welfare support request from your member portal.','member-dashboard','fa-heart','Normal');
+                }
+                if(!items.length) push('System Ready','No urgent actions right now','Your RIBACOM workspace is up to date. Continue exploring the ecosystem.','digital-ecosystem','fa-circle-check','Good');
+
+                return `
+                    <div class="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
+                            <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ribacom-gold">RIBACOM DIGITAL ECOSYSTEM</span>
+                            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-1">
+                                <div><h2 class="text-2xl sm:text-3xl font-extrabold">Activity & Notifications Centre</h2><p class="text-sm text-gray-300 mt-2">One place to see what needs your attention across the RIBACOM ecosystem.</p></div>
+                                <span class="text-xs bg-white/10 border border-white/20 rounded-xl px-3 py-2">${items.length} active item${items.length===1?'':'s'}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] uppercase font-bold text-gray-400">High Priority</div><div class="text-2xl font-extrabold text-red-600 mt-1">${items.filter(x=>x.priority==='High').length}</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Normal</div><div class="text-2xl font-extrabold text-amber-600 mt-1">${items.filter(x=>x.priority==='Normal').length}</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Role</div><div class="text-sm font-extrabold text-ribacom-green mt-2">${esc(role||'guest')}</div></div>
+                        </div>
+                        <div class="space-y-3">
+                            ${items.map(x=>`
+                                <div class="bg-white rounded-2xl border border-gray-100 card-shadow p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:items-center">
+                                    <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-ribacom-green flex items-center justify-center shrink-0"><i class="fa-solid ${x.icon}"></i></div>
+                                    <div class="flex-1"><div class="flex flex-wrap gap-2 items-center"><span class="text-[10px] uppercase font-extrabold text-gray-400">${x.type}</span><span class="text-[9px] font-extrabold px-2 py-1 rounded-full ${x.priority==='High'?'bg-red-100 text-red-700':'bg-amber-100 text-amber-700'}">${x.priority}</span></div><h3 class="font-extrabold text-ribacom-navy mt-1">${esc(x.title)}</h3><p class="text-xs text-gray-500 mt-1">${esc(x.desc)}</p></div>
+                                    <button onclick="app.navigate('${x.action}')" class="shrink-0 bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold">Open <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                                </div>`).join('')}
+                        </div>
+                        <div class="flex gap-2"><button onclick="app.navigate('digital-ecosystem')" class="bg-ribacom-navy text-white px-4 py-2.5 rounded-xl text-xs font-bold">Back to Ecosystem</button><button onclick="app.loadCloudData().then(()=>app.navigate('ecosystem-activity'))" class="bg-white border border-gray-200 text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-bold">Refresh Activity</button></div>
+                    </div>`;
             }
 
             renderDigitalEcosystemView() {
