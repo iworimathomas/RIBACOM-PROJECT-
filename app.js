@@ -294,10 +294,67 @@
                         <div class="flex flex-wrap gap-3">
                             ${status==='approved'&&id?'<button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-id-card mr-1"></i> Digital ID</button>':'<button onclick="app.toast(\'Digital ID becomes available after membership approval.\',\'warning\')" class="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-lock mr-1"></i> Digital ID after Approval</button>'}
                             <button onclick="app.navigate('welfare')" class="bg-ribacom-gold text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-hand-holding-heart mr-1"></i> Welfare</button>
-                            <button onclick="app.navigate('members')" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-extrabold">My Record</button>
+                            <button onclick="app.openMemberProfileEditor()" class="bg-ribacom-navy text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-user-pen mr-1"></i> Edit Profile</button><button onclick="app.navigate('members')" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-extrabold">My Record</button>
                         </div>
                     </div>`;
             }
+            openMemberProfileEditor() {
+                const m=this.db.members.find(x=>x.id===this.currentUser?.memberId)||{};
+                if(!this.currentUser?.memberId) return this.toast('Member record not found.','warning');
+                const old=document.getElementById('memberProfileModal'); if(old) old.remove();
+                const modal=document.createElement('div'); modal.id='memberProfileModal'; modal.className='fixed inset-0 z-[120] bg-black/60 flex items-center justify-center p-4';
+                modal.innerHTML=`
+                <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-5">
+                  <div class="flex justify-between items-center mb-4"><div><h3 class="text-xl font-extrabold text-ribacom-navy">My Profile</h3><p class="text-xs text-gray-500">You can update contact and personal information. Membership approval data remains protected.</p></div><button onclick="document.getElementById('memberProfileModal')?.remove()" class="text-xl">×</button></div>
+                  <form id="memberProfileForm" class="space-y-4">
+                    <div><label class="text-xs font-bold">Full Name</label><input id="mp_full_name" class="w-full border rounded-xl p-3 mt-1" value="${esc(m.full_name||'')}" required></div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                      <div><label class="text-xs font-bold">Phone</label><input id="mp_phone" class="w-full border rounded-xl p-3 mt-1" value="${esc(m.phone||'')}"></div>
+                      <div><label class="text-xs font-bold">LGA</label><input id="mp_lga" class="w-full border rounded-xl p-3 mt-1" value="${esc(m.lga||'')}"></div>
+                    </div>
+                    <div><label class="text-xs font-bold">Address</label><textarea id="mp_address" class="w-full border rounded-xl p-3 mt-1" rows="2">${esc(m.address||'')}</textarea></div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                      <div><label class="text-xs font-bold">Emergency Contact</label><input id="mp_emergency_name" class="w-full border rounded-xl p-3 mt-1" value="${esc(m.emergency_contact_name||'')}"></div>
+                      <div><label class="text-xs font-bold">Emergency Phone</label><input id="mp_emergency_phone" class="w-full border rounded-xl p-3 mt-1" value="${esc(m.emergency_contact_phone||'')}"></div>
+                    </div>
+                    <div><label class="text-xs font-bold">Profile / Passport Photo</label><input id="mp_photo" type="file" accept="image/*" class="w-full border rounded-xl p-3 mt-1"></div>
+                    <div class="border-t pt-4"><h4 class="font-extrabold text-ribacom-navy">Change Password</h4><p class="text-xs text-gray-500 mb-2">Leave blank to keep your current password.</p><input id="mp_password" type="password" minlength="8" autocomplete="new-password" class="w-full border rounded-xl p-3" placeholder="New password (8+ characters)"></div>
+                    <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="document.getElementById('memberProfileModal')?.remove()" class="px-4 py-2 rounded-xl bg-gray-100 text-sm font-bold">Cancel</button><button class="px-4 py-2 rounded-xl bg-ribacom-green text-white text-sm font-extrabold">Save Profile</button></div>
+                  </form>
+                </div>`;
+                document.body.appendChild(modal);
+                document.getElementById('memberProfileForm').onsubmit=(e)=>this.saveMemberProfile(e);
+            }
+
+            async saveMemberProfile(e) {
+                e.preventDefault();
+                if(!this.supabaseClient||!this.currentUser?.memberId) return this.toast('Please sign in again.','warning');
+                const m=this.db.members.find(x=>x.id===this.currentUser.memberId)||{};
+                const value=id=>document.getElementById(id)?.value?.trim()||'';
+                const patch={full_name:value('mp_full_name'),phone:value('mp_phone'),lga:value('mp_lga'),address:value('mp_address'),emergency_contact_name:value('mp_emergency_name'),emergency_contact_phone:value('mp_emergency_phone'),updated_at:new Date().toISOString()};
+                if(!patch.full_name) return this.toast('Full name is required.','warning');
+                const file=document.getElementById('mp_photo')?.files?.[0];
+                if(file){
+                    if(!file.type.startsWith('image/')) return this.toast('Please select an image.','warning');
+                    if(file.size>5*1024*1024) return this.toast('Photo must be 5 MB or smaller.','warning');
+                    const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+                    const path=`memberships/profile-${this.currentUser.id}-${Date.now()}.${ext}`;
+                    const up=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:false,cacheControl:'31536000'});
+                    if(up.error) return this.toast(up.error.message,'error');
+                    patch.photo_url=this.supabaseClient.storage.from('avatars').getPublicUrl(up.data.path).data.publicUrl;
+                }
+                const {error}=await this.supabaseClient.from('members').update(patch).eq('id',this.currentUser.memberId).eq('user_id',this.currentUser.id);
+                if(error) return this.toast(error.message,'error');
+                const newPassword=value('mp_password');
+                if(newPassword){
+                    if(newPassword.length<8) return this.toast('New password must be at least 8 characters.','warning');
+                    const {error:pe}=await this.supabaseClient.auth.updateUser({password:newPassword});
+                    if(pe) return this.toast(pe.message,'error');
+                }
+                document.getElementById('memberProfileModal')?.remove();
+                await this.loadCloudData(); this.toast('Profile updated successfully.','success'); this.navigate('member-dashboard');
+            }
+
             renderHomeView() {
                 const announcements = this.db.announcements.slice(0, 3);
                 const events = this.db.events.slice(0, 2);
