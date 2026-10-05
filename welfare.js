@@ -8,12 +8,16 @@
 
   RibacomApp.prototype.handleWelfareSubmit = async function(e){
     e.preventDefault();
-    if(!this.supabaseClient || !this.currentUser?.memberId) return this.toast('Please sign in as a member first.','warning');
+    if(!this.supabaseClient || !this.currentUser) return this.toast('Please sign in as a member first.','warning');
+    const {data:member,error:memberError}=await this.supabaseClient.from('members').select('id,status').eq('user_id',this.currentUser.id).maybeSingle();
+    if(memberError) return this.toast(memberError.message,'error');
+    if(!member) return this.toast('Your RIBACOM member record could not be found. Please complete membership registration.','warning');
+    if(String(member.status||'').toLowerCase()!=='approved') return this.toast('Only approved RIBACOM members can submit welfare requests.','warning');
     const category=document.getElementById('w_type')?.value || 'other';
     const description=(document.getElementById('w_desc')?.value || '').trim();
     if(!description) return this.toast('Please describe the welfare request.','warning');
     const amount=amounts[category] ?? 0;
-    const {error}=await this.supabaseClient.from('welfare_requests').insert({member_id:this.currentUser.memberId,category,amount_requested:amount,description,status:'pending'});
+    const {error}=await this.supabaseClient.from('welfare_requests').insert({member_id:member.id,category,amount_requested:amount,description,status:'pending'});
     if(error) return this.toast(error.message,'error');
     await this.loadCloudData();
     this.toast('Welfare request submitted for Executive review.','success');
