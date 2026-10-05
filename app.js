@@ -984,22 +984,29 @@
             }
 
             renderYouthView() {
-                const y = this.db.youth;
+                const raw = this.db.youth || {};
+                const title = raw.title || 'RIBACOM Youth Wing';
+                const content = raw.content || 'The RIBACOM Youth Wing provides a platform for youth participation, leadership development, community service, skills development and cultural activities.';
+                const image = raw.image || '';
+                const leader = raw.leader || 'Youth Wing Leadership — To Be Announced';
+                const activities = Array.isArray(raw.activities) && raw.activities.length
+                    ? raw.activities
+                    : ['Youth leadership and capacity development','Skills acquisition and entrepreneurship','Community service and volunteering','Cultural and social programmes','Sports and youth engagement'];
                 return `
                     <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
-                        <div class="bg-gradient-to-r from-ribacom-navy to-ribacom-green text-white p-8 rounded-3xl shadow-xl space-y-3">
+                        <div class="bg-gradient-to-r from-ribacom-navy to-ribacom-green text-white p-8 rounded-3xl shadow-xl space-y-4">
                             <span class="bg-ribacom-gold text-ribacom-navy font-black text-[10px] px-2.5 py-1 rounded-full uppercase">Youth Wing</span>
-                            <h2 class="text-2xl font-extrabold">${y.title}</h2>
-                            <p class="text-xs text-gray-200 leading-relaxed">${y.content}</p>
+                            <h2 class="text-2xl font-extrabold">${title}</h2>
+                            ${image ? `<img src="${image}" alt="RIBACOM Youth Wing" class="w-full max-h-56 object-cover rounded-2xl border border-white/20">` : ''}
+                            <p class="text-xs text-gray-200 leading-relaxed">${content}</p>
                             <div class="pt-2">
-                                <span class="text-xs text-ribacom-gold font-bold"><i class="fa-solid fa-user-shield mr-1"></i> Leadership: ${y.leader}</span>
+                                <span class="text-xs text-ribacom-gold font-bold"><i class="fa-solid fa-user-shield mr-1"></i> Leadership: ${leader}</span>
                             </div>
                         </div>
-
                         <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-3">
                             <h3 class="font-bold text-base text-gray-800">Youth Initiatives & Projects</h3>
                             <ul class="space-y-2">
-                                ${y.activities.map(act => `
+                                ${activities.map(act => `
                                     <li class="p-3 bg-gray-50 rounded-xl text-xs font-semibold text-gray-700 flex items-center gap-2">
                                         <i class="fa-solid fa-check text-ribacom-green"></i> ${act}
                                     </li>
