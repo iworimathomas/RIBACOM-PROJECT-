@@ -689,7 +689,7 @@
                                         <div><label class="form-label">Nationality *</label><input required id="m_nationality" value="Nigerian" class="form-input"></div>
                                         <div><label class="form-label">Marital Status</label><select id="m_marital" class="form-input"><option value="">Select</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
                                         <div><label class="form-label">Passport / National ID Number</label><input id="m_idNumber" class="form-input" placeholder="Optional"></div>
-                                        <div><label class="form-label">Passport Photograph URL</label><input type="url" id="m_photo" class="form-input" placeholder="https://..."></div>
+                                        <div><label class="form-label">Passport Photograph</label><input type="file" id="m_photo_file" accept="image/*" class="form-input"><input type="hidden" id="m_photo"><p class="text-[10px] text-gray-500 mt-1">Upload directly from your phone. Maximum 5 MB.</p></div>
                                     </div>
                                 </section>
 
