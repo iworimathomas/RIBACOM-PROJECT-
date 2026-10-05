@@ -236,18 +236,21 @@
                         container.innerHTML = this.renderContactView();
                         break;
                     case 'member-dashboard':
-                        if (!this.currentUser) {
-                            this.toast('Please log in to access your portal.', 'warning');
-                            this.openLoginModal();
-                            this.navigate('home');
-                            return;
-                        }
+                        if (!this.currentUser) { this.toast('Please log in to access your portal.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
                         container.innerHTML = this.renderMemberDashboardView();
+                        break;
+                    case 'admin-digital-ids':
+                        if (!this.currentUser || !['admin','super_admin'].includes(this.currentUser.roleKey)) { this.toast('Access denied. Administrator privileges required.', 'error'); this.navigate('home'); return; }
+                        container.innerHTML = this.renderAdminDigitalIdsView();
+                        break;
+                    case 'admin-dashboard':
+                        if (!this.currentUser || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Super Admin')) { this.toast('Access denied. Administrator privileges required.', 'error'); this.navigate('home'); return; }
+                        container.innerHTML = this.renderAdminDashboardView();
                         break;
                     default:
                         container.innerHTML = this.renderHomeView();
-                        break;
                 }
+                this.updateAuthHeaderUI();
             }
 
             renderMemberDashboardView() {
