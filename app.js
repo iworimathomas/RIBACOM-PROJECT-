@@ -1,3 +1,66 @@
+            renderContactView() {
+                const a = this.db.about || {};
+                const address = 'Agricultural Hall, Opposite St Charles, Tabokoto Road';
+                const email = 'ribacomgambia@gmail.com';
+                const contacts = [
+                    {role:'Chairman / President', phone:'+220 877991397', icon:'fa-user-tie'},
+                    {role:'Secretary General', phone:'+220 833586955', icon:'fa-user-pen'},
+                    {role:'Welfare Officer', phone:'+220 877039287', icon:'fa-hand-holding-heart'}
+                ];
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1">
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-ribacom-green">RIBACOM Secretariat</span>
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Contact Secretariat</h2>
+                            <p class="text-xs text-gray-600">Reach out to Rivers Bayelsa Community The Gambia (RIBACOM) for official enquiries, membership support and community assistance.</p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center"><i class="fa-solid fa-location-dot"></i></div>
+                                <div><div class="text-[10px] uppercase font-extrabold text-gray-400">Secretariat / Meeting Address</div><div class="text-sm font-bold text-ribacom-navy mt-1">${esc(address)}</div></div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center"><i class="fa-solid fa-envelope"></i></div>
+                                <div><div class="text-[10px] uppercase font-extrabold text-gray-400">RIBACOM Secretariat Email</div><a href="mailto:${email}" class="text-sm font-bold text-ribacom-green mt-1 inline-block">${email}</a></div>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-3 sm:grid-cols-3">
+                            ${contacts.map(c=>`
+                                <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center mb-3"><i class="fa-solid ${c.icon}"></i></div>
+                                    <div class="text-[11px] font-extrabold text-ribacom-navy">${esc(c.role)}</div>
+                                    <a href="tel:${c.phone.replace(/[^+\\d]/g,'')}" class="text-sm font-bold text-ribacom-green mt-1 inline-block">${esc(c.phone)}</a>
+                                    <a href="https://wa.me/${c.phone.replace(/\\D/g,'')}" target="_blank" rel="noopener" class="block text-[10px] font-bold text-gray-500 mt-2"><i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp / Call</a>
+                                </div>`).join('')}
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div>
+                                <h3 class="font-extrabold text-ribacom-navy">Send a Message</h3>
+                                <p class="text-[11px] text-gray-500 mt-1">Your message will open your email app addressed to the RIBACOM Secretariat.</p>
+                            </div>
+                            <form onsubmit="event.preventDefault(); app.sendSecretariatMessage(this);" class="space-y-3">
+                                <input name="name" type="text" required placeholder="Your Name" class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <input name="email" type="email" required placeholder="Your Email" class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <textarea name="message" required rows="4" placeholder="Message content..." class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none"></textarea>
+                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Email Secretariat</button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            sendSecretariatMessage(form) {
+                const name = form.name.value.trim();
+                const email = form.email.value.trim();
+                const message = form.message.value.trim();
+                const subject = encodeURIComponent('RIBACOM Secretariat Enquiry');
+                const body = encodeURIComponent('Name: ' + name + '\\nEmail: ' + email + '\\n\\nMessage:\\n' + message);
+                window.location.href = 'mailto:ribacomgambia@gmail.com?subject=' + subject + '&body=' + body;
+            }
+
 // Empty in-memory UI cache; Supabase is the authoritative data source.
         class RibacomApp {
             constructor() {
