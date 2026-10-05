@@ -7,22 +7,35 @@
 
   RibacomApp.prototype.handleMembershipSubmit = async function(e){
     e.preventDefault();
-    if(!this.supabaseClient){ return this.toast('Supabase is not connected.','error'); }
-    const fullName=clean(document.getElementById('m_fullName')?.value);
-    const phone=clean(document.getElementById('m_phone')?.value);
-    const email=clean(document.getElementById('m_email')?.value).toLowerCase();
-    const password=document.getElementById('m_password')?.value || '';
-    const stateRaw=clean(document.getElementById('m_state')?.value);
-    const lga=clean(document.getElementById('m_lga')?.value);
-    const address=clean(document.getElementById('m_address')?.value);
-    const photo=clean(document.getElementById('m_photo')?.value);
-    const categoryRaw=clean(document.getElementById('m_category')?.value);
-    const state = stateRaw === 'Rivers State' ? 'Rivers' : stateRaw === 'Bayelsa State' ? 'Bayelsa' : 'Other';
-    const category = categoryRaw.toLowerCase().includes('associate') ? associate : regular;
-    if(!fullName || !phone || !email || password.length < 8 || !address) return this.toast('Please complete all required fields.','warning');
+    if(!this.supabaseClient) return this.toast('Supabase is not connected.','error');
+    const val=id=>document.getElementById(id)?.value?.trim()||'';
+    const checked=id=>!!document.getElementById(id)?.checked;
+    const fullName=val('m_fullName'), phone=val('m_phone'), email=val('m_email').toLowerCase();
+    const password=val('m_password'), confirm=val('m_passwordConfirm');
+    const stateRaw=val('m_state'), lga=val('m_lga'), address=val('m_address'), photo=val('m_photo');
+    if(!fullName||!phone||!email||!address||password.length<8) return this.toast('Please complete all required fields.','warning');
+    if(password!==confirm) return this.toast('Passwords do not match.','warning');
+
+    const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
+    const category=val('m_category').toLowerCase().includes('associate')?'associate':'regular';
+    const details={
+      previous_name:val('m_otherName'),date_of_birth:val('m_dob'),gender:val('m_gender'),
+      nationality:val('m_nationality')||'Nigerian',passport_or_id:val('m_idNumber'),
+      origin_community:val('m_originCommunity'),clan_ward:val('m_clanWard'),
+      previous_association:val('m_previousAssociation'),emergency_contact_name:val('m_emergencyName'),
+      emergency_contact_phone:val('m_emergencyPhone'),spouse_name:val('m_spouse'),
+      children_count:Number(val('m_children')||0),next_of_kin:val('m_nextOfKin'),
+      next_of_kin_phone:val('m_nextOfKinPhone'),occupation:val('m_occupation'),
+      employer_business:val('m_employer'),work_address:val('m_workAddress'),skills:val('m_skills'),
+      interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
+      constitution_consent:checked('m_constitutionConsent'),information_declaration:checked('m_declaration'),
+      application_status:'pending',monthly_dues:'D50'
+    };
 
     this.toast('Creating your RIBACOM account…','info');
-    const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({email,password,options:{data:{full_name:fullName,phone}}});
+    const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({
+      email,password,options:{data:{full_name:fullName,phone,application_details:details}}
+    });
     if(authError) return this.toast(authError.message,'error');
     const user=authData?.user;
     if(!user) return this.toast('Account creation did not return a user.','error');
@@ -30,17 +43,15 @@
     const {error:profileError}=await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
     if(profileError) console.warn('Profile upsert:',profileError.message);
 
-    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:photo||null,nationality:'Nigerian',category,status:'pending'};
+    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:photo||null,nationality:details.nationality,category,status:'pending'};
     const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
     if(memberError) return this.toast(memberError.message,'error');
 
     if(!authData.session){
       this.toast('Account created. Verify your email, then sign in. Your membership is pending Secretariat approval.','success');
-      this.openLoginModal();
-      return;
+      this.openLoginModal(); return;
     }
-    await this.hydrateCurrentUser(user);
-    await this.loadCloudData();
+    await this.hydrateCurrentUser(user); await this.loadCloudData();
     this.toast('Membership application submitted for Secretariat approval.','success');
     this.navigate('member-dashboard');
   };
