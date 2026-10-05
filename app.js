@@ -125,7 +125,7 @@
                         q('payment_settings', {order:'method_name'}),
                         q('welfare_settings', {order:'setting_key'})
                     ]);
-                    const members = this.currentUser?.roleKey && ['admin','super_admin'].includes(this.currentUser.roleKey)
+                    const members = this.currentUser?.roleKey && ['admin','super_admin','treasurer'].includes(this.currentUser.roleKey)
                         ? await q('members', {order:'created_at', ascending:false})
                         : (this.currentUser?.memberId ? await q('members') : []);
                     const welfare = this.currentUser?.roleKey && ['admin','super_admin'].includes(this.currentUser.roleKey)
@@ -1499,7 +1499,7 @@
                 if (this.currentUser) {
                     if (this.currentUser.roleKey === 'treasurer') {
                         this.navigate('treasurer-dashboard');
-                    } else if (this.currentUser.roleKey === 'treasurer') { this.navigate('treasurer-dashboard'); } else if (this.currentUser.role.includes('Admin')) {
+                    } else if (this.currentUser.role.includes('Admin')) {
                         this.navigate('admin-dashboard');
                     } else {
                         this.navigate('member-dashboard');
