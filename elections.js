@@ -54,9 +54,13 @@
       choices[p.id]=el.value;
     }
     if(!confirm('Submit your RIBACOM election ballot? You will not be able to vote again in this election.'))return;
-    const {data:ballot,error:be}=await this.supabaseClient.from('election_ballots').insert({election_id:electionId,voter_member_id:state.member.id}).select('id').single();
+    const attested=confirm('VOTER ATTESTATION\n\nI confirm that I am the eligible RIBACOM member casting this ballot and that my selections are my own.');
+    if(!attested){this.toast('Voter attestation is required before submitting the ballot.','warning');return;}
+    const raw=JSON.stringify({election_id:electionId,voter_member_id:state.member.id,choices:Object.keys(choices).sort().map(k=>[k,choices[k]]),issued_at:new Date().toISOString()});
+    const ballotHash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw)).then(b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));
+    const {data:ballot,error:be}=await this.supabaseClient.from('election_ballots').insert({election_id:electionId,voter_member_id:state.member.id,voter_attestation:true,ballot_hash:ballotHash}).select('id').single();
     if(be){this.toast(be.code==='23505'?'You have already voted in this election.':'Unable to create ballot: '+be.message,'error');return;}
-    const rows=Object.entries(choices).map(([position_id,candidate_id])=>({ballot_id:ballot.id,position_id,candidate_id}));
+    const rows=Object.entries(choices).map(([position_id,candidate_id])=>({ballot_id:ballot.id,position_id,candidate_id,vote_hash:ballotHash}));
     const {error:ve}=await this.supabaseClient.from('election_votes').insert(rows);
     if(ve){
       await this.supabaseClient.from('election_ballots').delete().eq('id',ballot.id);
