@@ -81,19 +81,21 @@
       return;
     }
 
-    // Create the pending member record linked to the same authenticated user.
-    // Approval remains a Secretariat/Admin action; the member is never auto-approved.
-    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
-    const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
-    if(memberError){
-      this.toast(memberError.message,'error');
+    // A membership row is created only after authentication is established.
+    // The public/anon application path must not attempt the protected members INSERT policy.
+    if(!authData.session){
+      this.toast('Application saved successfully. Verify your email, then sign in. Your application remains pending Secretariat approval.','success');
+      this.openLoginModal();
       return;
     }
 
-    if(!authData.session){
-      this.toast('Account created and membership application saved. Verify your email, then sign in. Your membership remains pending Secretariat approval.','success');
-      this.openLoginModal(); return;
+    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
+    const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
+    if(memberError){
+      this.toast('Account created, but the member record could not be created: '+memberError.message,'error');
+      return;
     }
+
     await this.hydrateCurrentUser(user); await this.loadCloudData();
     this.toast('Membership application submitted for Secretariat approval.','success');
     this.navigate('member-dashboard');
