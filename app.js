@@ -124,16 +124,16 @@
                         q('youth_content', {order:'created_at', ascending:false}),
                         q('payment_settings', {order:'method_name'}),
                         q('welfare_settings', {order:'setting_key'}),
-                        this.currentUser?.memberId ? q('membership_applications', {order:'created_at', ascending:false}) : Promise.resolve([]),
-                        this.currentUser?.memberId ? q('finance_transactions', {order:'created_at', ascending:false}) : Promise.resolve([])
+                        (['admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general'].includes(this.currentUser?.roleKey) || this.currentUser?.memberId) ? q('membership_applications', {order:'created_at', ascending:false}) : Promise.resolve([]),
+                        (['admin','super_admin','treasurer'].includes(this.currentUser?.roleKey) || this.currentUser?.memberId) ? q('finance_transactions', {order:'created_at', ascending:false}) : Promise.resolve([])
                     ]);
-                    const members = this.currentUser?.roleKey && ['admin','super_admin','treasurer'].includes(this.currentUser.roleKey)
+                    const members = this.currentUser?.roleKey && ['admin','super_admin','treasurer','secretary_general','president','vice_president','assistant_secretary_general','welfare_officer'].includes(this.currentUser.roleKey)
                         ? await q('members', {order:'created_at', ascending:false})
                         : (this.currentUser?.memberId ? await q('members') : []);
-                    const welfare = this.currentUser?.roleKey && ['admin','super_admin'].includes(this.currentUser.roleKey)
+                    const welfare = this.currentUser?.roleKey && ['admin','super_admin','welfare_officer','president','vice_president'].includes(this.currentUser.roleKey)
                         ? await q('welfare_requests', {order:'created_at', ascending:false})
                         : (this.currentUser?.memberId ? await q('welfare_requests', {order:'created_at', ascending:false}) : []);
-                    const digitalIds = this.currentUser?.roleKey && ['admin','super_admin'].includes(this.currentUser.roleKey)
+                    const digitalIds = this.currentUser?.roleKey && ['admin','super_admin','president','vice_president'].includes(this.currentUser.roleKey)
                         ? await q('digital_ids', {order:'created_at', ascending:false})
                         : (this.currentUser?.memberId ? await q('digital_ids') : []);
                     this.db.about = about[0] ? {
