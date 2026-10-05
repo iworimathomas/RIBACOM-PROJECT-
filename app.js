@@ -1480,16 +1480,26 @@
                 }
                 const {data,error}=await this.supabaseClient.from('members').update(patch).eq('id',id).select().maybeSingle();
                 if(error){this.toast(error.message,'error');return;}
+                await this.loadCloudData();
                 if(status==='approved'){
-                    this.toast('Application approved. Membership number confirmed and Digital ID can now be issued.','success');
+                    const approvedMember=this.db.members.find(m=>m.id===id);
+                    const existingId=this.db.digitalIds.find(x=>x.memberId===id);
+                    if(approvedMember && !existingId){
+                        await this.createDigitalId(id);
+                    } else {
+                        this.toast('Application approved. Digital ID is already available.','success');
+                        this.navigate('admin-members');
+                    }
                 } else if(status==='rejected'){
                     this.toast('Membership application rejected.','warning');
+                    this.navigate('admin-members');
                 } else if(status==='suspended'){
                     this.toast('Membership suspended.','warning');
+                    this.navigate('admin-members');
                 } else {
                     this.toast(`Member status changed to ${status}.`,'success');
+                    this.navigate('admin-members');
                 }
-                await this.loadCloudData(); this.navigate('admin-members');
             }
             async createDigitalId(memberId) {
                 if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
