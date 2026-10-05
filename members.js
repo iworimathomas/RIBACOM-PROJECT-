@@ -65,7 +65,7 @@
       town_village:val('m_townVillage'),community_clan:details.origin_community,phone,whatsapp:phone,email,
       current_address:address,area_location:val('m_areaLocation'),occupation:details.occupation,
       employer_business:details.employer_business,nigerian_passport_number:details.passport_or_id,
-      membership_category:category==='associate'?'Associate Member':'Regular Member',
+      membership_category:category,
       rivers_bayelsa_connection:state, father_name:val('m_fatherName'),mother_name:val('m_motherName'),
       spouse_name:details.spouse_name,date_of_arrival_gambia:val('m_arrivalGambia'),
       next_of_kin_name:details.next_of_kin,next_of_kin_relationship:val('m_nextOfKinRelationship'),
