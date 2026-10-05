@@ -125,7 +125,7 @@
     return this.updateWelfareStatus(id,'rejected');
   };
 })();
-/* Executive Account Management — secure setup records; authentication invitations require a trusted server-side service. */
+/* Executive Account Management — secure invitation workflow */
 (function(){
   const execRoles=[
     ['super_admin','President / Super Admin'],
@@ -140,33 +140,38 @@
     if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return this.toast('Administrator access required.','error');
     const {data,error}=await this.supabaseClient.from('executive_accounts').select('*').order('created_at',{ascending:false});
     if(error) return this.toast(error.message,'error');
-    const rows=(data||[]);
-    const roleLabel=r=>execRoles.find(x=>x[0]===r)?.[1]||r||'Not set';
-    const modal=document.createElement('div');
-    modal.id='ribacomExecutiveAccounts';
+    const rows=data||[], roleLabel=r=>execRoles.find(x=>x[0]===r)?.[1]||r||'Not set';
+    const modal=document.createElement('div'); modal.id='ribacomExecutiveAccounts';
     modal.className='fixed inset-0 z-[110] bg-black/60 flex items-center justify-center p-4';
     modal.innerHTML=`<div class="bg-white rounded-3xl max-w-3xl w-full p-5 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-start justify-between gap-3 mb-4"><div><h3 class="font-extrabold text-xl text-ribacom-navy">Executive Account Management</h3><p class="text-xs text-gray-500 mt-1">Prepare and track official executive login records. Passwords are never stored here.</p></div><button onclick="document.getElementById('ribacomExecutiveAccounts')?.remove()" class="text-xl text-gray-500">×</button></div>
-      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-xs text-amber-800 mb-4"><b>Secure invitation:</b> The app currently records executive account details, but the server-side Supabase invitation service is not connected yet. Do not enter or store passwords in this panel.</div>
+      <div class="flex items-start justify-between gap-3 mb-4"><div><h3 class="font-extrabold text-xl text-ribacom-navy">Executive Account Management</h3><p class="text-xs text-gray-500 mt-1">Securely invite executives. Passwords are never entered or stored by RIBACOM.</p></div><button onclick="document.getElementById('ribacomExecutiveAccounts')?.remove()" class="text-xl text-gray-500">×</button></div>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-800 mb-4"><b>Secure setup:</b> The invitation is sent by the protected Supabase Auth service. The executive creates their own password from the email invitation.</div>
       <form onsubmit="app.createExecutiveAccount(event)" class="grid md:grid-cols-2 gap-3 border rounded-2xl p-4 mb-5">
         <label class="text-xs font-bold">Executive Name<input id="exa_name" required class="mt-1 w-full border rounded-xl px-3 py-2"></label>
         <label class="text-xs font-bold">Email<input id="exa_email" type="email" required class="mt-1 w-full border rounded-xl px-3 py-2"></label>
         <label class="text-xs font-bold">Phone<input id="exa_phone" class="mt-1 w-full border rounded-xl px-3 py-2"></label>
         <label class="text-xs font-bold">RIBACOM Login ID<input id="exa_login" required placeholder="RIBACOM-SG" class="mt-1 w-full border rounded-xl px-3 py-2 uppercase"></label>
         <label class="text-xs font-bold md:col-span-2">Executive Role<select id="exa_role" required class="mt-1 w-full border rounded-xl px-3 py-2">${execRoles.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></label>
-        <button class="md:col-span-2 bg-ribacom-green text-white rounded-xl py-2.5 font-extrabold">Create Account Setup Record</button>
+        <button id="exa_submit" class="md:col-span-2 bg-ribacom-green text-white rounded-xl py-2.5 font-extrabold">Create & Send Secure Invitation</button>
       </form>
-      <div class="space-y-2">${rows.map(x=>`<div class="border rounded-2xl p-3"><div class="flex flex-wrap justify-between gap-2"><div><b class="text-sm text-ribacom-navy">${esc(x.full_name)}</b><div class="text-xs text-gray-500">${esc(roleLabel(x.role))} • ${esc(x.login_id)}</div><div class="text-xs text-gray-500">${esc(x.email)} ${x.phone?'• '+esc(x.phone):''}</div></div><span class="text-[10px] font-extrabold px-2 py-1 rounded-full ${x.is_active?'bg-emerald-50 text-emerald-700':'bg-gray-100 text-gray-500'}">${x.is_active?'ACTIVE':'INACTIVE'} • ${x.auth_user_id?'AUTH LINKED':'NOT INVITED'}</span></div></div>`).join('')||'<p class="text-xs text-gray-500 text-center py-5">No executive account setup records yet.</p>'}</div>
+      <div class="space-y-2">${rows.map(x=>`<div class="border rounded-2xl p-3"><div class="flex flex-wrap justify-between gap-2"><div><b class="text-sm text-ribacom-navy">${esc(x.full_name)}</b><div class="text-xs text-gray-500">${esc(roleLabel(x.role))} • ${esc(x.login_id)}</div><div class="text-xs text-gray-500">${esc(x.email)} ${x.phone?'• '+esc(x.phone):''}</div></div><span class="text-[10px] font-extrabold px-2 py-1 rounded-full ${x.is_active?'bg-emerald-50 text-emerald-700':'bg-gray-100 text-gray-500'}">${x.is_active?'ACTIVE':'INACTIVE'} • ${x.auth_user_id?'INVITED / AUTH LINKED':'NOT INVITED'}</span></div></div>`).join('')||'<p class="text-xs text-gray-500 text-center py-5">No executive account records yet.</p>'}</div>
     </div>`;
     document.body.appendChild(modal);
   };
   RibacomApp.prototype.createExecutiveAccount = async function(e){
     e.preventDefault();
-    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
-    const payload={login_id:document.getElementById('exa_login')?.value.trim().toUpperCase(),full_name:document.getElementById('exa_name')?.value.trim(),email:document.getElementById('exa_email')?.value.trim(),phone:document.getElementById('exa_phone')?.value.trim()||null,role:document.getElementById('exa_role')?.value,created_by:this.currentUser.id,must_change_password:true,is_active:true};
-    const {error}=await this.supabaseClient.from('executive_accounts').insert(payload);
-    if(error) return this.toast(error.message,'error');
-    this.toast('Executive account setup record created.','success');
-    await this.openExecutiveAccounts();
+    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return this.toast('Administrator access required.','error');
+    const btn=document.getElementById('exa_submit'); if(btn){btn.disabled=true;btn.textContent='Sending secure invitation…';}
+    const payload={login_id:document.getElementById('exa_login')?.value.trim().toUpperCase(),full_name:document.getElementById('exa_name')?.value.trim(),email:document.getElementById('exa_email')?.value.trim(),phone:document.getElementById('exa_phone')?.value.trim()||null,role:document.getElementById('exa_role')?.value};
+    try{
+      const {data,error}=await this.supabaseClient.functions.invoke('executive-account-invite',{body:payload});
+      if(error) throw error; if(data?.error) throw new Error(data.error);
+      this.toast('Secure invitation sent. The executive must use the email link to create their password.','success');
+      await this.openExecutiveAccounts();
+    }catch(err){
+      let msg=err?.message||'Secure invitation failed.';
+      try{if(err?.context?.body){const b=typeof err.context.body==='string'?JSON.parse(err.context.body):err.context.body;msg=b?.error||msg;}}catch(_){}
+      this.toast(msg,'error');
+    }finally{if(btn){btn.disabled=false;btn.textContent='Create & Send Secure Invitation';}}
   };
 })();
