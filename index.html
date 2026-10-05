@@ -95,7 +95,7 @@
                         <h1 class="font-extrabold text-sm sm:text-base leading-tight tracking-wide text-white">
                             RIBACOM <span class="text-ribacom-gold font-normal">THE GAMBIA</span>
                         </h1>
-                        <p class="text-[10px] text-gray-300 tracking-wider uppercase font-medium">Rivers Bayelsa Community in Diaspora</p>
+                        <p class="text-[10px] text-gray-300 tracking-wider uppercase font-medium">Rivers Bayelsa Community in Diaspora • TRUTH • UNITY • SERVICE</p>
                     </div>
                 </div>
 
@@ -103,9 +103,11 @@
                 <nav class="hidden lg:flex items-center space-x-1 font-medium text-sm">
                     <button onclick="app.navigate('home')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</button>
                     <button onclick="app.navigate('about')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">About</button>
-                    <button onclick="app.navigate('leadership')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Leadership</button>
+                    <button onclick="app.navigate('leadership')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Community Leadership</button>
                     <button onclick="app.navigate('constitution')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Constitution</button>
                     <button onclick="app.navigate('welfare')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Welfare</button>
+                    <button onclick="app.navigate('members')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Members</button>
+                    <button onclick="app.navigate('announcements')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">News</button>
                     <button onclick="app.navigate('events')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Events</button>
                     
                     <!-- More Dropdown -->
@@ -114,7 +116,7 @@
                             More <i class="fa-solid fa-chevron-down text-xs opacity-70"></i>
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 text-gray-800 hidden group-hover:block border border-gray-100 z-50">
-                            <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-bullhorn w-5 text-ribacom-green"></i> Announcements</a>
+                            <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-bullhorn w-5 text-ribacom-green"></i> News & Announcements</a>
                             <a href="#" onclick="app.navigate('publications')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-file-lines w-5 text-ribacom-green"></i> Publications</a>
                             <a href="#" onclick="app.navigate('gallery')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-images w-5 text-ribacom-green"></i> Gallery</a>
                             <a href="#" onclick="app.navigate('youth')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-people-group w-5 text-ribacom-green"></i> Youth Wing</a>
@@ -180,13 +182,14 @@
                     <div class="space-y-1 my-4 font-medium text-sm">
                         <a href="#" onclick="app.navigate('home'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-house w-5 text-ribacom-gold"></i> Home</a>
                         <a href="#" onclick="app.navigate('about'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-circle-info w-5 text-ribacom-gold"></i> About RIBACOM</a>
-                        <a href="#" onclick="app.navigate('leadership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-users-gear w-5 text-ribacom-gold"></i> Executive Leadership</a>
+                        <a href="#" onclick="app.navigate('leadership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-users-gear w-5 text-ribacom-gold"></i> Community Leadership</a>
                         <a href="#" onclick="app.navigate('constitution'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-book-bookmark w-5 text-ribacom-gold"></i> Master Constitution</a>
-                        <a href="#" onclick="app.navigate('membership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-plus w-5 text-ribacom-gold"></i> Membership Registration</a>
+                        <a href="#" onclick="app.navigate('membership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-plus w-5 text-ribacom-gold"></i> Sign Up / Membership</a>
+                        <a href="#" onclick="app.navigate('members'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-address-book w-5 text-ribacom-gold"></i> Members</a>
                         <a href="#" onclick="app.navigate('digital-id'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-id-card w-5 text-ribacom-gold"></i> Digital Identity Card</a>
                         <a href="#" onclick="app.navigate('welfare'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-hand-holding-heart w-5 text-ribacom-gold"></i> Welfare Assistance</a>
                         <a href="#" onclick="app.navigate('events'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-calendar-days w-5 text-ribacom-gold"></i> Events & Meetings</a>
-                        <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullhorn w-5 text-ribacom-gold"></i> Official Notices</a>
+                        <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullhorn w-5 text-ribacom-gold"></i> News & Official Notices</a>
                         <a href="#" onclick="app.navigate('publications'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-file-pdf w-5 text-ribacom-gold"></i> Publications</a>
                         <a href="#" onclick="app.navigate('gallery'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-camera-retro w-5 text-ribacom-gold"></i> Photo Gallery</a>
                         <a href="#" onclick="app.navigate('youth'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-child-reaching w-5 text-ribacom-gold"></i> Youth Wing</a>
@@ -220,9 +223,9 @@
                 <i class="fa-solid fa-user-plus text-lg mb-0.5"></i>
                 <span>Join</span>
             </button>
-            <button onclick="app.navigate('events')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="events">
-                <i class="fa-solid fa-calendar-days text-lg mb-0.5"></i>
-                <span>Events</span>
+            <button onclick="app.navigate('announcements')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="announcements">
+                <i class="fa-solid fa-newspaper text-lg mb-0.5"></i>
+                <span>News</span>
             </button>
             <button id="mobileAccountBottomBtn" onclick="app.handleAuthAction()" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition">
                 <i class="fa-solid fa-user-lock text-lg mb-0.5"></i>
