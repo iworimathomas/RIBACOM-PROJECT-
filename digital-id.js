@@ -3,6 +3,15 @@
   function admin(app) { return !!app?.currentUser && ['admin','super_admin'].includes(app.currentUser.roleKey); }
   function esc(v) { return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
   function idNumber() { return `RBC-ID-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`; }
+  async function nextUniqueIdNumber(app) {
+    for (let i=0;i<8;i++) {
+      const candidate=idNumber();
+      if (!app.supabaseClient) return candidate;
+      const {data,error}=await app.supabaseClient.from('digital_ids').select('id').eq('id_card_number',candidate).maybeSingle();
+      if (!error && !data) return candidate;
+    }
+    throw new Error('Unable to generate a unique Digital ID number. Please try again.');
+  }
   function qr(member, number) { return `RIBACOM-GAMBIA|ID:${number}|MEMBER:${member.id}|NAME:${member.full_name || member.fullName}`; }
 
   RibacomApp.prototype.createDigitalId = async function(memberId) {
@@ -11,7 +20,7 @@
     if (!member) return this.toast('Member not found.','error');
     if (member.status !== 'approved') return this.toast('Only approved members can receive a Digital ID.','warning');
     if (this.db.digitalIds.some(x => x.memberId === memberId || x.member_id === memberId)) return this.toast('This member already has a Digital ID.','warning');
-    const number = idNumber(), issued = new Date(), expiry = new Date(issued); expiry.setFullYear(expiry.getFullYear()+1);
+    const number = await nextUniqueIdNumber(this), issued = new Date(), expiry = new Date(issued); expiry.setFullYear(expiry.getFullYear()+1);
     const {error} = await this.supabaseClient.from('digital_ids').insert({member_id:memberId,id_card_number:number,qr_code_data:qr(member,number),status:'active',issued_at:issued.toISOString(),expires_at:expiry.toISOString()});
     if (error) return this.toast(error.message,'error');
     await this.loadCloudData(); this.toast('Digital ID issued successfully.','success'); this.navigate('admin-digital-ids');
