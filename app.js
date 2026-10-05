@@ -272,19 +272,36 @@
                     }
                 }
 
-                const role = profile?.role || 'member';
+                // Keep the profile role authoritative, but recover a missing profile safely
+                // from the authenticated account so verified users are never stranded as guests.
+                let resolvedProfile = profile;
+                if (!resolvedProfile) {
+                    const {data:createdProfile,error:profileSyncError}=await this.supabaseClient
+                        .from('profiles')
+                        .upsert({
+                            id:user.id,
+                            email:user.email || '',
+                            full_name:activeMember?.full_name || latestApplication?.full_name || user.email || '',
+                            phone:activeMember?.phone || latestApplication?.phone || ''
+                        },{onConflict:'id'})
+                        .select('*')
+                        .maybeSingle();
+                    if (profileSyncError) console.warn('Post-verification profile sync:', profileSyncError.message);
+                    else resolvedProfile = createdProfile;
+                }
+                const role = resolvedProfile?.role || 'member';
                 this.currentUser = {
                     id: user.id,
                     userId: user.id,
                     email: user.email,
-                    fullName: profile?.full_name || activeMember?.full_name || latestApplication?.full_name || user.email,
-                    phone: profile?.phone || activeMember?.phone || '',
+                    fullName: resolvedProfile?.full_name || activeMember?.full_name || latestApplication?.full_name || user.email,
+                    phone: resolvedProfile?.phone || activeMember?.phone || '',
                     role: ({super_admin:'Super Admin',admin:'Admin',president:'President / Chairman',vice_president:'Vice President',secretary_general:'Secretary General',assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',visitor:'Visitor'}[role] || 'Member'),
                     roleKey: role,
                     membershipNumber: activeMember?.membership_number || '',
                     memberId: activeMember?.id || null,
                     status: activeMember?.status || latestApplication?.status || null,
-                    photoUrl: profile?.avatar_url || activeMember?.photo_url || latestApplication?.photo_url || ''
+                    photoUrl: resolvedProfile?.avatar_url || activeMember?.photo_url || latestApplication?.photo_url || ''
                 };
                 this.updateAuthHeaderUI();
             }
