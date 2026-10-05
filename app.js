@@ -2094,17 +2094,24 @@
             }
 
             handleAuthAction() {
-                if (this.currentUser) {
-                    if (this.currentUser.roleKey === 'treasurer') {
-                        this.navigate('treasurer-dashboard');
-                    } else if (this.currentUser.role.includes('Admin')) {
-                        this.navigate('admin-dashboard');
-                    } else {
-                        this.navigate('member-dashboard');
-                    }
-                } else {
+                if (!this.currentUser) {
                     this.openLoginModal();
+                    return;
                 }
+                const role = String(this.currentUser.roleKey || '').toLowerCase();
+                if (['admin','super_admin'].includes(role)) {
+                    this.navigate('admin-dashboard');
+                    return;
+                }
+                if (role === 'treasurer') {
+                    this.navigate('treasurer-dashboard');
+                    return;
+                }
+                if (['president','vice_president','secretary_general','assistant_secretary_general','welfare_officer','pro'].includes(role)) {
+                    this.navigate('executive-work');
+                    return;
+                }
+                this.navigate('member-dashboard');
             }
 
             updateAuthHeaderUI() {
