@@ -1,7 +1,7 @@
 // Empty in-memory UI cache; Supabase is the authoritative data source.
         class RibacomApp {
             constructor() {
-                this.db = {members:[],digitalIds:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
+                this.db = {members:[],digitalIds:[],membershipApplications:[],financeTransactions:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
                 this.currentUser = null;
                 this.loginMode = 'member';
                 this.currentView = 'home';
@@ -112,7 +112,7 @@
                     return data || [];
                 };
                 try {
-                    const [about, leadership, advisers, constitution, announcements, events, gallery, publications, youth, payments, welfareSettings] = await Promise.all([
+                    const [about, leadership, advisers, constitution, announcements, events, gallery, publications, youth, payments, welfareSettings, membershipApplications, financeTransactions] = await Promise.all([
                         q('ribacom_about_content', {limit:1}),
                         q('leadership', {order:'display_order'}),
                         q('advisers', {order:'created_at', ascending:false}),
@@ -123,7 +123,9 @@
                         q('publications', {order:'publication_date', ascending:false}),
                         q('youth_content', {order:'created_at', ascending:false}),
                         q('payment_settings', {order:'method_name'}),
-                        q('welfare_settings', {order:'setting_key'})
+                        q('welfare_settings', {order:'setting_key'}),
+                        this.currentUser?.memberId ? q('membership_applications', {order:'created_at', ascending:false}) : Promise.resolve([]),
+                        this.currentUser?.memberId ? q('finance_transactions', {order:'created_at', ascending:false}) : Promise.resolve([])
                     ]);
                     const members = this.currentUser?.roleKey && ['admin','super_admin','treasurer'].includes(this.currentUser.roleKey)
                         ? await q('members', {order:'created_at', ascending:false})
@@ -157,6 +159,8 @@
                     this.db.members = members.map(x => ({...x, membershipNo:x.membership_number, fullName:x.full_name, stateOfOrigin:x.state_of_origin, photo:x.photo_url, issueDate:x.created_at?.slice(0,10)}));
                     this.db.welfareRequests = welfare.map(x => ({...x, memberName:x.member_id, type:x.category, amount:x.approved_amount ?? x.amount_requested, date:x.created_at?.slice(0,10)}));
                     this.db.digitalIds = digitalIds.map(x => ({...x, idCardNumber:x.id_card_number, memberId:x.member_id, qrCodeData:x.qr_code_data}));
+                    this.db.membershipApplications = membershipApplications.filter(x=>!this.currentUser?.memberId || x.user_id===this.currentUser.id);
+                    this.db.financeTransactions = financeTransactions.filter(x=>!this.currentUser?.memberId || x.member_id===this.currentUser.memberId);
                     this.cloudDataLoaded = true;
                 } catch (e) { console.warn('RIBACOM cloud sync failed:', e); }
             }
@@ -238,71 +242,18 @@
                             this.navigate('home');
                             return;
                         }
-                        container.innerHTML = this.renderMemberDashboardView();
-                        break;
-                    case 'admin-digital-ids':
-                        if (!this.currentUser || !['admin','super_admin'].includes(this.currentUser.roleKey)) {
-                            this.toast('Access denied. Administrator privileges required.', 'error');
-                            this.navigate('home');
-                            return;
-                        }
-                        container.innerHTML = this.renderAdminDigitalIdsView();
-                        break;
-                    case 'admin-dashboard':
-                        if (!this.currentUser || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Super Admin')) {
-                            this.toast('Access denied. Administrator privileges required.', 'error');
-                            this.navigate('home');
-                            return;
-                        }
-                        container.innerHTML = this.renderAdminDashboardView();
-                        break;
-                    default:
-                        container.innerHTML = this.renderHomeView();
-                }
-
-                this.updateAuthHeaderUI();
-            }
-
-            renderMembersView() {
-                const isAdmin=['admin','super_admin'].includes(this.currentUser?.roleKey);
-                const records=isAdmin ? this.db.members : this.db.members.filter(m=>m.id===this.currentUser?.memberId);
-                return `
-                    <div class="space-y-6 animate-fadeIn">
-                        <div class="text-center">
-                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-ribacom-green">RIBACOM Members</span>
-                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Members Directory</h2>
-                            <p class="text-xs text-gray-500 mt-1">${isAdmin?'Administrator view — complete member records.':'Your membership record — private to your account.'}</p>
-                        </div>
-                        <div class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden">
-                            <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
-                                <span class="text-sm font-extrabold text-ribacom-navy">${records.length} record${records.length===1?'':'s'}</span>
-                                ${!isAdmin?'<button onclick="app.navigate(\'member-dashboard\')" class="text-xs font-bold text-ribacom-green">Open My Dashboard</button>':''}
-                            </div>
-                            <div class="divide-y">
-                                ${records.length?records.map(m=>`
-                                    <div class="p-4 flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                            ${m.photo_url?'<img src="'+m.photo_url+'" class="w-full h-full object-cover" alt="Member">':'<i class="fa-solid fa-user text-ribacom-green"></i>'}
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <div class="font-extrabold text-sm text-ribacom-navy">${m.full_name||'Member'}</div>
-                                            <div class="text-[11px] text-gray-500">${m.state_of_origin||'—'} • ${m.category||'member'}</div>
-                                            <div class="text-[11px] mt-1"><span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold">${m.status||'pending'}</span></div>
-                                        </div>
-                                    </div>`).join(''):'<div class="p-8 text-center text-sm text-gray-500">No membership record found.</div>'}
-                            </div>
-                        </div>
-                    </div>`;
-            }
-
-            renderMemberDashboardView() {
+                        container.innerHTML = this.renderMemberDashboardView() {
                 const m=this.db.members.find(x=>x.id===this.currentUser?.memberId)||{};
-                // Always prefer the authenticated member record name over a generic fallback.
+                const appRecord=(this.db.membershipApplications||[]).find(x=>x.user_id===this.currentUser?.id) || {};
                 const memberName=(m.full_name||m.fullName||this.currentUser?.fullName||this.currentUser?.email||'Member').trim();
-                const status=(m.status||this.currentUser?.status||'pending').toLowerCase();
+                const status=(m.status||appRecord.status||this.currentUser?.status||'pending').toLowerCase();
                 const statusClass=status==='approved'?'bg-emerald-50 text-emerald-700':status==='rejected'?'bg-red-50 text-red-700':'bg-amber-50 text-amber-700';
+                const id=(this.db.digitalIds||[]).find(x=>x.memberId===m.id);
+                const tx=(this.db.financeTransactions||[]).filter(x=>x.status==='confirmed');
+                const paid=tx.filter(x=>x.direction==='income').reduce((n,x)=>n+Number(x.amount||0),0);
+                const recent=tx.slice(0,5);
                 return `
-                    <div class="max-w-4xl mx-auto space-y-6 animate-fadeIn">
+                    <div class="max-w-5xl mx-auto space-y-6 animate-fadeIn">
                         <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
                             <div class="flex items-center gap-4">
                                 <div class="w-16 h-16 rounded-full bg-white/10 border border-white/20 overflow-hidden flex items-center justify-center">
@@ -311,31 +262,42 @@
                                 <div><p class="text-xs text-gray-300">RIBACOM MEMBER PORTAL</p><h2 class="text-xl font-extrabold">${esc(memberName)}</h2><p class="text-xs text-gray-300">${esc(this.currentUser?.email||'')}</p></div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Status</p><span class="inline-block mt-2 px-2 py-1 rounded-full text-xs font-extrabold ${statusClass}">${status}</span></div>
-                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Category</p><p class="font-extrabold text-sm mt-2">${m.category||'—'}</p></div>
-                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Origin</p><p class="font-extrabold text-sm mt-2">${m.state_of_origin||'—'}</p></div>
-                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Membership No.</p><p class="font-extrabold text-sm mt-2">${m.membership_number||'Pending'}</p></div>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Membership</p><span class="inline-block mt-2 px-2 py-1 rounded-full text-xs font-extrabold ${statusClass}">${esc(status)}</span></div>
+                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Category</p><p class="font-extrabold text-sm mt-2">${esc(m.category||'—')}</p></div>
+                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Origin</p><p class="font-extrabold text-sm mt-2">${esc(m.state_of_origin||'—')}</p></div>
+                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Membership No.</p><p class="font-extrabold text-sm mt-2">${esc(m.membership_number||'Pending')}</p></div>
+                            <div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Paid Records</p><p class="font-extrabold text-sm mt-2">D${paid.toLocaleString()}</p></div>
+                        </div>
+                        <div class="bg-white rounded-3xl border border-gray-100 card-shadow p-5 sm:p-7">
+                            <div class="flex items-center justify-between gap-3 mb-4"><h3 class="font-extrabold text-ribacom-navy">Application Status</h3><span class="px-2 py-1 rounded-full text-[10px] font-extrabold uppercase ${statusClass}">${esc(appRecord.status||status)}</span></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Submitted</span><p class="font-semibold mt-1">${appRecord.created_at?new Date(appRecord.created_at).toLocaleDateString():'—'}</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Reviewed</span><p class="font-semibold mt-1">${appRecord.reviewed_at?new Date(appRecord.reviewed_at).toLocaleDateString():'Awaiting review'}</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Admin Note</span><p class="font-semibold mt-1">${esc(appRecord.admin_notes||'No note')}</p></div>
+                            </div>
                         </div>
                         <div class="bg-white rounded-3xl border border-gray-100 card-shadow p-5 sm:p-7">
                             <h3 class="font-extrabold text-ribacom-navy mb-4">My Membership Profile</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Phone</span><p class="font-semibold">${m.phone||'—'}</p></div>
-                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Email</span><p class="font-semibold break-all">${m.email||this.currentUser?.email||'—'}</p></div>
-                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">LGA</span><p class="font-semibold">${m.lga||'—'}</p></div>
-                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Address</span><p class="font-semibold">${m.address||'—'}</p></div>
-                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Nationality</span><p class="font-semibold">${m.nationality||'Nigerian'}</p></div>
-                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Application</span><p class="font-semibold">Pending Secretariat review unless marked approved.</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Phone</span><p class="font-semibold">${esc(m.phone||'—')}</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Email</span><p class="font-semibold break-all">${esc(m.email||this.currentUser?.email||'—')}</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">LGA</span><p class="font-semibold">${esc(m.lga||'—')}</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Address</span><p class="font-semibold">${esc(m.address||'—')}</p></div>
+                                <div><span class="text-[10px] uppercase text-gray-400 font-bold">Nationality</span><p class="font-semibold">${esc(m.nationality||'Nigerian')}</p></div>
                             </div>
                         </div>
+                        <div class="bg-white rounded-3xl border border-gray-100 card-shadow p-5 sm:p-7">
+                            <div class="flex items-center justify-between mb-4"><h3 class="font-extrabold text-ribacom-navy">Recent Payment History</h3><button onclick="app.navigate('finance')" class="text-xs font-bold text-ribacom-green">View Finance</button></div>
+                            ${recent.length?'<div class="space-y-2">'+recent.map(x=>'<div class="flex justify-between gap-3 border-b last:border-0 py-2 text-xs"><span><b>'+esc(x.category||'Payment')+'</b><br><span class="text-gray-500">'+new Date(x.created_at).toLocaleDateString()+'</span></span><b class="'+(x.direction==='income'?'text-emerald-700':'text-red-700')+'">'+(x.direction==='income'?'+':'-')+'D'+Number(x.amount||0).toLocaleString()+'</b></div>').join('')+'</div>':'<p class="text-sm text-gray-500">No confirmed payment records yet.</p>'}
+                        </div>
                         <div class="flex flex-wrap gap-3">
-                            ${status==='approved'?'<button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-id-card mr-1"></i> Digital ID</button>':'<button onclick="app.toast(\'Digital ID becomes available after membership approval.\',\'warning\')" class="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-lock mr-1"></i> Digital ID after Approval</button>'}
+                            ${status==='approved'&&id?'<button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-id-card mr-1"></i> Digital ID</button>':'<button onclick="app.toast(\'Digital ID becomes available after membership approval.\',\'warning\')" class="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-lock mr-1"></i> Digital ID after Approval</button>'}
                             <button onclick="app.navigate('welfare')" class="bg-ribacom-gold text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-hand-holding-heart mr-1"></i> Welfare</button>
                             <button onclick="app.navigate('members')" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-extrabold">My Record</button>
-                        </div>iv>
+                        </div>
                     </div>`;
             }
-
             renderHomeView() {
                 const announcements = this.db.announcements.slice(0, 3);
                 const events = this.db.events.slice(0, 2);
