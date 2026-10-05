@@ -19,15 +19,37 @@
       youth_content:[['section_title','Section title'],['body_content','Body content'],['image_url','Image URL']],
       payment_settings:[['method_name','Method'],['account_name','Account name'],['account_number','Account number'],['bank_name','Bank name'],['instructions','Instructions']]
     }[type]||[];
-    const body=fields.map(([k,l])=>`<label class="block text-xs font-bold text-gray-700 mb-2">${esc(l)}<input id="adm_${k}" value="${esc(existing?.[k])}" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" ${k.includes('biography')||k==='content'||k==='description'||k==='instructions'||k==='body_content'?'':'type="text"'}></label>`).join('');
+    const body=fields.map(([k,l])=>`<label class="block text-xs font-bold text-gray-700 mb-2">${esc(l)}<input id="adm_${k}" value="${esc(existing?.[k])}" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" ${k.includes('biography')||k==='content'||k==='description'||k==='instructions'||k==='body_content'?'':'type="text"'}></label>`).join('')+
+      ((type==='leadership'||type==='advisers') ? `<div class="mt-1 mb-3"><label class="block text-xs font-bold text-gray-700">Upload photo directly from phone<input id="adm_photo_file" type="file" accept="image/*" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm bg-white"></label><p class="text-[10px] text-gray-500 mt-1">Choose a photo from your phone. It will be uploaded to RIBACOM Supabase Storage and saved automatically.</p></div>` : '');
     const modal=document.createElement('div'); modal.id='ribacomAdminEditor'; modal.className='fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4'; modal.innerHTML=`<div class="bg-white rounded-3xl max-w-lg w-full p-5 max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-4"><h3 class="font-extrabold text-lg text-ribacom-navy">${esc(title)}</h3><button onclick="document.getElementById('ribacomAdminEditor')?.remove()" class="text-xl">×</button></div>${body}<div class="flex gap-2 mt-4"><button onclick="app.saveAdminEditor('${type}','${id}')" class="flex-1 bg-ribacom-green text-white py-2.5 rounded-xl font-bold">Save</button><button onclick="document.getElementById('ribacomAdminEditor')?.remove()" class="px-5 bg-gray-100 rounded-xl font-bold">Cancel</button></div></div>`;
     document.body.appendChild(modal);
+  };
+
+  RibacomApp.prototype.uploadAdminPhoto = async function(type,id='') {
+    const input=document.getElementById('adm_photo_file');
+    const file=input?.files?.[0];
+    if(!file) return '';
+    if(!this.supabaseClient) throw new Error('Supabase is not connected.');
+    if(!file.type.startsWith('image/')) throw new Error('Please select an image file.');
+    if(file.size > 5*1024*1024) throw new Error('Photo must be 5 MB or smaller.');
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
+    const folder=type==='leadership'?'leadership':'advisers';
+    const path=`${folder}/${id||crypto.randomUUID()}-${Date.now()}.${ext}`;
+    const {data,error}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
+    if(error) throw error;
+    return this.supabaseClient.storage.from('avatars').getPublicUrl(data.path).data.publicUrl;
   };
 
   RibacomApp.prototype.saveAdminEditor = async function(type,id='') {
     if(!isAdmin(this)) return;
     const schemas={leadership:['name','position','photo_url','biography','phone','email'],advisers:['name','category','photo_url','biography','phone'],announcements:['title','content'],events:['title','description','event_date','location','image_url','organizer'],publications:['title','description','file_url','category','publication_date'],youth_content:['section_title','body_content','image_url'],payment_settings:['method_name','account_name','account_number','bank_name','instructions']};
     const data={}; (schemas[type]||[]).forEach(k=>data[k]=val('adm_'+k));
+    if(type==='leadership'||type==='advisers'){
+      try {
+        const uploadedPhoto=await this.uploadAdminPhoto(type,id);
+        if(uploadedPhoto) data.photo_url=uploadedPhoto;
+      } catch(e) { return this.toast(e.message,'error'); }
+    }
     if(type==='leadership') data.display_order=Number(data.display_order||0),data.is_active=true;
     if(type==='advisers') data.is_active=true;
     if(['announcements','events','publications'].includes(type)) data.is_published=true;
