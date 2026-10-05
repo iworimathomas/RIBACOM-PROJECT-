@@ -293,6 +293,16 @@
                 }
                 const {data,error}=await this.supabaseClient.from('members').update(patch).eq('id',id).select().maybeSingle();
                 if(error){this.toast(error.message,'error');return;}
+
+                // Keep the applicant's application record synchronized with the member decision.
+                // This prevents the Admin dashboard and member dashboard from showing different statuses.
+                const applicationStatus=status==='approved'?'approved':status==='rejected'?'rejected':status==='suspended'?'suspended':status;
+                const {error:applicationUpdateError}=await this.supabaseClient
+                    .from('membership_applications')
+                    .update({status:applicationStatus,updated_at:new Date().toISOString()})
+                    .eq('user_id',member.user_id);
+                if(applicationUpdateError) console.warn('Application status sync:',applicationUpdateError.message);
+
                 await this.loadCloudData();
                 if(status==='approved'){
                     const approvedMember=this.db.members.find(m=>m.id===id);
