@@ -38,6 +38,22 @@
       status:decision,reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),reviewer_comment:comment.trim()||null
     }).eq('id',row.id);
     if(e2) return this.toast(e2.message,'error');
+    if(row.content_type==='publication'){
+      const {data:pub}=await this.supabaseClient.from('publications').select('source_type,source_id').eq('id',row.content_id).maybeSingle();
+      if(pub?.source_type==='election_results'&&pub?.source_id){
+        await this.supabaseClient.from('elections').update({
+          results_publication_status:decision==='approved'?'approved':'rejected',
+          results_published_at:decision==='approved'?new Date().toISOString():null,
+          results_published_by:decision==='approved'?this.currentUser.id:null,
+          updated_at:new Date().toISOString()
+        }).eq('id',pub.source_id);
+        await this.supabaseClient.from('election_audit_logs').insert({
+          election_id:pub.source_id,actor_user_id:this.currentUser.id,
+          action:decision==='approved'?'results_publication_approved':'results_publication_rejected',
+          details:{publication_id:row.content_id,reviewer_comment:comment.trim()||null}
+        });
+      }
+    }
     this.toast(decision==='approved'?'Approved and published.':'Rejected and returned to the executive.','success');
     this.navigate('approval-center');
   };
