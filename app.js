@@ -1471,14 +1471,25 @@
             async suspendMember(id) { return this.setMemberStatus(id,'suspended'); }
             async setMemberStatus(id,status) {
                 if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+                const member=this.db.members.find(m=>m.id===id);
+                if(!member){this.toast('Member record not found.','error');return;}
                 const patch={status,updated_at:new Date().toISOString()};
                 if(status==='approved'){
-                    const member=this.db.members.find(m=>m.id===id);
-                    if(member && !member.membershipNo) patch.membership_number=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+                    const currentNo=member.membershipNo||member.membership_number;
+                    if(!currentNo) patch.membership_number=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
                 }
                 const {data,error}=await this.supabaseClient.from('members').update(patch).eq('id',id).select().maybeSingle();
                 if(error){this.toast(error.message,'error');return;}
-                await this.loadCloudData(); this.toast(`Member status changed to ${status}.`,'success'); this.navigate('admin-dashboard');
+                if(status==='approved'){
+                    this.toast('Application approved. Membership number confirmed and Digital ID can now be issued.','success');
+                } else if(status==='rejected'){
+                    this.toast('Membership application rejected.','warning');
+                } else if(status==='suspended'){
+                    this.toast('Membership suspended.','warning');
+                } else {
+                    this.toast(`Member status changed to ${status}.`,'success');
+                }
+                await this.loadCloudData(); this.navigate('admin-members');
             }
             async createDigitalId(memberId) {
                 if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
