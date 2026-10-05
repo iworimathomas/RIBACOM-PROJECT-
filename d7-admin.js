@@ -29,6 +29,22 @@
   RibacomApp.prototype.navigate=function(viewId,params){if(routes.includes(viewId)){if(!isAdmin(this)){this.toast('Administrator privileges required.','error');return oldNav.call(this,'home');}this.currentView=viewId;const el=document.getElementById('appViewport');if(el)el.innerHTML=this.renderD7Page(viewId);this.updateAuthHeaderUI();window.scrollTo({top:0,behavior:'smooth'});return;}return oldNav.call(this,viewId,params);};
   const oldDash=RibacomApp.prototype.renderAdminDashboardView;
   RibacomApp.prototype.renderAdminDashboardView=function(){const base=oldDash.call(this);if(!isAdmin(this))return base;const buttons=[['admin-members','Members'],['admin-digital-ids','Digital IDs'],['admin-leadership','Leadership'],['admin-advisers','Advisers'],['admin-constitution','Constitution'],['admin-announcements','Announcements'],['admin-events','Events'],['admin-gallery','Gallery'],['admin-publications','Publications'],['admin-youth','Youth'],['admin-welfare','Welfare'],['admin-payments','Payments'],['admin-about','About RIBACOM'],['admin-system','System Verification']];return base+`<div class="bg-white rounded-3xl p-5 card-shadow"><h3 class="font-extrabold text-ribacom-navy mb-3">Complete Control Centre</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-2">${buttons.map(([r,l])=>`<button onclick="app.navigate('${r}')" class="bg-gray-50 hover:bg-gray-100 border rounded-xl px-3 py-3 text-xs font-bold text-ribacom-navy text-left">${esc(l)}</button>`).join('')}</div></div>`;};
+  // Membership review dashboard enhancement
+  const previousAdminDashboard=RibacomApp.prototype.renderAdminDashboardView;
+  RibacomApp.prototype.renderAdminDashboardView=function(){
+    const base=previousAdminDashboard.call(this);
+    if(!isAdmin(this))return base;
+    const members=this.db.members||[];
+    const count=s=>members.filter(m=>(m.status||'pending').toLowerCase()===s).length;
+    const pending=count('pending'), approved=count('approved'), rejected=count('rejected');
+    return base+'<div class="bg-white rounded-3xl p-5 card-shadow mt-4">'+
+      '<div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><h3 class="font-extrabold text-ribacom-navy">Membership Application Review</h3><p class="text-xs text-gray-500">Monitor membership applications and open the full Members management screen.</p></div><button onclick="app.navigate(\'admin-members\')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Open Members</button></div>'+
+      '<div class="grid grid-cols-3 gap-2">'+
+      '<div class="rounded-2xl bg-amber-50 p-3"><div class="text-[10px] uppercase font-bold text-amber-700">Pending</div><div class="text-xl font-extrabold text-amber-800">'+pending+'</div></div>'+
+      '<div class="rounded-2xl bg-emerald-50 p-3"><div class="text-[10px] uppercase font-bold text-emerald-700">Approved</div><div class="text-xl font-extrabold text-emerald-800">'+approved+'</div></div>'+
+      '<div class="rounded-2xl bg-red-50 p-3"><div class="text-[10px] uppercase font-bold text-red-700">Rejected</div><div class="text-xl font-extrabold text-red-800">'+rejected+'</div></div>'+
+      '</div></div>';
+  };
   // Keep a real array for Youth administration rather than the public single-item summary.
   const oldLoad=RibacomApp.prototype.loadCloudData;
   RibacomApp.prototype.loadCloudData=async function(){await oldLoad.call(this);if(this.supabaseClient&&isAdmin(this)){const {data}=await this.supabaseClient.from('youth_content').select('*').order('created_at',{ascending:false});this.db.youthRows=data||[];}}
