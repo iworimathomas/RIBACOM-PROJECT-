@@ -828,7 +828,7 @@
                                 <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto text-base">
                                     <i class="fa-solid fa-baby"></i>
                                 </div>
-                                <h4 class="font-bold text-xs text-gray-800">Child Birth</h4>
+                                <h4 class="font-bold text-xs text-gray-800">Birthday Benefit</h4>
                                 <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.birth?.amount||5000).toLocaleString()}</p>
                             </div>
 
@@ -837,8 +837,8 @@
                                     <i class="fa-solid fa-ribbon"></i>
                                 </div>
                                 <h4 class="font-bold text-xs text-gray-800">Bereavement</h4>
-                                <p class="text-lg font-extrabold text-ribacom-green">D1,500</p>
-                                <p class="text-[9px] text-gray-400">Parent / Spouse / Child</p>
+                                <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.loss_parent?.amount||15000).toLocaleString()}</p>
+                                <p class="text-[9px] text-gray-400">Parent / Spouse / Child — subject to applicable maximum</p>
                             </div>
                         </div>
 
@@ -852,10 +852,12 @@
                                     <div>
                                         <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Category *</label>
                                         <select required id="w_type" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                                            <option value="Wedding">Wedding Celebration (D1,000)</option>
-                                            <option value="Birth">Child Birth (D500)</option>
-                                            <option value="Bereavement">Bereavement (D1,500)</option>
-                                            <option value="Emergency">Other Special Welfare</option>
+                                            <option value="wedding">Wedding Benefit — up to D${(this.db.welfareSettings.wedding?.amount||10000).toLocaleString()}</option>
+                                            <option value="birth">Birthday Benefit — up to D${(this.db.welfareSettings.birth?.amount||5000).toLocaleString()}</option>
+                                            <option value="loss_parent">Loss of Parent — up to D${(this.db.welfareSettings.loss_parent?.amount||15000).toLocaleString()}</option>
+                                            <option value="loss_spouse">Loss of Spouse — up to D${(this.db.welfareSettings.loss_spouse?.amount||15000).toLocaleString()}</option>
+                                            <option value="loss_child">Loss of Child — up to D${(this.db.welfareSettings.loss_child?.amount||15000).toLocaleString()}</option>
+                                            <option value="other">Other Special Welfare</option>
                                         </select>
                                     </div>
                                     <div>
