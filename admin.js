@@ -175,3 +175,39 @@
     }finally{if(btn){btn.disabled=false;btn.textContent='Create & Send Secure Invitation';}}
   };
 })();
+
+/* Membership application review centre */
+(function(){
+  RibacomApp.prototype.openMembershipApplications = async function(){
+    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return this.toast('Administrator access required.','error');
+    const {data,error}=await this.supabaseClient.from('membership_applications').select('*').order('created_at',{ascending:false});
+    if(error) return this.toast(error.message,'error');
+    const esc2=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const rows=data||[];
+    const modal=document.createElement('div'); modal.id='ribacomApplications'; modal.className='fixed inset-0 z-[115] bg-black/60 flex items-center justify-center p-4';
+    modal.innerHTML=`<div class="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-y-auto p-5"><div class="flex justify-between items-center mb-4"><div><h3 class="text-xl font-extrabold text-ribacom-navy">Membership Applications</h3><p class="text-xs text-gray-500">Review applications before issuing membership and Digital ID.</p></div><button onclick="document.getElementById('ribacomApplications')?.remove()" class="text-xl">×</button></div><div class="space-y-3">${rows.map(a=>`<div class="border rounded-2xl p-4"><div class="flex flex-wrap justify-between gap-3"><div><div class="font-extrabold text-ribacom-navy">${esc2(a.full_name)}</div><div class="text-xs text-gray-500">${esc2(a.membership_category)} • ${esc2(a.state_of_origin)} • ${esc2(a.lga)}</div><div class="text-xs text-gray-500">${esc2(a.email)} • ${esc2(a.phone)}</div><div class="text-xs text-gray-500 mt-1">${esc2(a.current_address||'')} </div></div><span class="text-[10px] font-extrabold uppercase px-2 py-1 rounded-full ${a.status==='approved'?'bg-emerald-50 text-emerald-700':a.status==='rejected'?'bg-red-50 text-red-700':'bg-amber-50 text-amber-700'}">${esc2(a.status)}</span></div><div class="flex flex-wrap gap-2 mt-3">${a.photo_url?`<a href="${esc2(a.photo_url)}" target="_blank" class="text-xs text-blue-600 font-bold">View Photo</a>`:''}${a.status==='pending'||a.status==='under_review'?`<button onclick="app.approveMembershipApplication('${a.id}')" class="bg-ribacom-green text-white px-3 py-2 rounded-xl text-xs font-bold">Approve & Create Membership</button><button onclick="app.rejectMembershipApplication('${a.id}')" class="bg-red-50 text-red-700 px-3 py-2 rounded-xl text-xs font-bold">Reject</button>`:''}</div></div>`).join('')||'<p class="text-sm text-gray-500 text-center py-8">No membership applications.</p>'}</div></div>`;
+    document.body.appendChild(modal);
+  };
+  RibacomApp.prototype.approveMembershipApplication = async function(id){
+    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+    const {data:a,error:ae}=await this.supabaseClient.from('membership_applications').select('*').eq('id',id).maybeSingle();
+    if(ae||!a) return this.toast(ae?.message||'Application not found.','error');
+    if(!['pending','under_review'].includes(a.status)) return this.toast('This application has already been reviewed.','warning');
+    const {data:existing}=await this.supabaseClient.from('members').select('id,membership_number').eq('user_id',a.user_id).maybeSingle();
+    const membershipNumber=existing?.membership_number||`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+    const {data:m,error:me}=await this.supabaseClient.from('members').upsert({user_id:a.user_id,membership_number:membershipNumber,full_name:a.full_name,email:a.email,phone:a.phone,photo_url:a.photo_url,date_of_birth:a.date_of_birth,gender:a.gender,address:a.current_address,nationality:a.nationality||'Nigerian',state_of_origin:['Rivers','Bayelsa'].includes(a.state_of_origin)?a.state_of_origin:'Other',lga:a.lga,rivers_bayelsa_connection:a.rivers_bayelsa_connection,category:(a.membership_category||'').toLowerCase().includes('associate')?'associate':'regular',status:'approved',emergency_contact_name:a.emergency_contact_name,emergency_contact_phone:a.emergency_contact_phone,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select().maybeSingle();
+    if(me){this.toast(me.message,'error');return;}
+    const qr=`RIBACOM-GAMBIA|ID:${membershipNumber}|MEMBER:${m?.id||existing?.id}|NAME:${a.full_name}`;
+    const {error:de}=await this.supabaseClient.from('digital_ids').upsert({member_id:m?.id||existing?.id,id_card_number:membershipNumber,qr_code_data:qr,status:'active',issued_at:new Date().toISOString()},{onConflict:'member_id'});
+    if(de){this.toast(de.message,'error');return;}
+    const {error:rv}=await this.supabaseClient.from('membership_applications').update({status:'approved',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id);
+    if(rv){this.toast(rv.message,'error');return;}
+    await this.loadCloudData(); this.toast(`Application approved. Membership ${membershipNumber} and Digital ID issued.`,'success'); await this.openMembershipApplications();
+  };
+  RibacomApp.prototype.rejectMembershipApplication = async function(id){
+    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+    const note=prompt('Reason for rejection (optional):')||null;
+    const {error}=await this.supabaseClient.from('membership_applications').update({status:'rejected',admin_notes:note,reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id);
+    if(error) return this.toast(error.message,'error'); this.toast('Membership application rejected.','warning'); await this.openMembershipApplications();
+  };
+})();
