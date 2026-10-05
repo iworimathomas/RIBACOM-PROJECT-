@@ -365,7 +365,7 @@
             navigate(view, params=null) {
                 this.currentView=view||'home';
                 try { localStorage.setItem('ribacom_last_view',this.currentView); } catch (_) {}
-                const protectedViews=['member-dashboard','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
+                const protectedViews=['member-dashboard','digital-id','welfare','notifications','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
                 const roleRoutes={
                     'admin-dashboard':['admin','super_admin'],'admin-members':['admin','super_admin'],'admin-digital-ids':['admin','super_admin'],
                     'admin-constitution':['admin','super_admin'],'admin-gallery':['admin','super_admin'],'admin-leadership':['admin','super_admin'],
@@ -383,6 +383,9 @@
                 }
                 const roleAccess={
                     'member-dashboard':['member','admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'],
+                    'digital-id':['member','admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'],
+                    'welfare':['member','admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'],
+                    'notifications':['member','admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'],
                     'treasurer-dashboard':['treasurer','admin','super_admin'],
                     'finance':['treasurer','admin','super_admin'],
                     'finance-reports':['treasurer','admin','super_admin'],
