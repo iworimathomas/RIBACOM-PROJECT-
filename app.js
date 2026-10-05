@@ -221,6 +221,14 @@
                         return;
                     }
                     await this.hydrateCurrentUser(user);
+                    const roleKey=String(this.currentUser?.roleKey||'member').toLowerCase();
+                    const preferred=String(localStorage.getItem('ribacom_last_view')||'');
+                    const privileged=['admin-dashboard','treasurer-dashboard','executive-work'];
+                    const allowed=preferred && (!privileged.includes(preferred) ||
+                      (preferred==='admin-dashboard' && ['admin','super_admin'].includes(roleKey)) ||
+                      (preferred==='treasurer-dashboard' && roleKey==='treasurer') ||
+                      (preferred==='executive-work' && ['president','vice_president','secretary_general','assistant_secretary_general','welfare_officer','pro'].includes(roleKey)));
+                    if(allowed) this.currentView=preferred;
                 } catch (error) {
                     console.warn('Session restore failed:', error);
                     this.currentUser = null;
@@ -356,6 +364,7 @@
 
             navigate(view, params=null) {
                 this.currentView=view||'home';
+                try { localStorage.setItem('ribacom_last_view',this.currentView); } catch (_) {}
                 const protectedViews=['member-dashboard','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
                 if(protectedViews.includes(this.currentView) && !this.currentUser){
                     this.toast('Please sign in to access this portal.','warning');
