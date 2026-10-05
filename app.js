@@ -294,6 +294,8 @@
 
             renderMemberDashboardView() {
                 const m=this.db.members.find(x=>x.id===this.currentUser?.memberId)||{};
+                // Always prefer the authenticated member record name over a generic fallback.
+                const memberName=(m.full_name||m.fullName||this.currentUser?.fullName||this.currentUser?.email||'Member').trim();
                 const status=(m.status||this.currentUser?.status||'pending').toLowerCase();
                 const statusClass=status==='approved'?'bg-emerald-50 text-emerald-700':status==='rejected'?'bg-red-50 text-red-700':'bg-amber-50 text-amber-700';
                 return `
@@ -303,7 +305,7 @@
                                 <div class="w-16 h-16 rounded-full bg-white/10 border border-white/20 overflow-hidden flex items-center justify-center">
                                     ${m.photo_url?'<img src="'+m.photo_url+'" class="w-full h-full object-cover" alt="Profile">':'<i class="fa-solid fa-user text-2xl text-ribacom-gold"></i>'}
                                 </div>
-                                <div><p class="text-xs text-gray-300">RIBACOM MEMBER PORTAL</p><h2 class="text-xl font-extrabold">${this.currentUser?.fullName||'Member'}</h2><p class="text-xs text-gray-300">${this.currentUser?.email||''}</p></div>
+                                <div><p class="text-xs text-gray-300">RIBACOM MEMBER PORTAL</p><h2 class="text-xl font-extrabold">${esc(memberName)}</h2><p class="text-xs text-gray-300">${esc(this.currentUser?.email||'')}</p></div>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1513,8 +1515,8 @@
                     }
 
                     container.innerHTML = `
-                        <button onclick="app.handleAuthAction()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition border border-white/20">
-                            Portal
+                        <button onclick="app.handleAuthAction()" title="${esc(this.currentUser?.fullName||'Member Portal')}" class="bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition border border-white/20 max-w-[180px] truncate">
+                            ${esc(this.currentUser?.fullName||'Member Portal')}
                         </button>
                         <button onclick="app.logout()" class="text-gray-300 hover:text-white p-1.5 text-xs">
                             <i class="fa-solid fa-right-from-bracket"></i>
