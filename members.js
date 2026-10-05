@@ -13,6 +13,11 @@
     const fullName=val('m_fullName'), phone=val('m_phone'), email=val('m_email').toLowerCase();
     const password=val('m_password'), confirm=val('m_passwordConfirm');
     const stateRaw=val('m_state'), lga=val('m_lga'), address=val('m_address'), photo=val('m_photo');
+    const photoFile=document.getElementById('m_photo_file')?.files?.[0];
+    if(photoFile){
+      if(!photoFile.type.startsWith('image/')) return this.toast('Please select an image file.','warning');
+      if(photoFile.size>5*1024*1024) return this.toast('Photo must be 5 MB or smaller.','warning');
+    }
     if(!fullName||!phone||!email||!address||password.length<8) return this.toast('Please complete all required fields.','warning');
     if(password!==confirm) return this.toast('Passwords do not match.','warning');
 
@@ -32,6 +37,14 @@
       application_status:'pending',monthly_dues:'D50'
     };
 
+    let uploadedPhotoUrl=photo||null;
+    if(photoFile){
+      const ext=(photoFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+      const path=`memberships/${crypto.randomUUID()}-${Date.now()}.${ext}`;
+      const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,photoFile,{contentType:photoFile.type,upsert:false,cacheControl:'3600'});
+      if(upError) return this.toast('Photo upload failed: '+upError.message,'error');
+      uploadedPhotoUrl=this.supabaseClient.storage.from('avatars').getPublicUrl(up.data.path).data.publicUrl;
+    }
     this.toast('Creating your RIBACOM account…','info');
     const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({
       email,password,options:{data:{full_name:fullName,phone,application_details:details}}
@@ -45,7 +58,7 @@
 
     // Create the membership record even when Supabase requires email verification.
     // This keeps the application in Pending status instead of losing the application.
-    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:photo||null,nationality:details.nationality,category,status:'pending'};
+    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
     const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
     if(memberError){
       this.toast(memberError.message,'error');
