@@ -15,7 +15,13 @@
                 this.initTestMode();
                 this.initSupabase();
                 this.bindSupabaseAuthState();
-                this.restoreSupabaseSession().then(() => this.loadCloudData()).then(() => this.navigate(this.currentView));
+                this.ready = this.restoreSupabaseSession()
+                    .then(() => this.loadCloudData())
+                    .then(() => this.navigate(this.currentView))
+                    .catch(error => {
+                        console.error('RIBACOM startup error:', error);
+                        this.navigate(this.currentView || 'home');
+                    });
             }
 
             initSupabase() {
@@ -38,6 +44,7 @@
 
             async loadCloudData() {
                 if (!this.supabaseClient) return this.db;
+                this.cloudErrors = [];
                 const sources = {
                     members: 'members',
                     digitalIds: 'digital_ids',
@@ -58,7 +65,12 @@
                 const results = await Promise.all(Object.entries(sources).map(async ([key, table]) => {
                     try {
                         const { data, error } = await this.supabaseClient.from(table).select('*');
-                        return [key, error ? [] : (data || [])];
+                        if (error) {
+                            this.cloudErrors.push({table, message:error.message || String(error)});
+                            console.warn('RIBACOM data load failed for '+table+':', error.message || error);
+                            return [key, []];
+                        }
+                        return [key, data || []];
                     } catch (error) {
                         console.warn('RIBACOM data load failed for '+table+':', error);
                         return [key, []];
@@ -95,6 +107,9 @@
                     } else {
                         this.db[key] = value;
                     }
+                }
+                if (this.cloudErrors.length) {
+                    console.warn('RIBACOM cloud data warnings:', this.cloudErrors);
                 }
                 return this.db;
             }
@@ -354,8 +369,9 @@
                 const mobileProfile = document.getElementById('mobileProfileCard');
                 const mobileFooter = document.getElementById('mobileDrawerFooter');
 
+                if (!container) return;
                 if (this.currentUser) {
-                    miniStatus.innerText = this.currentUser.fullName;
+                    if (miniStatus) miniStatus.innerText = this.currentUser.fullName;
                     if (idBtn) idBtn.classList.remove('hidden');
 
                     if (mobileProfile) {
@@ -381,7 +397,7 @@
                         `;
                     }
                 } else {
-                    miniStatus.innerText = "Guest User";
+                    if (miniStatus) miniStatus.innerText = "Guest User";
                     if (idBtn) idBtn.classList.add('hidden');
                     if (mobileProfile) mobileProfile.classList.add('hidden');
 
@@ -584,5 +600,7 @@
         let app;
         window.addEventListener('DOMContentLoaded', () => {
             app = new RibacomApp();
-            app.navigate('home');
+            // RibacomApp now owns startup sequencing so authentication and cloud data
+            // are restored before the initial route renders. This prevents a double
+            // navigation race that could overwrite the authenticated dashboard.
         });
