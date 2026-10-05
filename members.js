@@ -20,6 +20,7 @@
     }
     if(!fullName||!phone||!email||!address||password.length<8) return this.toast('Please complete all required fields.','warning');
     if(password!==confirm) return this.toast('Passwords do not match.','warning');
+    if(!checked('m_constitutionConsent') || !checked('m_declaration')) return this.toast('Please accept the Constitution consent and declaration before submitting.','warning');
 
     const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
     const category=val('m_category').toLowerCase().includes('associate')?'associate':'regular';
@@ -56,8 +57,32 @@
     const {error:profileError}=await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
     if(profileError) console.warn('Profile upsert:',profileError.message);
 
-    // Create the membership record even when Supabase requires email verification.
-    // This keeps the application in Pending status instead of losing the application.
+    // Save the complete application first. This is the authoritative application record.
+    // RLS permits this insert for anon/authenticated users only when the declaration is accepted.
+    const applicationPayload={
+      user_id:user.id,full_name:fullName,date_of_birth:details.date_of_birth,gender:details.gender,
+      nationality:details.nationality,place_of_birth:val('m_placeOfBirth'),state_of_origin:state,lga,
+      town_village:val('m_townVillage'),community_clan:details.origin_community,phone,whatsapp:phone,email,
+      current_address:address,area_location:val('m_areaLocation'),occupation:details.occupation,
+      employer_business:details.employer_business,nigerian_passport_number:details.passport_or_id,
+      membership_category:category==='associate'?'Associate Member':'Regular Member',
+      rivers_bayelsa_connection:state, father_name:val('m_fatherName'),mother_name:val('m_motherName'),
+      spouse_name:details.spouse_name,date_of_arrival_gambia:val('m_arrivalGambia'),
+      next_of_kin_name:details.next_of_kin,next_of_kin_relationship:val('m_nextOfKinRelationship'),
+      next_of_kin_phone:details.next_of_kin_phone,emergency_contact_name:details.emergency_contact_name,
+      emergency_contact_phone:details.emergency_contact_phone,preferred_contact_method:val('m_contactMethod')||'WhatsApp',
+      photo_url:uploadedPhotoUrl,declaration_accepted:true,digital_signature:fullName,status:'pending',
+      medical_emergency_information:val('m_medicalEmergency'),national_id_number:details.passport_or_id,
+      proof_of_nigerian_origin_url:val('m_proofOfOrigin')
+    };
+    const {error:applicationError}=await this.supabaseClient.from('membership_applications').insert(applicationPayload);
+    if(applicationError){
+      this.toast('Application could not be saved: '+applicationError.message,'error');
+      return;
+    }
+
+    // Create the pending member record linked to the same authenticated user.
+    // Approval remains a Secretariat/Admin action; the member is never auto-approved.
     const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
     const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
     if(memberError){
