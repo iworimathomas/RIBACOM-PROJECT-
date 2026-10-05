@@ -23,11 +23,13 @@
       else if(t.startsWith('select:')){const opts=t.slice(7).split('|');control=`<select id="d7_${k}" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm">${opts.map(o=>`<option value="${esc(o)}" ${existing?.[k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;}
       else if(imageFields.includes(k)) control=`<input id="d7_${k}" type="url" value="${esc(existing?.[k])}" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" placeholder="Uploaded photo URL">`;
       else control=`<input id="d7_${k}" type="${t}" value="${esc(existing?.[k])}" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm">`;
-      return `<label class="block text-xs font-bold text-gray-700">${l}${control}${imageFields.includes(k)?`<div class="mt-2 flex items-center gap-2"><input id="d7_${k}_file" type="file" accept="image/*" class="w-full border rounded-xl px-3 py-2 text-xs bg-white"><span class="text-[10px] text-gray-500">Choose from phone</span></div>`:''}</label>`;
+      return `<label class="block text-xs font-bold text-gray-700">${(type==='leadership'&&k==='photo_url'?'Executive Photo — President/Chairman or other Executive':l)}${control}${imageFields.includes(k)?`<div class="mt-2 space-y-2"><input id="d7_${k}_file" type="file" accept="image/*" class="w-full border rounded-xl px-3 py-2 text-xs bg-white" onchange="app.previewD7Image(this,'d7_${k}_preview')"><img id="d7_${k}_preview" src="${esc(existing?.[k]||'')}" class="${existing?.[k]?'':'hidden'} w-20 h-20 rounded-full object-cover border" alt="Photo preview"><span class="text-[10px] text-gray-500">Select directly from your phone. The app will compress the photo before upload.</span></div>`:''}</label>`;
     }).join('');
     const modal=document.createElement('div');modal.id='d7Editor';modal.className='fixed inset-0 z-[120] bg-black/60 flex items-center justify-center p-4';modal.innerHTML=`<div class="bg-white rounded-3xl max-w-xl w-full p-5 max-h-[92vh] overflow-y-auto"><div class="flex justify-between items-center mb-4"><h3 class="text-lg font-extrabold text-ribacom-navy">${id?'Edit':'Add'} ${esc(m.title)}</h3><button onclick="document.getElementById('d7Editor')?.remove()" class="text-xl">×</button></div><div class="space-y-3">${fields}<p class="text-[10px] text-gray-500 mt-2">Photo fields can be uploaded directly from your mobile phone. The URL is filled automatically after upload.</p></div><div class="flex gap-2 mt-5"><button onclick="app.saveD7Record('${type}','${id}')" class="flex-1 bg-ribacom-green text-white py-2.5 rounded-xl font-bold">Save</button><button onclick="document.getElementById('d7Editor')?.remove()" class="px-5 bg-gray-100 rounded-xl font-bold">Cancel</button></div></div>`;document.body.appendChild(modal);
   }
   RibacomApp.prototype.openD7Editor=function(type,id=''){if(!isAdmin(this))return this.toast('Administrator access required.','error');renderEditor(this,type,id);};
+  RibacomApp.prototype.previewD7Image=function(input,targetId){const file=input?.files?.[0],img=document.getElementById(targetId);if(!file||!img)return;if(!file.type.startsWith('image/'))return;const url=URL.createObjectURL(file);img.src=url;img.classList.remove('hidden');img.onload=()=>URL.revokeObjectURL(url);};
+  RibacomApp.prototype.compressD7Image=async function(file){return new Promise((resolve,reject)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(url);const max=1000,scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));const ctx=c.getContext('2d');ctx.drawImage(img,0,0,c.width,c.height);c.toBlob(blob=>{if(!blob)return reject(new Error('Could not compress photo.'));resolve(new File([blob],(file.name||'photo').replace(/\.[^.]+$/,'')+'.webp',{type:'image/webp'}));},'image/webp',0.82);};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not read photo.'));};img.src=url;});};
   RibacomApp.prototype.uploadD7Image=async function(type,id=''){
   const keys=['photo_url','image_url'];
   for(const key of keys){
@@ -35,9 +37,9 @@
     if(!file) continue;
     if(!file.type.startsWith('image/')) throw new Error('Please select an image file.');
     if(file.size>5*1024*1024) throw new Error('Photo must be 5 MB or smaller.');
-    const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-    const path=`admin-media/${type}/${id||crypto.randomUUID()}-${Date.now()}.${ext}`;
-    const {data,error}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
+    const optimized=await this.compressD7Image(file);
+    const path=`admin-media/${type}/${id||crypto.randomUUID()}-${Date.now()}.webp`;
+    const {data,error}=await this.supabaseClient.storage.from('avatars').upload(path,optimized,{contentType:'image/webp',upsert:true,cacheControl:'31536000'});
     if(error) throw error;
     const url=this.supabaseClient.storage.from('avatars').getPublicUrl(data.path).data.publicUrl;
     return {key,url};
