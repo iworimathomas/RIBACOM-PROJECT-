@@ -47,8 +47,17 @@
     const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
     if(memberError) return this.toast(memberError.message,'error');
 
+    // Create the membership record even when Supabase requires email verification.
+    // This keeps the application in Pending status instead of losing the application.
+    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:photo||null,nationality:details.nationality,category,status:'pending'};
+    const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
+    if(memberError){
+      this.toast(memberError.message,'error');
+      return;
+    }
+
     if(!authData.session){
-      this.toast('Account created. Verify your email, then sign in. Your membership is pending Secretariat approval.','success');
+      this.toast('Account created and membership application saved. Verify your email, then sign in. Your membership remains pending Secretariat approval.','success');
       this.openLoginModal(); return;
     }
     await this.hydrateCurrentUser(user); await this.loadCloudData();
