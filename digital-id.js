@@ -16,10 +16,13 @@
 
   RibacomApp.prototype.createDigitalId = async function(memberId) {
     if (!admin(this)) return this.toast('Administrator access required.','error');
-    const member = this.db.members.find(m => m.id === memberId);
-    if (!member) return this.toast('Member not found.','error');
-    if (member.status !== 'approved') return this.toast('Only approved members can receive a Digital ID.','warning');
-    if (this.db.digitalIds.some(x => x.memberId === memberId || x.member_id === memberId)) return this.toast('This member already has a Digital ID.','warning');
+    const {data:member,error:memberError}=await this.supabaseClient.from('members').select('*').eq('id',memberId).maybeSingle();
+    if(memberError) return this.toast(memberError.message,'error');
+    if(!member) return this.toast('Member not found.','error');
+    if(String(member.status||'').toLowerCase()!=='approved') return this.toast('Only approved members can receive a Digital ID.','warning');
+    const {data:existing,error:existingError}=await this.supabaseClient.from('digital_ids').select('id').eq('member_id',memberId).maybeSingle();
+    if(existingError) return this.toast(existingError.message,'error');
+    if(existing) return this.toast('This member already has a Digital ID.','warning');
     const number = await nextUniqueIdNumber(this), issued = new Date(), expiry = new Date(issued); expiry.setFullYear(expiry.getFullYear()+1);
     const {error} = await this.supabaseClient.from('digital_ids').insert({member_id:memberId,id_card_number:number,qr_code_data:qr(member,number),status:'active',issued_at:issued.toISOString(),expires_at:expiry.toISOString()});
     if (error) return this.toast(error.message,'error');
