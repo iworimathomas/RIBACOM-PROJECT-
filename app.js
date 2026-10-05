@@ -1309,12 +1309,26 @@
                 const checked = id => !!document.getElementById(id)?.checked;
                 const fullName=val('m_fullName'), phone=val('m_phone'), email=val('m_email').toLowerCase();
                 const state=val('m_state'), lga=val('m_lga'), category=val('m_category').startsWith('Associate')?'associate':'regular';
-                const address=val('m_address'), photo=val('m_photo')||null, password=val('m_password'), confirm=val('m_passwordConfirm');
+                const address=val('m_address'), password=val('m_password'), confirm=val('m_passwordConfirm');
+                const photoInput=document.getElementById('m_photo_file');
                 if(password.length<8){this.toast('Create a password of at least 8 characters.','warning');return;}
                 if(password!==confirm){this.toast('Passwords do not match.','warning');return;}
+                if(!checked('m_declaration')){this.toast('Please accept the declaration before submitting.','warning');return;}
+
+                let photo=null;
+                const photoFile=photoInput?.files?.[0];
+                if(photoFile){
+                    if(!photoFile.type.startsWith('image/')){this.toast('Please select a valid image file.','warning');return;}
+                    if(photoFile.size>5*1024*1024){this.toast('Passport photograph must be 5 MB or smaller.','warning');return;}
+                    const ext=(photoFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+                    const path=`memberships/application-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                    const up=await this.supabaseClient.storage.from('avatars').upload(path,photoFile,{contentType:photoFile.type,upsert:false,cacheControl:'31536000'});
+                    if(up.error){this.toast(up.error.message,'error');return;}
+                    photo=this.supabaseClient.storage.from('avatars').getPublicUrl(up.data.path).data.publicUrl;
+                }
 
                 const applicationDetails={
-                    previous_name:val('m_otherName'), date_of_birth:val('m_dob'), gender:val('m_gender'),
+                    previous_name:val('m_otherName'), date_of_birth:val('m_dob')||null, gender:val('m_gender')||null,
                     nationality:val('m_nationality')||'Nigerian', passport_or_id:val('m_idNumber'),
                     origin_community:val('m_originCommunity'), clan_ward:val('m_clanWard'),
                     previous_association:val('m_previousAssociation'), emergency_contact_name:val('m_emergencyName'),
@@ -1323,8 +1337,7 @@
                     next_of_kin_phone:val('m_nextOfKinPhone'), occupation:val('m_occupation'),
                     employer_business:val('m_employer'), work_address:val('m_workAddress'), skills:val('m_skills'),
                     interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
-                    constitution_consent:checked('m_constitutionConsent'), information_declaration:checked('m_declaration'),
-                    application_status:'pending', monthly_dues:'D50'
+                    constitution_consent:checked('m_constitutionConsent'), information_declaration:checked('m_declaration')
                 };
 
                 this.toast('Creating your secure RIBACOM account...','info');
@@ -1334,19 +1347,36 @@
                 if(authError){this.toast(authError.message,'error');return;}
                 const user=authData?.user;
                 if(!user){this.toast('Account creation did not return a user. Please try again.','error');return;}
+
+                const {error:applicationError}=await this.supabaseClient.from('membership_applications').insert({
+                    user_id:user.id,full_name:fullName,date_of_birth:applicationDetails.date_of_birth,gender:applicationDetails.gender,
+                    nationality:applicationDetails.nationality,state_of_origin:state==='Other / Associate'?'Other':state.replace(' State',''),
+                    lga,town_village:applicationDetails.origin_community,community_clan:applicationDetails.clan_ward,
+                    phone,whatsapp:phone,email,current_address:address,occupation:applicationDetails.occupation,
+                    employer_business:applicationDetails.employer_business,nigerian_passport_number:applicationDetails.passport_or_id,
+                    membership_category:category==='associate'?'Associate Member':'Regular Member',
+                    rivers_bayelsa_connection:state,spouse_name:applicationDetails.spouse_name,
+                    next_of_kin_name:applicationDetails.next_of_kin,next_of_kin_phone:applicationDetails.next_of_kin_phone,
+                    emergency_contact_name:applicationDetails.emergency_contact_name,emergency_contact_phone:applicationDetails.emergency_contact_phone,
+                    photo_url:photo,declaration_accepted:true,digital_signature:fullName,status:'pending'
+                });
+                if(applicationError){this.toast(applicationError.message,'error');return;}
+
                 const {error:profileError}=await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
                 if(profileError) console.warn('Profile sync:',profileError.message);
 
                 if(!authData.session){
-                    this.toast('Application saved with your account. Please verify your email, then sign in.','success');
+                    this.toast('Application submitted. Please verify your email, then sign in. The Secretariat will review your application.','success');
                     this.openLoginModal();
                     return;
                 }
 
                 const {error}=await this.supabaseClient.from('members').upsert({
                     user_id:user.id,full_name:fullName,email,phone,
-                    state_of_origin:state==='Other / Associate'?'Other':state,lga,address,
-                    photo_url:photo,nationality:applicationDetails.nationality,category,status:'pending'
+                    state_of_origin:state==='Other / Associate'?'Other':state.replace(' State',''),lga,address,
+                    photo_url:photo,nationality:applicationDetails.nationality,category,status:'pending',
+                    date_of_birth:applicationDetails.date_of_birth,gender:applicationDetails.gender,
+                    emergency_contact_name:applicationDetails.emergency_contact_name,emergency_contact_phone:applicationDetails.emergency_contact_phone
                 },{onConflict:'user_id'});
                 if(error){this.toast(error.message,'error');return;}
                 await this.hydrateCurrentUser(user);
@@ -1354,7 +1384,6 @@
                 await this.loadCloudData();
                 this.navigate('member-dashboard');
             }
-
             async handleWelfareSubmit(e) {
                 e.preventDefault();
                 if (!this.supabaseClient || !this.currentUser?.memberId) { this.toast('Please sign in as an approved member first.', 'warning'); return; }
