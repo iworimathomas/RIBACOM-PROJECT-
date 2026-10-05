@@ -297,11 +297,24 @@
                 // Keep the applicant's application record synchronized with the member decision.
                 // This prevents the Admin dashboard and member dashboard from showing different statuses.
                 const applicationStatus=status==='approved'?'approved':status==='rejected'?'rejected':status==='suspended'?'suspended':status;
-                const {error:applicationUpdateError}=await this.supabaseClient
+                // Synchronize only the applicant's latest application, so an older historical
+                // application is never accidentally changed by a new membership decision.
+                const {data:latestApplication,error:applicationLookupError}=await this.supabaseClient
                     .from('membership_applications')
-                    .update({status:applicationStatus,updated_at:new Date().toISOString()})
-                    .eq('user_id',member.user_id);
-                if(applicationUpdateError) console.warn('Application status sync:',applicationUpdateError.message);
+                    .select('id')
+                    .eq('user_id',member.user_id)
+                    .order('created_at',{ascending:false})
+                    .limit(1)
+                    .maybeSingle();
+                if(applicationLookupError){
+                    console.warn('Application lookup sync:',applicationLookupError.message);
+                } else if(latestApplication?.id){
+                    const {error:applicationUpdateError}=await this.supabaseClient
+                        .from('membership_applications')
+                        .update({status:applicationStatus,updated_at:new Date().toISOString()})
+                        .eq('id',latestApplication.id);
+                    if(applicationUpdateError) console.warn('Application status sync:',applicationUpdateError.message);
+                }
 
                 await this.loadCloudData();
                 if(status==='approved'){
