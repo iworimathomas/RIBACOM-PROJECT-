@@ -80,7 +80,17 @@
                             ...id,
                             memberId: id.memberId || id.member_id || null,
                             idCardNumber: id.idCardNumber || id.id_card_number || '',
-                            qrCodeData: id.qrCodeData || id.qr_code_data || ''
+                            qrCodeData: id.qrCodeData || id.qr_code_data || '',
+                            expiresAt: id.expiresAt || id.expires_at || null,
+                            issuedAt: id.issuedAt || id.issued_at || null
+                        }));
+                    } else if (key === 'membershipApplications') {
+                        this.db.membershipApplications = value.map(a => ({
+                            ...a,
+                            fullName: a.fullName || a.full_name || '',
+                            userId: a.userId || a.user_id || null,
+                            membershipCategory: a.membershipCategory || a.membership_category || '',
+                            status: a.status || 'pending'
                         }));
                     } else {
                         this.db[key] = value;
