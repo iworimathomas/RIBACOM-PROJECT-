@@ -3,6 +3,7 @@
             constructor() {
                 this.db = {members:[],digitalIds:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
                 this.currentUser = null;
+                this.loginMode = 'member';
                 this.currentView = 'home';
                 this.supabaseClient = null;
                 this.cloudMode = false;
@@ -1423,7 +1424,12 @@
                 ]);
 
                 const role = profile?.role || 'member';
-                const displayRole = role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : role === 'visitor' ? 'Visitor' : 'Member';
+                if (this.loginMode === 'treasurer' && role !== 'treasurer') {
+                    await this.supabaseClient.auth.signOut();
+                    this.toast('This login is reserved for the RIBACOM Treasurer account.', 'error');
+                    return;
+                }
+                const displayRole = role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : role === 'treasurer' ? 'Treasurer' : role === 'visitor' ? 'Visitor' : 'Member';
                 this.currentUser = {
                     id: user.id,
                     userId: user.id,
@@ -1441,7 +1447,7 @@
                 this.closeAuthModal();
                 this.updateAuthHeaderUI();
                 this.toast(`Welcome back, ${this.currentUser.fullName}`, 'success');
-                this.navigate(['super_admin','admin'].includes(role) ? 'admin-dashboard' : 'member-dashboard');
+                this.navigate(role === 'treasurer' ? 'treasurer-dashboard' : (['super_admin','admin'].includes(role) ? 'admin-dashboard' : 'member-dashboard'));
             }
 
             async restoreSupabaseSession() {
@@ -1468,7 +1474,7 @@
                     email: user.email,
                     fullName: profile?.full_name || member?.full_name || user.email,
                     phone: profile?.phone || member?.phone || '',
-                    role: role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : role === 'visitor' ? 'Visitor' : 'Member',
+                    role: role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : role === 'treasurer' ? 'Treasurer' : role === 'visitor' ? 'Visitor' : 'Member',
                     roleKey: role,
                     membershipNumber: member?.membership_number || '',
                     memberId: member?.id || null,
@@ -1491,7 +1497,9 @@
 
             handleAuthAction() {
                 if (this.currentUser) {
-                    if (this.currentUser.role.includes('Admin')) {
+                    if (this.currentUser.roleKey === 'treasurer') {
+                        this.navigate('treasurer-dashboard');
+                    } else if (this.currentUser.role.includes('Admin')) {
                         this.navigate('admin-dashboard');
                     } else {
                         this.navigate('member-dashboard');
@@ -1556,11 +1564,24 @@
             }
 
             openLoginModal() {
+                this.loginMode = 'member';
+                document.getElementById('authModalTitle').innerText = 'Member Login';
+                document.getElementById('registerPrompt').classList.remove('hidden');
                 document.getElementById('authModal').classList.remove('hidden');
+                this.switchAuthTab('login');
+            }
+
+            openTreasurerLoginModal() {
+                this.loginMode = 'treasurer';
+                document.getElementById('authModalTitle').innerText = 'Treasurer Login';
+                document.getElementById('registerPrompt').classList.add('hidden');
+                document.getElementById('authModal').classList.remove('hidden');
+                this.switchAuthTab('login');
             }
 
             closeAuthModal() {
                 document.getElementById('authModal').classList.add('hidden');
+                this.loginMode = 'member';
             }
 
             switchAuthTab(tab) {
