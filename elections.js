@@ -85,7 +85,19 @@
     if(error){this.toast(error.message,'error');return;}await this.supabaseClient.from('election_audit_logs').insert({election_id:data.id,actor_user_id:this.currentUser.id,action:'election_created'});this.toast('Draft election created.','success');this.renderElectionManager();
   };
   RibacomApp.prototype.setElectionStatus=async function(id,status){
-    const {error}=await this.supabaseClient.from('elections').update({status}).eq('id',id);if(error){this.toast(error.message,'error');return;}await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'status_changed',details:{status}});this.renderElectionManager();
+    const {data:e,error:loadError}=await this.supabaseClient.from('elections').select('*,election_positions(id),election_candidates(id,status)').eq('id',id).single();
+    if(loadError||!e){this.toast('Election could not be loaded.','error');return;}
+    if(status==='open'){
+      if(!e.starts_at||!e.ends_at||new Date(e.ends_at)<=new Date(e.starts_at)){this.toast('Set a valid start and end time before opening the election.','warning');return;}
+      if(new Date(e.ends_at)<=new Date()){this.toast('The election end time has already passed.','warning');return;}
+      const positions=e.election_positions||[]; const candidates=(e.election_candidates||[]).filter(c=>c.status==='approved');
+      if(!positions.length){this.toast('Add at least one election position before opening.','warning');return;}
+      for(const p of positions){if(!candidates.some(c=>c.position_id===p.id)){this.toast('Every position must have at least one approved candidate.','warning');return;}}
+    }
+    const {error}=await this.supabaseClient.from('elections').update({status,updated_at:new Date().toISOString()}).eq('id',id);
+    if(error){this.toast(error.message,'error');return;}
+    await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'status_changed',details:{status}});
+    this.renderElectionManager();
   };
   RibacomApp.prototype.manageElectionDetails=async function(id){
     const {data:e}=await this.supabaseClient.from('elections').select('*').eq('id',id).single();
