@@ -14,7 +14,27 @@
                 this.testDigitalId=null;
                 this.initTestMode();
                 this.initSupabase();
+                this.bindSupabaseAuthState();
                 this.restoreSupabaseSession().then(() => this.loadCloudData()).then(() => this.navigate(this.currentView));
+            }
+
+            bindSupabaseAuthState() {
+                if (!this.supabaseClient?.auth) return;
+                try {
+                    this.supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                        if (event === 'SIGNED_OUT') {
+                            this.currentUser = null;
+                            this.updateAuthHeaderUI();
+                            return;
+                        }
+                        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') && session?.user) {
+                            await this.hydrateCurrentUser(session.user);
+                            this.updateAuthHeaderUI();
+                        }
+                    });
+                } catch (error) {
+                    console.warn('Supabase auth listener setup failed:', error);
+                }
             }
 
             initTestMode() {
