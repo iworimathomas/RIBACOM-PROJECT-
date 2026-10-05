@@ -510,80 +510,111 @@
 
             renderMembershipView() {
                 return `
-                    <div class="max-w-2xl mx-auto space-y-6 animate-fadeIn">
+                    <div class="max-w-4xl mx-auto space-y-6 animate-fadeIn">
                         <div class="text-center space-y-2">
-                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Membership Registration</h2>
-                            <p class="text-xs text-gray-600">Register as an officially recognized member of RIBACOM The Gambia.</p>
+                            <span class="inline-flex items-center gap-2 bg-emerald-50 text-ribacom-green px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+                                <i class="fa-solid fa-user-plus"></i> RIBACOM Membership
+                            </span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-ribacom-navy">Membership Application</h2>
+                            <p class="text-xs sm:text-sm text-gray-600">Complete the form below. Your application will remain <strong>Pending</strong> until reviewed by the RIBACOM Secretariat.</p>
                         </div>
 
-                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 card-shadow space-y-6">
-                            <form onsubmit="app.handleMembershipSubmit(event)" class="space-y-4">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name *</label>
-                                        <input type="text" required id="m_fullName" placeholder="e.g. Doubra Briggs" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                        <div class="bg-white p-5 sm:p-8 rounded-3xl border border-gray-100 card-shadow">
+                            <form onsubmit="app.handleMembershipSubmit(event)" class="space-y-7">
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-id-card text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">1. Personal Information</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Full Name *</label><input required id="m_fullName" class="form-input" placeholder="Full legal name"></div>
+                                        <div><label class="form-label">Previous / Other Name</label><input id="m_otherName" class="form-input" placeholder="Maiden or former name, if applicable"></div>
+                                        <div><label class="form-label">Date of Birth</label><input type="date" id="m_dob" class="form-input"></div>
+                                        <div><label class="form-label">Gender</label><select id="m_gender" class="form-input"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+                                        <div><label class="form-label">Nationality *</label><input required id="m_nationality" value="Nigerian" class="form-input"></div>
+                                        <div><label class="form-label">Marital Status</label><select id="m_marital" class="form-input"><option value="">Select</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
+                                        <div><label class="form-label">Passport / National ID Number</label><input id="m_idNumber" class="form-input" placeholder="Optional"></div>
+                                        <div><label class="form-label">Passport Photograph URL</label><input type="url" id="m_photo" class="form-input" placeholder="https://..."></div>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Phone Number (WhatsApp) *</label>
-                                        <input type="tel" required id="m_phone" placeholder="+220 700 0000" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                                    </div>
-                                </div>
+                                </section>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Address *</label>
-                                        <input type="email" required id="m_email" placeholder="name@domain.com" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-map-location-dot text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">2. Rivers / Bayelsa Origin & Membership</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">State of Origin *</label><select required id="m_state" class="form-input"><option value="Rivers State">Rivers State</option><option value="Bayelsa State">Bayelsa State</option><option value="Other / Associate">Associate (Other State/Nationality)</option></select></div>
+                                        <div><label class="form-label">L.G.A</label><input id="m_lga" class="form-input" placeholder="Local Government Area"></div>
+                                        <div><label class="form-label">Town / Community</label><input id="m_originCommunity" class="form-input" placeholder="Town, village or community"></div>
+                                        <div><label class="form-label">Clan / Ward</label><input id="m_clanWard" class="form-input" placeholder="Clan or ward"></div>
+                                        <div><label class="form-label">Membership Category *</label><select required id="m_category" class="form-input"><option value="Regular Member">Regular Member — by birth/ancestry</option><option value="Associate Member">Associate Member — by marriage/affiliation</option></select></div>
+                                        <div><label class="form-label">Previous Community Association</label><input id="m_previousAssociation" class="form-input" placeholder="If applicable"></div>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Account Password *</label>
-                                        <input type="password" required minlength="8" id="m_password" placeholder="At least 8 characters" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-house-user text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">3. Contact & Residence in The Gambia</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Phone / WhatsApp *</label><input required type="tel" id="m_phone" class="form-input" placeholder="+220 ..."></div>
+                                        <div><label class="form-label">Email Address *</label><input required type="email" id="m_email" class="form-input" placeholder="name@example.com"></div>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">State of Origin *</label>
-                                        <select required id="m_state" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                                            <option value="Rivers State">Rivers State</option>
-                                            <option value="Bayelsa State">Bayelsa State</option>
-                                            <option value="Other / Associate">Associate (Other State/Nationality)</option>
-                                        </select>
+                                    <div><label class="form-label">Gambia Residential Address *</label><input required id="m_address" class="form-input" placeholder="Area, street, compound, etc."></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Emergency Contact Name</label><input id="m_emergencyName" class="form-input"></div>
+                                        <div><label class="form-label">Emergency Contact Phone</label><input type="tel" id="m_emergencyPhone" class="form-input"></div>
                                     </div>
-                                </div>
+                                </section>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">L.G.A / Origin Community</label>
-                                        <input type="text" id="m_lga" placeholder="e.g. Yenagoa or Bonny" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-people-roof text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">4. Family & Next of Kin</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Spouse Name</label><input id="m_spouse" class="form-input"></div>
+                                        <div><label class="form-label">Number of Children</label><input type="number" min="0" id="m_children" class="form-input" placeholder="0"></div>
+                                        <div><label class="form-label">Next of Kin</label><input id="m_nextOfKin" class="form-input"></div>
+                                        <div><label class="form-label">Next of Kin Phone</label><input type="tel" id="m_nextOfKinPhone" class="form-input"></div>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Membership Category *</label>
-                                        <select required id="m_category" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                                            <option value="Regular Member">Regular Member (By Ancestry/Birth)</option>
-                                            <option value="Associate Member">Associate Member (By Marriage/Affiliation)</option>
-                                        </select>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-briefcase text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">5. Occupation & Skills</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Occupation / Profession</label><input id="m_occupation" class="form-input"></div>
+                                        <div><label class="form-label">Employer / Business</label><input id="m_employer" class="form-input"></div>
                                     </div>
-                                </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Work Address</label><input id="m_workAddress" class="form-input"></div>
+                                        <div><label class="form-label">Skills / Expertise</label><input id="m_skills" class="form-input" placeholder="e.g. ICT, accounting, construction"></div>
+                                    </div>
+                                </section>
 
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Gambia Residential Address *</label>
-                                    <input type="text" required id="m_address" placeholder="Street, Area, Serrekunda/Banjul" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                                </div>
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-handshake-angle text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">6. Community Participation</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_welfareInterest"> Welfare activities</label>
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_youthInterest"> Youth activities</label>
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_culturalInterest"> Cultural activities</label>
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_volunteer"> Volunteer / service</label>
+                                    </div>
+                                </section>
 
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Passport Photograph URL</label>
-                                    <input type="url" id="m_photo" placeholder="https://..." class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                                    <p class="text-[10px] text-gray-400 mt-1">Optional. Standard placeholder photo applied if left blank.</p>
-                                </div>
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-lock text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">7. Account & Declaration</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Password *</label><input type="password" required minlength="8" id="m_password" class="form-input" placeholder="At least 8 characters"></div>
+                                        <div><label class="form-label">Confirm Password *</label><input type="password" required minlength="8" id="m_passwordConfirm" class="form-input"></div>
+                                    </div>
+                                    <label class="flex gap-3 text-xs text-gray-600"><input type="checkbox" required id="m_constitutionConsent" class="mt-0.5"> I agree to abide by the RIBACOM Constitution and lawful decisions of the Community.</label>
+                                    <label class="flex gap-3 text-xs text-gray-600"><input type="checkbox" required id="m_declaration" class="mt-0.5"> I declare that the information supplied in this application is true and correct to the best of my knowledge.</label>
+                                </section>
 
-                                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1">
-                                    <p class="font-bold"><i class="fa-solid fa-coins mr-1"></i> Membership Fees & Dues Notice:</p>
-                                    <p>Standard monthly dues are <strong>D50 / month</strong>. Submitting this form creates your membership profile pending Secretariat approval.</p>
+                                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                                    <p class="font-extrabold"><i class="fa-solid fa-coins mr-1"></i> Monthly Dues</p>
+                                    <p>RIBACOM membership dues are <strong>D50 per month</strong>. Your application is submitted as <strong>Pending</strong> for Secretariat review. Approval is required before full member benefits and Digital ID issuance.</p>
                                 </div>
-
-                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl text-sm shadow-lg transition">
-                                    Submit Membership Application
-                                </button>
+                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg transition"><i class="fa-solid fa-paper-plane mr-2"></i> Submit Membership Application</button>
                             </form>
                         </div>
                     </div>
+                    <style>
+                        .form-label{display:block;font-size:.7rem;font-weight:800;color:#374151;text-transform:uppercase;margin-bottom:.25rem}
+                        .form-input{width:100%;padding:.6rem .75rem;border:1px solid #e5e7eb;border-radius:.75rem;font-size:.875rem;outline:none}
+                        .form-input:focus{box-shadow:0 0 0 2px rgba(16,185,129,.25);border-color:#10b981}
+                    </style>
                 `;
             }
 
@@ -1072,32 +1103,52 @@
             async handleMembershipSubmit(e) {
                 e.preventDefault();
                 if (!this.supabaseClient) { this.toast('Supabase is not connected.', 'error'); return; }
-                const fullName = document.getElementById('m_fullName').value.trim();
-                const phone = document.getElementById('m_phone').value.trim();
-                const email = document.getElementById('m_email').value.trim().toLowerCase();
-                const state = document.getElementById('m_state').value;
-                const lga = document.getElementById('m_lga').value.trim();
-                const category = document.getElementById('m_category').value.startsWith('Associate') ? 'associate' : 'regular';
-                const address = document.getElementById('m_address').value.trim();
-                const photo = document.getElementById('m_photo').value.trim() || null;
-                const password = document.getElementById('m_password')?.value || '';
-                if (password.length < 8) { this.toast('Create a password of at least 8 characters.', 'warning'); return; }
-                this.toast('Creating your secure RIBACOM account...', 'info');
-                const { data: authData, error: authError } = await this.supabaseClient.auth.signUp({email, password, options:{data:{full_name:fullName, phone}}});
-                if (authError) { this.toast(authError.message, 'error'); return; }
-                const user = authData?.user;
-                if (!user) { this.toast('Account creation did not return a user. Please try again.', 'error'); return; }
-                const { error: profileError } = await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
-                if (profileError) { console.warn(profileError); }
-                if (!authData.session) {
-                    this.toast('Account created. Please verify your email, then sign in to complete your membership application.', 'success');
+                const val = id => document.getElementById(id)?.value?.trim() || '';
+                const checked = id => !!document.getElementById(id)?.checked;
+                const fullName=val('m_fullName'), phone=val('m_phone'), email=val('m_email').toLowerCase();
+                const state=val('m_state'), lga=val('m_lga'), category=val('m_category').startsWith('Associate')?'associate':'regular';
+                const address=val('m_address'), photo=val('m_photo')||null, password=val('m_password'), confirm=val('m_passwordConfirm');
+                if(password.length<8){this.toast('Create a password of at least 8 characters.','warning');return;}
+                if(password!==confirm){this.toast('Passwords do not match.','warning');return;}
+
+                const applicationDetails={
+                    previous_name:val('m_otherName'), date_of_birth:val('m_dob'), gender:val('m_gender'),
+                    nationality:val('m_nationality')||'Nigerian', passport_or_id:val('m_idNumber'),
+                    origin_community:val('m_originCommunity'), clan_ward:val('m_clanWard'),
+                    previous_association:val('m_previousAssociation'), emergency_contact_name:val('m_emergencyName'),
+                    emergency_contact_phone:val('m_emergencyPhone'), spouse_name:val('m_spouse'),
+                    children_count:Number(val('m_children')||0), next_of_kin:val('m_nextOfKin'),
+                    next_of_kin_phone:val('m_nextOfKinPhone'), occupation:val('m_occupation'),
+                    employer_business:val('m_employer'), work_address:val('m_workAddress'), skills:val('m_skills'),
+                    interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
+                    constitution_consent:checked('m_constitutionConsent'), information_declaration:checked('m_declaration'),
+                    application_status:'pending', monthly_dues:'D50'
+                };
+
+                this.toast('Creating your secure RIBACOM account...','info');
+                const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({
+                    email,password,options:{data:{full_name:fullName,phone,application_details:applicationDetails}}
+                });
+                if(authError){this.toast(authError.message,'error');return;}
+                const user=authData?.user;
+                if(!user){this.toast('Account creation did not return a user. Please try again.','error');return;}
+                const {error:profileError}=await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
+                if(profileError) console.warn('Profile sync:',profileError.message);
+
+                if(!authData.session){
+                    this.toast('Application saved with your account. Please verify your email, then sign in.','success');
                     this.openLoginModal();
                     return;
                 }
-                const { error } = await this.supabaseClient.from('members').upsert({user_id:user.id,full_name:fullName,email,phone,state_of_origin:state === 'Other / Associate' ? 'Other' : state,lga,address,photo_url:photo,nationality:'Nigerian',category,status:'pending'},{onConflict:'user_id'});
-                if (error) { this.toast(error.message, 'error'); return; }
+
+                const {error}=await this.supabaseClient.from('members').upsert({
+                    user_id:user.id,full_name:fullName,email,phone,
+                    state_of_origin:state==='Other / Associate'?'Other':state,lga,address,
+                    photo_url:photo,nationality:applicationDetails.nationality,category,status:'pending'
+                },{onConflict:'user_id'});
+                if(error){this.toast(error.message,'error');return;}
                 await this.hydrateCurrentUser(user);
-                this.toast('Membership application submitted for Secretariat approval.', 'success');
+                this.toast('Membership application submitted for Secretariat approval.','success');
                 await this.loadCloudData();
                 this.navigate('member-dashboard');
             }
