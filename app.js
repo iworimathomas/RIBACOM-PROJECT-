@@ -234,6 +234,59 @@
                 this.navigate('member-dashboard');
             }
 
+            renderBasicPublicView(view) {
+                const titles={about:'About RIBACOM',members:'Members',announcements:'News & Announcements',events:'Events',gallery:'Media Gallery',publications:'Publications',youth:'Youth Wing',advisers:'Council of Advisers',contact:'Contact Us',constitution:'Constitution'};
+                const keyMap={announcements:'announcements',events:'events',gallery:'gallery',publications:'publications',advisers:'advisers',constitution:'constitution'};
+                const title=titles[view]||'RIBACOM';
+                const key=keyMap[view];
+                let body='';
+                if(view==='home') body='<div class="bg-ribacom-navy text-white rounded-3xl p-7 sm:p-10 border-b-4 border-ribacom-gold"><span class="text-ribacom-gold text-xs font-black uppercase">Official Community Portal</span><h1 class="text-3xl sm:text-5xl font-extrabold mt-2">'+esc(window.RIBACOM_CONFIG?.orgName||'RIBACOM')+'</h1><p class="mt-3 text-sm text-gray-200">'+esc(window.RIBACOM_CONFIG?.officialName||'Rivers Bayelsa Community in Diaspora The Gambia')+'</p><p class="mt-4 text-ribacom-gold font-extrabold">'+esc(window.RIBACOM_CONFIG?.motto||'TRUTH • UNITY • SERVICE')+'</p><div class="mt-6 flex flex-wrap gap-2"><button onclick="app.navigate(\'membership\')" class="bg-ribacom-gold text-ribacom-navy px-5 py-3 rounded-xl font-extrabold text-sm">Join RIBACOM</button><button onclick="app.navigate(\'announcements\')" class="bg-white/10 border border-white/20 px-5 py-3 rounded-xl font-bold text-sm">Latest News</button></div></div>';
+                else if(view==='membership') body='<div class="bg-white rounded-3xl border p-6"><h2 class="text-2xl font-extrabold text-ribacom-navy">RIBACOM Membership</h2><p class="text-sm text-gray-600 mt-2">Membership applications are submitted through the secure member portal.</p><button onclick="app.openLoginModal()" class="mt-5 bg-ribacom-green text-white px-5 py-3 rounded-xl font-bold">Login / Apply for Membership</button></div>';
+                else if(view==='contact') body='<div class="bg-white rounded-3xl border p-6"><h2 class="text-2xl font-extrabold text-ribacom-navy">Contact RIBACOM</h2><div class="mt-4 space-y-2 text-sm text-gray-700"><p><b>Secretariat:</b> Agricultural Hall, Opposite Charles Jaw School, Bundung</p><p><b>Email:</b> ribacomgambia@gmail.com</p><p><b>Chairman / President:</b> +220 877991397</p><p><b>Secretary General:</b> +220 833586955</p><p><b>Welfare Officer:</b> +220 877039287</p></div></div>';
+                else {
+                    const rows=(this.db[key]||[]);
+                    body='<div class="space-y-4">'+(rows.length?rows.map(x=>'<article class="bg-white rounded-2xl border p-5"><h3 class="font-extrabold text-ribacom-navy">'+esc(x.title||x.name||x.article_title||'RIBACOM Record')+'</h3><p class="text-sm text-gray-600 mt-2">'+esc(x.description||x.content||x.caption||x.article_text||'')+'</p></article>').join(''):'<div class="bg-white rounded-2xl border p-6 text-sm text-gray-500">No published records are currently available.</div>')+'</div>';
+                }
+                return '<div class="max-w-5xl mx-auto space-y-5 animate-fadeIn"><div><h2 class="text-2xl font-extrabold text-ribacom-navy">'+esc(title)+'</h2><p class="text-xs text-gray-500">RIBACOM Digital Ecosystem</p></div>'+body+'</div>';
+            }
+
+            navigate(view, params=null) {
+                this.currentView=view||'home';
+                const protectedViews=['member-dashboard','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
+                if(protectedViews.includes(this.currentView) && !this.currentUser){
+                    this.toast('Please sign in to access this portal.','warning');
+                    this.openLoginModal();
+                    return;
+                }
+                let html;
+                try {
+                    if(this.currentView==='member-dashboard') html=this.renderMemberDashboardView?.();
+                    else if(this.currentView==='admin-dashboard') html=this.renderAdminDashboardView?.();
+                    else if(this.currentView==='admin-digital-ids') html=this.renderAdminDigitalIdsView?.();
+                    else if(this.currentView==='admin-members') html=this.renderMembershipReviewD7?.();
+                    else if(this.currentView==='admin-constitution') html=this.renderAdminConstitutionD5?.();
+                    else if(this.currentView==='admin-gallery') html=this.renderAdminGalleryD5?.();
+                    else if(this.currentView==='admin-system') html=this.renderD7Page?.(this.currentView);
+                    else if(this.currentView==='treasurer-dashboard') html=this.renderTreasurerDashboardView?.();
+                    else if(this.currentView==='finance') html=this.renderFinanceView?.();
+                    else if(this.currentView==='finance-reports') html=this.renderFinanceReports?.();
+                    else if(this.currentView==='approval-center') html=this.renderApprovalCenter?.();
+                    else if(this.currentView==='executive-work') html=this.renderExecutiveWorkCenter?.();
+                    else if(this.currentView==='digital-id') html=this.renderDigitalIdView?.();
+                    else if(this.currentView==='elections') html=this.renderElectionsView?.();
+                    else html=this.renderBasicPublicView(this.currentView);
+                    const target=document.getElementById('appViewport');
+                    if(target) {
+                        if(html && typeof html.then==='function') html.then(h=>{target.innerHTML=h||'';this.updateAuthHeaderUI();window.scrollTo({top:0,behavior:'smooth'});});
+                        else { target.innerHTML=html||this.renderBasicPublicView(this.currentView); this.updateAuthHeaderUI(); window.scrollTo({top:0,behavior:'smooth'}); }
+                    }
+                } catch(error) {
+                    console.error('RIBACOM navigation error:',error);
+                    const target=document.getElementById('appViewport');
+                    if(target) target.innerHTML='<div class="bg-white rounded-2xl border border-red-200 p-6 text-red-700"><b>RIBACOM page error.</b><p class="text-sm mt-1">Please try this page again.</p></div>';
+                }
+            }
+
             updateAuthHeaderUI() {
                 const container = document.getElementById('authButtonsContainer');
                 const miniStatus = document.getElementById('userMiniStatus');
