@@ -550,7 +550,7 @@
                 const canSearch=!!u.id;
                 const modules=[
                     {id:'membership',icon:'fa-users',title:'Membership',desc:'Applications, member records and membership services.',show:true},
-                    {id:'digital-id',icon:'fa-id-card',title:'Elections & Voting\n                            <span class="text-xs text-gray-500 block mt-1">Secure member elections</span>\n                        </div><div class="module-card cursor-pointer" onclick="app.navigate('elections')">Digital ID & Verification',desc:'View and verify official RIBACOM Digital IDs.',show:true},
+                    {id:'elections',icon:'fa-check-to-slot',title:'Elections & Voting',desc:'Secure member elections and voting.',show:!!u.id},\n                    {id:'digital-id',icon:'fa-id-card',title:'Digital ID & Verification',desc:'View and verify official RIBACOM Digital IDs.',show:true},
                     {id:'finance',icon:'fa-coins',title:'Finance & Dues',desc:'Dues, payment records and financial services.',show:!!u.id||isAdmin},
                     {id:'welfare',icon:'fa-hand-holding-heart',title:'Welfare',desc:'Welfare benefits, claims and support.',show:true},
                     {id:'announcements',icon:'fa-bullhorn',title:'News & Announcements',desc:'Official RIBACOM communications.',show:true},
