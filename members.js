@@ -3,6 +3,23 @@
   const regular = 'regular';
   const associate = 'associate';
   function clean(v){ return String(v ?? '').trim(); }
+  function normalizeCategory(v){
+    const s=String(v ?? '').trim().toLowerCase();
+    if(s.includes('associate')) return associate;
+    return regular;
+  }
+  function displayCategory(v){
+    return normalizeCategory(v)===associate ? 'Associate Member' : 'Regular Member';
+  }
+  function normalizeStatus(v){
+    const s=String(v ?? '').trim().toLowerCase().replace(/[- ]+/g,'_');
+    return s || 'pending';
+  }
+  function displayStatus(v){
+    const labels={pending:'Pending',under_review:'Under Review',approved:'Approved',rejected:'Rejected',suspended:'Suspended',active:'Active'};
+    const s=normalizeStatus(v);
+    return labels[s] || String(v ?? 'Pending').replace(/[_-]+/g,' ').replace(/\b\w/g,m=>m.toUpperCase());
+  }
   window.RIBACOM_MEMBERSHIP_CATEGORIES = { regular, associate };
 
   RibacomApp.prototype.handleMembershipSubmit = async function(e){
@@ -23,7 +40,7 @@
     if(!checked('m_constitutionConsent') || !checked('m_declaration')) return this.toast('Please accept the Constitution consent and declaration before submitting.','warning');
 
     const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
-    const category=val('m_category').toLowerCase().includes('associate')?'associate':'regular';
+    const category=normalizeCategory(val('m_category'));
     const details={
       previous_name:val('m_otherName'),date_of_birth:val('m_dob'),gender:val('m_gender'),
       nationality:val('m_nationality')||'Nigerian',passport_or_id:val('m_idNumber'),
@@ -116,7 +133,7 @@
       '<div class="grid md:grid-cols-3 gap-4"><div class="bg-white rounded-2xl p-5 card-shadow"><p class="text-[11px] uppercase font-bold text-gray-400">Membership Status</p><div class="mt-3 inline-flex px-3 py-1 rounded-full text-xs font-extrabold '+badge+'">'+escv(statusLabel)+'</div></div>'+
       '<div class="bg-white rounded-2xl p-5 card-shadow"><p class="text-[11px] uppercase font-bold text-gray-400">Membership Number</p><p class="mt-3 text-lg font-extrabold text-ribacom-green">'+escv(member.membershipNo||member.membership_number||'Not issued')+'</p></div>'+
       '<div class="bg-white rounded-2xl p-5 card-shadow"><p class="text-[11px] uppercase font-bold text-gray-400">Digital ID</p><p class="mt-3 text-lg font-extrabold text-ribacom-navy">'+(digital?escv(digital.idCardNumber):'Not issued')+'</p></div></div>'+
-      '<div class="grid lg:grid-cols-2 gap-5"><div class="bg-white rounded-3xl p-6 card-shadow"><h3 class="font-extrabold text-ribacom-navy">My Membership Application</h3><div class="mt-4 space-y-3 text-sm"><div class="flex justify-between gap-4"><span class="text-gray-500">Applicant</span><b>'+escv(application.full_name||member.fullName||u.fullName)+'</b></div><div class="flex justify-between gap-4"><span class="text-gray-500">Category</span><b>'+escv(application.membership_category||member.category||'Member')+'</b></div><div class="flex justify-between gap-4"><span class="text-gray-500">Application status</span><b>'+escv(statusLabel)+'</b></div></div></div>'+
+      '<div class="grid lg:grid-cols-2 gap-5"><div class="bg-white rounded-3xl p-6 card-shadow"><h3 class="font-extrabold text-ribacom-navy">My Membership Application</h3><div class="mt-4 space-y-3 text-sm"><div class="flex justify-between gap-4"><span class="text-gray-500">Applicant</span><b>'+escv(application.full_name||member.fullName||u.fullName)+'</b></div><div class="flex justify-between gap-4"><span class="text-gray-500">Category</span><b>'+escvdisplayCategory(application.membership_category||member.category||'regular')+'</b></div><div class="flex justify-between gap-4"><span class="text-gray-500">Application status</span><b>'+escv(statusLabel)+'</b></div></div></div>'+
       '<div class="bg-white rounded-3xl p-6 card-shadow"><h3 class="font-extrabold text-ribacom-navy">My Digital Identity</h3>'+digitalHtml+'</div></div>'+
       '<div class="bg-white rounded-3xl p-6 card-shadow"><div class="flex flex-wrap gap-3"><button onclick="app.navigate(\'member-profile\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl text-xs font-bold">My Profile</button><button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Digital ID</button><button onclick="app.navigate(\'home\')" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-xs font-bold">Back Home</button></div></div>'+
       '</div>';
