@@ -121,6 +121,81 @@
     this.navigate('member-dashboard');
   };
 
+  // Complete the Secretariat approval chain: application -> member -> membership number -> Digital ID.
+  // This method is intentionally kept in the membership module so admin approval cannot
+  // silently call a missing function and leave the application/member records out of sync.
+  RibacomApp.prototype.approveMembershipApplication = async function(applicationId){
+    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return this.toast('Admin approval required.','error');
+    if(!this.supabaseClient) return this.toast('Supabase connection is unavailable.','error');
+    const {data:application,error:applicationError}=await this.supabaseClient
+      .from('membership_applications').select('*').eq('id',applicationId).maybeSingle();
+    if(applicationError) return this.toast(applicationError.message,'error');
+    if(!application) return this.toast('Membership application not found.','error');
+    if(['approved','rejected','suspended'].includes(String(application.status||'').toLowerCase()) && application.status!=='approved')
+      return this.toast('This application has already been decided.','warning');
+
+    let member=null;
+    const {data:existingMember,error:memberLookupError}=await this.supabaseClient
+      .from('members').select('*').eq('user_id',application.user_id).maybeSingle();
+    if(memberLookupError) return this.toast(memberLookupError.message,'error');
+    member=existingMember;
+
+    const category=String(application.membership_category||'regular').toLowerCase().includes('associate')?'associate':'regular';
+    let membershipNumber=member?.membership_number||null;
+    if(!membershipNumber){
+      for(let attempt=0;attempt<12;attempt++){
+        const candidate='RBC-GM-'+new Date().getFullYear()+'-'+String(Date.now()).slice(-6)+(attempt?'-'+attempt:'');
+        const {data:conflict,error:checkError}=await this.supabaseClient.from('members').select('id').eq('membership_number',candidate).maybeSingle();
+        if(checkError) return this.toast(checkError.message,'error');
+        if(!conflict){membershipNumber=candidate;break;}
+      }
+    }
+    if(!membershipNumber) return this.toast('Unable to generate a unique membership number.','error');
+
+    const memberPayload={
+      user_id:application.user_id,
+      full_name:application.full_name,
+      email:application.email,
+      phone:application.phone,
+      date_of_birth:application.date_of_birth||null,
+      gender:application.gender||null,
+      address:application.current_address||null,
+      nationality:application.nationality||'Nigerian',
+      state_of_origin:application.state_of_origin||null,
+      lga:application.lga||null,
+      rivers_bayelsa_connection:application.rivers_bayelsa_connection||null,
+      category,
+      status:'approved',
+      membership_number:membershipNumber,
+      photo_url:application.photo_url||null,
+      emergency_contact_name:application.emergency_contact_name||null,
+      emergency_contact_phone:application.emergency_contact_phone||null,
+      updated_at:new Date().toISOString()
+    };
+    const {data:upsertedMember,error:memberError}=await this.supabaseClient
+      .from('members').upsert(memberPayload,{onConflict:'user_id'}).select('*').maybeSingle();
+    if(memberError) return this.toast('Member approval failed: '+memberError.message,'error');
+    member=upsertedMember;
+
+    const now=new Date().toISOString();
+    const {error:applicationUpdateError}=await this.supabaseClient.from('membership_applications').update({
+      status:'approved',reviewed_by:this.currentUser.id,reviewed_at:now,updated_at:now
+    }).eq('id',applicationId);
+    if(applicationUpdateError) return this.toast('Member was approved, but application synchronization failed: '+applicationUpdateError.message,'error');
+
+    await this.loadCloudData();
+    const existingId=(this.db.digitalIds||[]).find(x=>x.memberId===member.id||x.member_id===member.id);
+    if(!existingId && typeof this.createDigitalId==='function'){
+      await this.createDigitalId(member.id);
+    } else if(existingId){
+      this.toast('Application approved. Digital ID is already available.','success');
+      this.navigate('member-dashboard');
+    } else {
+      this.toast('Application approved and member record created, but Digital ID service is unavailable.','warning');
+      this.navigate('admin-members');
+    }
+  };
+
   RibacomApp.prototype.renderMemberDashboardView = function(){
     const u=this.currentUser||{};
     const member=(this.db.members||[]).find(m=>m.id===u.memberId)||{};
