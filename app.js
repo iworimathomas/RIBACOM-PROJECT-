@@ -34,6 +34,10 @@
                     created_at:new Date().toISOString()
                 };
                 this.testDigitalId = null;
+                if (this.testMode) {
+                    this.db.members = [this.testMember];
+                    this.db.digitalIds = [];
+                }
                 if (this.testMode) this.currentUser={id:'TEST-USER-001',memberId:'TEST-RIBACOM-001',roleKey:'member',email:'test-member@ribacom.test',full_name:'RIBACOM Test Member'};
             }
 
@@ -47,14 +51,20 @@
                 if (!this.testMode) return;
                 this.testMember.status='approved';
                 this.testMember.membership_number='RBC-TEST-0001';
+                this.testMember.membershipNo=this.testMember.membership_number;
+                this.testMember.fullName=this.testMember.full_name;
+                this.testMember.stateOfOrigin=this.testMember.state_of_origin;
                 this.testDigitalId={
                     id:'TEST-DIGITAL-ID-001',
                     memberId:this.testMember.id,
-                    membership_number:this.testMember.membership_number,
+                    idCardNumber:'RBC-ID-TEST-0001',
+                    qrCodeData:`RIBACOM-GAMBIA|ID:RBC-ID-TEST-0001|MEMBER:${this.testMember.id}|NAME:${this.testMember.full_name}`,
                     status:'active',
-                    issue_date:new Date().toISOString(),
-                    expiry_date:new Date(Date.now()+365*24*60*60*1000).toISOString()
+                    issued_at:new Date().toISOString(),
+                    expires_at:new Date(Date.now()+365*24*60*60*1000).toISOString()
                 };
+                this.db.members=[this.testMember];
+                this.db.digitalIds=[this.testDigitalId];
                 this.toast('TEST MODE: Membership approved and Digital ID generated. No real database record was changed.','success');
                 this.navigate('digital-id');
             }
@@ -90,6 +100,7 @@
             }
 
             async loadCloudData() {
+                if (this.testMode) return;
                 if (!this.supabaseClient) return;
                 const q = async (table, options = {}) => {
                     let query = this.supabaseClient.from(table).select(options.select || '*');
