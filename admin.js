@@ -210,7 +210,10 @@
     const issuedAt=new Date();
     const expiresAt=new Date(issuedAt); expiresAt.setFullYear(expiresAt.getFullYear()+1);
     const qr=`RIBACOM-GAMBIA|ID:${membershipNumber}|MEMBER:${memberId}|NAME:${a.full_name}`;
-    const {error:de}=await this.supabaseClient.from('digital_ids').upsert({member_id:memberId,id_card_number:membershipNumber,qr_code_data:qr,status:'active',issued_at:issuedAt.toISOString(),expires_at:expiresAt.toISOString()},{onConflict:'member_id'});
+    const {data:existingDigitalId,error:deRead}=await this.supabaseClient.from('digital_ids').select('id,id_card_number,status,issued_at,expires_at').eq('member_id',memberId).maybeSingle();
+    if(deRead){this.toast(deRead.message,'error');return;}
+    const digitalPayload={member_id:memberId,id_card_number:membershipNumber,qr_code_data:qr,status:'active',issued_at:existingDigitalId?.issued_at||issuedAt.toISOString(),expires_at:expiresAt.toISOString()};
+    const {error:de}=await this.supabaseClient.from('digital_ids').upsert(digitalPayload,{onConflict:'member_id'});
     if(de){this.toast(de.message,'error');return;}
     const {error:rv}=await this.supabaseClient.from('membership_applications').update({status:'approved',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id);
     if(rv){this.toast(rv.message,'error');return;}
