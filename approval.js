@@ -105,7 +105,8 @@
 
   const oldNav=RibacomApp.prototype.navigate;
   RibacomApp.prototype.navigate=function(v,p=null){
-    if(v==='executive-work'){this.currentView=v;const c=document.getElementById('appViewport');if(c)c.innerHTML=this.renderExecutiveWorkCenter();this.updateAuthHeaderUI();return}\n    if(v==='approval-center'){
+    if(v==='executive-work'){this.currentView=v;const c=document.getElementById('appViewport');if(c)c.innerHTML=this.renderExecutiveWorkCenter();this.updateAuthHeaderUI();return}
+    if(v==='approval-center'){
       this.currentView=v;
       const c=document.getElementById('appViewport');
       this.renderApprovalCenter().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI()});
