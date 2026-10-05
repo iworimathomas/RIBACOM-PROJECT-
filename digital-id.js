@@ -28,6 +28,17 @@
     await this.loadCloudData(); this.toast('Digital ID updated.','success'); this.navigate('admin-digital-ids');
   };
 
+  RibacomApp.prototype.verifyDigitalId = async function(idNumber) {
+    const number=String(idNumber||'').trim();
+    if(!number) return {valid:false,message:'Enter a Digital ID number.'};
+    const {data,error}=await this.supabaseClient.from('digital_ids').select('id,id_card_number,status,expires_at,member_id').eq('id_card_number',number).maybeSingle();
+    if(error) return {valid:false,message:error.message};
+    if(!data) return {valid:false,message:'Digital ID not found.'};
+    const expired=data.expires_at && new Date(data.expires_at).getTime()<Date.now();
+    if(data.status!=='active'||expired) return {valid:false,message:'Digital ID is not active.'};
+    return {valid:true,id:data.id,idCardNumber:data.id_card_number,status:'active',expiresAt:data.expires_at};
+  };
+
   RibacomApp.prototype.changeDigitalIdStatus = async function(id,status) {
     if (!admin(this)) return;
     if (!['active','suspended','revoked','expired'].includes(status)) return;
