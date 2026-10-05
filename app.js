@@ -18,6 +18,60 @@
                 this.restoreSupabaseSession().then(() => this.loadCloudData()).then(() => this.navigate(this.currentView));
             }
 
+            initSupabase() {
+                try {
+                    const cfg = window.RIBACOM_CONFIG || {};
+                    if (!window.supabase?.createClient || !cfg.supabaseUrl || !cfg.supabaseKey) {
+                        console.warn('RIBACOM Supabase configuration is unavailable.');
+                        return;
+                    }
+                    this.supabaseClient = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey, {
+                        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+                    });
+                    this.cloudMode = true;
+                } catch (error) {
+                    console.error('Supabase initialization failed:', error);
+                    this.supabaseClient = null;
+                    this.cloudMode = false;
+                }
+            }
+
+            async loadCloudData() {
+                if (!this.supabaseClient) return this.db;
+                const sources = {
+                    members: 'members',
+                    digitalIds: 'digital_ids',
+                    leadership: 'leadership',
+                    advisers: 'advisers',
+                    constitution: 'constitution',
+                    announcements: 'announcements',
+                    events: 'events',
+                    gallery: 'gallery',
+                    publications: 'publications',
+                    paymentSettings: 'payment_settings',
+                    welfareRequests: 'welfare_requests',
+                    financeTransactions: 'finance_transactions',
+                    membershipApplications: 'membership_applications',
+                    youthContent: 'youth_content',
+                    aboutContent: 'ribacom_about_content'
+                };
+                const results = await Promise.all(Object.entries(sources).map(async ([key, table]) => {
+                    try {
+                        const { data, error } = await this.supabaseClient.from(table).select('*');
+                        return [key, error ? [] : (data || [])];
+                    } catch (error) {
+                        console.warn('RIBACOM data load failed for '+table+':', error);
+                        return [key, []];
+                    }
+                }));
+                for (const [key, value] of results) {
+                    if (key === 'youthContent') this.db.youth = value[0] || this.db.youth;
+                    else if (key === 'aboutContent') this.db.about = value[0] || this.db.about;
+                    else this.db[key] = value;
+                }
+                return this.db;
+            }
+
             bindSupabaseAuthState() {
                 if (!this.supabaseClient?.auth) return;
                 try {
