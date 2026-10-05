@@ -1613,7 +1613,14 @@
             }
         }
 
-        // Global Initialization
+                // Shared HTML escaping helper used by all modular views.
+        function esc(value) {
+            return String(value ?? '').replace(/[&<>"']/g, ch => ({
+                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+            }[ch]));
+        }
+
+// Global Initialization
         let app;
         window.addEventListener('DOMContentLoaded', () => {
             app = new RibacomApp();
