@@ -75,7 +75,7 @@
           <h3 class="text-xl font-extrabold mt-1">${esc(member?.fullName || member?.full_name || this.currentUser?.fullName || 'Member')}</h3>
           <div class="text-sm mt-2">ID: <strong>${esc(mine.idCardNumber || mine.id_card_number)}</strong></div>
           <div class="text-xs mt-1 opacity-80">Status: ${esc(mine.status || 'active')} • Expires: ${esc((mine.expires_at || mine.expiresAt || '').slice(0,10) || '—')}</div></div>
-          <i class="fa-solid fa-id-card text-3xl text-ribacom-gold"></i>
+          <div id="ribacomDigitalIdQr" class="bg-white rounded-xl p-2 shrink-0"></div>
         </div>
       </div>` : '';
     return `
@@ -96,6 +96,16 @@
           <div id="ribacomDigitalIdVerifyResult" class="mt-4 hidden"></div>
         </div>
       </div>`;
+  };
+
+  RibacomApp.prototype.renderDigitalIdQr = function() {
+    const box=document.getElementById('ribacomDigitalIdQr');
+    if(!box || typeof QRCode==='undefined') return;
+    const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === this.currentUser?.memberId);
+    if(!mine) return;
+    const data=mine.qrCodeData || mine.qr_code_data || ('RIBACOM-GAMBIA|ID:'+(mine.idCardNumber || mine.id_card_number));
+    box.innerHTML='';
+    new QRCode(box,{text:data,width:110,height:110});
   };
 
   RibacomApp.prototype.verifyDigitalIdFromView = async function() {
@@ -120,7 +130,7 @@
     if(view === 'digital-id') {
       this.currentView=view;
       const container=document.getElementById('appViewport');
-      if(container) container.innerHTML=this.renderDigitalIdView();
+      if(container) { container.innerHTML=this.renderDigitalIdView(); setTimeout(()=>this.renderDigitalIdQr(),0); }
       this.updateAuthHeaderUI();
       return;
     }
