@@ -106,11 +106,14 @@
       return;
     }
 
+    // Create the pending member row only when the authenticated session is available.
+    // The membership application remains the authoritative record until Secretariat approval.
     const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
     const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
     if(memberError){
-      this.toast('Account created, but the member record could not be created: '+memberError.message,'error');
-      return;
+      // Do not fail the application after the authoritative application row was saved.
+      console.warn('Pending member sync:',memberError.message);
+      this.toast('Application saved. Your member profile will be synchronized after verification.','success');
     }
 
     await this.hydrateCurrentUser(user); await this.loadCloudData();
