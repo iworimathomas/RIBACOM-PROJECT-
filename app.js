@@ -259,6 +259,10 @@
                         if (!this.currentUser) { this.toast('Please log in to use Unified Ecosystem Search.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
                         container.innerHTML = this.renderEcosystemSearchView();
                         break;
+                    case 'ecosystem-communication':
+                        if (!this.currentUser) { this.toast('Please log in to access Communications.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
+                        container.innerHTML = this.renderEcosystemCommunicationView();
+                        break;
                     case 'digital-ecosystem':
                         container.innerHTML = this.renderDigitalEcosystemView();
                         break;
@@ -430,6 +434,45 @@
                 root.innerHTML='<div class="space-y-3">'+out.map(x=>`<button onclick="app.navigate('${x.action}')" class="w-full text-left bg-white rounded-2xl border border-gray-100 card-shadow p-4 flex items-center gap-4 hover:border-ribacom-green transition"><div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center"><i class="fa-solid ${x.icon}"></i></div><div class="min-w-0 flex-1"><div class="text-[9px] uppercase font-extrabold text-gray-400">${x.type}</div><div class="font-extrabold text-ribacom-navy truncate">${esc(x.title)}</div><div class="text-xs text-gray-500 truncate">${esc(x.desc)}</div></div><i class="fa-solid fa-arrow-right text-gray-300"></i></button>`).join('')+'</div>';
             }
 
+            renderEcosystemCommunicationView() {
+                const u=this.currentUser||{};
+                if(!u.id) return '<div class="max-w-3xl mx-auto p-8 text-center">Please log in to access RIBACOM Communications.</div>';
+                const role=(u.roleKey||'member').toLowerCase();
+                const canManage=['admin','super_admin','president','secretary_general','pro'].includes(role);
+                const notices=[];
+                const add=(type,title,body,date,action,icon)=>notices.push({type,title,body,date,action,icon});
+                this.db.announcements.filter(x=>x.is_published!==false).slice(0,10).forEach(x=>add('Official Notice',x.title,x.description||x.content||'RIBACOM announcement',x.date||x.created_at?.slice(0,10),'announcements','fa-bullhorn'));
+                this.db.events.filter(x=>x.date && x.date>=new Date().toISOString().slice(0,10)).slice(0,6).forEach(x=>add('Upcoming Event',x.title,x.description||x.location||'RIBACOM event',x.date,'events','fa-calendar-days'));
+                if(['admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general'].includes(role)){
+                    const pending=this.db.membershipApplications.filter(x=>x.status==='pending').length;
+                    if(pending) add('Internal Alert',pending+' membership application'+(pending===1?'':'s')+' awaiting review','Internal membership administration requires attention.',new Date().toISOString().slice(0,10),'admin-members','fa-user-plus');
+                }
+                if(['admin','super_admin','president','vice_president','welfare_officer'].includes(role)){
+                    const pending=this.db.welfareRequests.filter(x=>['pending','under_review'].includes(x.status)).length;
+                    if(pending) add('Welfare Alert',pending+' welfare request'+(pending===1?'':'s')+' in progress','Review welfare support activity in the ecosystem.',new Date().toISOString().slice(0,10),'welfare','fa-hand-holding-heart');
+                }
+                return `
+                    <div class="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
+                            <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ribacom-gold">RIBACOM DIGITAL ECOSYSTEM</span>
+                            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mt-1">
+                                <div><h2 class="text-2xl sm:text-3xl font-extrabold">Member Communication Centre</h2><p class="text-sm text-gray-300 mt-2">A central communication layer for official notices, upcoming activities and authorized internal alerts.</p></div>
+                                ${canManage?'<button onclick="app.navigate(\'announcements\')" class="bg-white text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-extrabold">Manage Official Notices</button>':''}
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Notices</div><div class="text-2xl font-extrabold text-ribacom-navy mt-1">${notices.filter(x=>x.type==='Official Notice').length}</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Events</div><div class="text-2xl font-extrabold text-ribacom-green mt-1">${notices.filter(x=>x.type==='Upcoming Event').length}</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] uppercase font-bold text-amber-600">Alerts</div><div class="text-2xl font-extrabold mt-1">${notices.filter(x=>x.type!=='Official Notice'&&x.type!=='Upcoming Event').length}</div></div>
+                        </div>
+                        <div class="space-y-3">
+                            ${notices.length?notices.map(x=>`<button onclick="app.navigate('${x.action}')" class="w-full text-left bg-white rounded-2xl border border-gray-100 card-shadow p-4 sm:p-5 flex gap-4 hover:border-ribacom-green transition"><div class="w-11 h-11 rounded-2xl bg-emerald-50 text-ribacom-green flex items-center justify-center shrink-0"><i class="fa-solid ${x.icon}"></i></div><div class="flex-1 min-w-0"><div class="text-[9px] uppercase font-extrabold text-gray-400">${x.type} • ${esc(x.date||'')}</div><h3 class="font-extrabold text-ribacom-navy mt-1">${esc(x.title)}</h3><p class="text-xs text-gray-500 mt-1 line-clamp-2">${esc(x.body)}</p></div><i class="fa-solid fa-chevron-right text-gray-300 self-center"></i></button>`).join(''):'<div class="bg-white rounded-3xl border border-gray-100 p-10 text-center text-sm text-gray-500">No communications are currently available.</div>'}
+                        </div>
+                        <div class="bg-ribacom-navy text-white rounded-3xl p-5"><div class="font-extrabold">Official communication policy</div><p class="text-xs text-gray-300 mt-1">Official RIBACOM notices remain connected to the existing publication and approval workflow. This centre does not create a separate messaging database.</p></div>
+                        <div class="flex gap-2"><button onclick="app.navigate('digital-ecosystem')" class="bg-ribacom-navy text-white px-4 py-2.5 rounded-xl text-xs font-bold">Back to Ecosystem</button><button onclick="app.loadCloudData().then(()=>app.navigate('ecosystem-communication'))" class="bg-white border border-gray-200 text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-bold">Refresh</button></div>
+                    </div>`;
+            }
+
             renderDigitalEcosystemView() {
                 const u=this.currentUser||{};
                 const role=(u.roleKey||'guest').toLowerCase();
@@ -521,6 +564,7 @@
                     {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Executive tasks and organizational work.',show:isExec||isAdmin}
                 ];
                 modules.push({id:'ecosystem-search',icon:'fa-magnifying-glass',title:'Unified Ecosystem Search',desc:'Search authorized RIBACOM records from one place.',show:canSearch});
+                modules.push({id:'ecosystem-communication',icon:'fa-comments',title:'Communication Centre',desc:'Official notices, events and authorized internal alerts.',show:canSearch});
                 const visible=modules.filter(x=>x.show);
 
                 return `
