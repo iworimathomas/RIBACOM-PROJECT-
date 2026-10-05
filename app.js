@@ -509,7 +509,14 @@
                 const member=this.db.members.find(m=>m.id===memberId); if(!member){this.toast('Member not found.','error');return;}
                 if(member.status!=='approved'){this.toast('Only approved members can receive a Digital ID.','warning');return;}
                 const existing=this.db.digitalIds.find(x=>x.memberId===memberId || x.member_id===memberId); if(existing){this.toast('This member already has a Digital ID. Use edit/renew instead.','warning');return;}
-                const idCardNumber=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+                let idCardNumber=null;
+                for(let attempt=0;attempt<8;attempt++){
+                    const candidate=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}${attempt?'-'+attempt:''}`;
+                    const {data:conflict,error:checkError}=await this.supabaseClient.from('digital_ids').select('id').eq('id_card_number',candidate).maybeSingle();
+                    if(checkError){this.toast(checkError.message,'error');return;}
+                    if(!conflict){idCardNumber=candidate;break;}
+                }
+                if(!idCardNumber){this.toast('Unable to generate a unique Digital ID number. Please try again.','error');return;}
                 const qr=`RIBACOM-GAMBIA|ID:${idCardNumber}|MEMBER:${memberId}|NAME:${member.fullName}`;
                 const expiry=new Date(); expiry.setFullYear(expiry.getFullYear()+1); const {error}=await this.supabaseClient.from('digital_ids').insert({member_id:memberId,id_card_number:idCardNumber,qr_code_data:qr,status:'active',issued_at:new Date().toISOString(),expires_at:expiry.toISOString()});
                 if(error){this.toast(error.message,'error');return;} await this.loadCloudData(); this.toast('Digital ID issued successfully.','success'); this.navigate('admin-digital-ids');
