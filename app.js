@@ -1499,7 +1499,7 @@
                 if (this.currentUser) {
                     if (this.currentUser.roleKey === 'treasurer') {
                         this.navigate('treasurer-dashboard');
-                    } else if (this.currentUser.role.includes('Admin')) {
+                    } else if (this.currentUser.roleKey === 'treasurer') { this.navigate('treasurer-dashboard'); } else if (this.currentUser.role.includes('Admin')) {
                         this.navigate('admin-dashboard');
                     } else {
                         this.navigate('member-dashboard');
