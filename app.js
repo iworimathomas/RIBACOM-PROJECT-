@@ -343,7 +343,15 @@
                             <div class="absolute -right-10 -bottom-10 opacity-10 text-[200px] pointer-events-none">
                                 <i class="fa-solid fa-shield-halved"></i>
                             </div>
-                            <div class="relative z-10 max-w-2xl space-y-4">
+                            <div class="relative z-10 max-w-3xl space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white p-1.5 shadow-2xl border-2 border-ribacom-gold/70 flex-shrink-0 overflow-hidden">
+                                        <img src="ribacom-crest.jpg" alt="Official Rivers Bayelsa Community RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                                    </div>
+                                    <div class="inline-flex items-center gap-2 bg-ribacom-gold/20 text-ribacom-gold border border-ribacom-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                                        <i class="fa-solid fa-star text-[10px]"></i> Official Community Platform
+                                    </div>
+                                </div>
                                 <div class="inline-flex items-center gap-2 bg-ribacom-gold/20 text-ribacom-gold border border-ribacom-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
                                     <i class="fa-solid fa-star text-[10px]"></i> Official Community Platform
                                 </div>
