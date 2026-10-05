@@ -67,7 +67,24 @@
                 for (const [key, value] of results) {
                     if (key === 'youthContent') this.db.youth = value[0] || this.db.youth;
                     else if (key === 'aboutContent') this.db.about = value[0] || this.db.about;
-                    else this.db[key] = value;
+                    else if (key === 'members') {
+                        this.db.members = value.map(m => ({
+                            ...m,
+                            fullName: m.fullName || m.full_name || '',
+                            membershipNo: m.membershipNo || m.membership_number || '',
+                            stateOfOrigin: m.stateOfOrigin || m.state_of_origin || '',
+                            photoUrl: m.photoUrl || m.photo_url || ''
+                        }));
+                    } else if (key === 'digitalIds') {
+                        this.db.digitalIds = value.map(id => ({
+                            ...id,
+                            memberId: id.memberId || id.member_id || null,
+                            idCardNumber: id.idCardNumber || id.id_card_number || '',
+                            qrCodeData: id.qrCodeData || id.qr_code_data || ''
+                        }));
+                    } else {
+                        this.db[key] = value;
+                    }
                 }
                 return this.db;
             }
