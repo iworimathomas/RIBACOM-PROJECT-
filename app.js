@@ -266,9 +266,10 @@
                         container.innerHTML = this.renderEcosystemCommunicationView();
                         break;
                     case 'election-results':
-                        container.innerHTML = typeof this.renderPublicElectionResults==='function'
-                            ? await this.renderPublicElectionResults(this.pendingElectionResultsId)
-                            : '<div class="p-8 text-center">Election results are loading.</div>';
+                        container.innerHTML = '<div class="p-8 text-center">Election results are loading.</div>';
+                        if (typeof this.renderPublicElectionResults==='function') {
+                            this.renderPublicElectionResults(this.pendingElectionResultsId).then(html => { container.innerHTML = html; });
+                        }
                         break;
                     case 'elections':
                         if (!this.currentUser) { this.toast('Please log in to access RIBACOM Elections.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
