@@ -59,9 +59,36 @@
     return '<div class="max-w-5xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase text-ribacom-gold">RIBACOM Governance</span><h2 class="text-2xl font-extrabold mt-1">'+(canApprove(this)?'Presidential Approval Centre':'My Submissions')+'</h2><p class="text-xs text-gray-300 mt-1">'+(canApprove(this)?'No executive publication becomes public until you approve it.':'Submit official work for President / Super Admin approval before publication.')+'</p></div><div class="grid grid-cols-2 gap-3"><div class="bg-white border rounded-2xl p-4"><small>PENDING</small><div class="text-2xl font-extrabold text-amber-600">'+pending.length+'</div></div><div class="bg-white border rounded-2xl p-4"><small>MY SUBMISSIONS</small><div class="text-2xl font-extrabold">'+mine.length+'</div></div></div><div class="space-y-3">'+cards+'</div></div>';
   };
 
+  RibacomApp.prototype.submitExecutiveWork=async function(type,e){
+    e.preventDefault();
+    if(!canSubmit(this)) return this.toast('Executive access required.','error');
+    const val=id=>document.getElementById(id)?.value?.trim()||'';
+    let payload={};
+    if(type==='announcement') payload={title:val('ew_title'),content:val('ew_content'),author_id:this.currentUser.id,is_published:false};
+    if(type==='event') payload={title:val('ew_title'),description:val('ew_content'),event_date:document.getElementById('ew_date')?.value||new Date().toISOString(),location:val('ew_location'),organizer:val('ew_organizer')||'RIBACOM Executive Body',is_published:false};
+    if(type==='publication') payload={title:val('ew_title'),description:val('ew_content'),file_url:val('ew_url'),category:document.getElementById('ew_category')?.value||'general',publication_date:document.getElementById('ew_date')?.value||new Date().toISOString().slice(0,10),is_published:false};
+    if(type==='gallery') payload={title:val('ew_title'),caption:val('ew_content'),image_url:val('ew_url'),created_by:this.currentUser.id,is_published:false};
+    if(!payload.title) return this.toast('Please enter a title.','warning');
+    const table=tableMap[type];
+    const {error}=await this.supabaseClient.from(table).insert(payload);
+    if(error) return this.toast(error.message,'error');
+    this.toast('Submitted to the President for approval. It is not public yet.','success');
+    this.navigate('approval-center');
+  };
+
+  RibacomApp.prototype.renderExecutiveWorkCenter=function(){
+    if(!canSubmit(this)) return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">Executive access required.</div>';
+    return '<div class="max-w-5xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase text-ribacom-gold">Executive Portal</span><h2 class="text-2xl font-extrabold mt-1">Create Official Work</h2><p class="text-xs text-gray-300 mt-1">All official content goes to the President for approval before publication.</p></div><div class="grid sm:grid-cols-2 gap-4">
+<form onsubmit="app.submitExecutiveWork('announcement',event)" class="bg-white border rounded-2xl p-5 space-y-3"><h3 class="font-extrabold text-ribacom-navy">News / Announcement</h3><input id="ew_title" required placeholder="Title" class="w-full border rounded-xl p-2.5"><textarea id="ew_content" required placeholder="Official content" class="w-full border rounded-xl p-2.5 h-28"></textarea><button class="w-full bg-ribacom-green text-white rounded-xl py-2.5 font-bold">Submit for Approval</button></form>
+<form onsubmit="app.submitExecutiveWork('event',event)" class="bg-white border rounded-2xl p-5 space-y-3"><h3 class="font-extrabold text-ribacom-navy">Event / Meeting</h3><input id="ew_title" required placeholder="Event title" class="w-full border rounded-xl p-2.5"><input id="ew_date" type="datetime-local" required class="w-full border rounded-xl p-2.5"><input id="ew_location" required placeholder="Location" class="w-full border rounded-xl p-2.5"><textarea id="ew_content" required placeholder="Description" class="w-full border rounded-xl p-2.5 h-24"></textarea><input id="ew_organizer" placeholder="Organizer" class="w-full border rounded-xl p-2.5"><button class="w-full bg-ribacom-green text-white rounded-xl py-2.5 font-bold">Submit for Approval</button></form>
+<form onsubmit="app.submitExecutiveWork('publication',event)" class="bg-white border rounded-2xl p-5 space-y-3"><h3 class="font-extrabold text-ribacom-navy">Publication</h3><input id="ew_title" required placeholder="Publication title" class="w-full border rounded-xl p-2.5"><input id="ew_url" required placeholder="Document URL" class="w-full border rounded-xl p-2.5"><select id="ew_category" class="w-full border rounded-xl p-2.5"><option value="general">General</option><option value="notice">Notice</option><option value="report">Report</option><option value="meeting">Meeting</option><option value="election">Election</option></select><textarea id="ew_content" placeholder="Description" class="w-full border rounded-xl p-2.5 h-24"></textarea><button class="w-full bg-ribacom-green text-white rounded-xl py-2.5 font-bold">Submit for Approval</button></form>
+<form onsubmit="app.submitExecutiveWork('gallery',event)" class="bg-white border rounded-2xl p-5 space-y-3"><h3 class="font-extrabold text-ribacom-navy">Gallery</h3><input id="ew_title" required placeholder="Photo title" class="w-full border rounded-xl p-2.5"><input id="ew_url" required placeholder="Image URL" class="w-full border rounded-xl p-2.5"><textarea id="ew_content" placeholder="Caption" class="w-full border rounded-xl p-2.5 h-24"></textarea><button class="w-full bg-ribacom-green text-white rounded-xl py-2.5 font-bold">Submit for Approval</button></form>
+</div></div>';
+  };
+
   const oldNav=RibacomApp.prototype.navigate;
   RibacomApp.prototype.navigate=function(v,p=null){
-    if(v==='approval-center'){
+    if(v==='executive-work'){this.currentView=v;const c=document.getElementById('appViewport');if(c)c.innerHTML=this.renderExecutiveWorkCenter();this.updateAuthHeaderUI();return}\n    if(v==='approval-center'){
       this.currentView=v;
       const c=document.getElementById('appViewport');
       this.renderApprovalCenter().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI()});
