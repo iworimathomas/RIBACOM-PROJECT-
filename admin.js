@@ -194,7 +194,16 @@
     if(ae||!a) return this.toast(ae?.message||'Application not found.','error');
     if(!['pending','under_review'].includes(a.status)) return this.toast('This application has already been reviewed.','warning');
     const {data:existing}=await this.supabaseClient.from('members').select('id,membership_number').eq('user_id',a.user_id).maybeSingle();
-    const membershipNumber=existing?.membership_number||`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+    let membershipNumber=existing?.membership_number||null;
+    if(!membershipNumber){
+      for(let i=0;i<8;i++){
+        const candidate=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}${i?'-'+i:''}`;
+        const {data:conflict,error:ce}=await this.supabaseClient.from('members').select('id').eq('membership_number',candidate).maybeSingle();
+        if(ce) return this.toast(ce.message,'error');
+        if(!conflict){ membershipNumber=candidate; break; }
+      }
+      if(!membershipNumber) return this.toast('Unable to generate a unique membership number. Please try again.','error');
+    }
     const {data:m,error:me}=await this.supabaseClient.from('members').upsert({user_id:a.user_id,membership_number:membershipNumber,full_name:a.full_name,email:a.email,phone:a.phone,photo_url:a.photo_url,date_of_birth:a.date_of_birth,gender:a.gender,address:a.current_address,nationality:a.nationality||'Nigerian',state_of_origin:['Rivers','Bayelsa'].includes(a.state_of_origin)?a.state_of_origin:'Other',lga:a.lga,rivers_bayelsa_connection:a.rivers_bayelsa_connection,category:(a.membership_category||'').toLowerCase().includes('associate')?'associate':'regular',status:'approved',emergency_contact_name:a.emergency_contact_name,emergency_contact_phone:a.emergency_contact_phone,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select().maybeSingle();
     if(me){this.toast(me.message,'error');return;}
     const memberId=m?.id||existing?.id;
