@@ -343,6 +343,109 @@
                 this.updateAuthHeaderUI();
             }
 
+            async getEventAttendance(eventId) {
+                if (!this.supabaseClient || !eventId) return [];
+                const {data,error}=await this.supabaseClient.from('events_attendance').select('*').eq('event_id',eventId).order('registered_at',{ascending:true});
+                if(error){console.warn('Attendance read failed:',error.message);return [];}
+                return data||[];
+            }
+
+            async registerForEvent(eventId) {
+                if(!this.currentUser?.memberId) { this.toast('Please log in as an approved member to register.','warning'); this.openLoginModal(); return; }
+                const member=this.db.members.find(m=>m.id===this.currentUser.memberId);
+                if(member && member.status!=='approved') { this.toast('Only approved members can register for events.','warning'); return; }
+                const {error}=await this.supabaseClient.from('events_attendance').insert({event_id:eventId,member_id:this.currentUser.memberId,status:'registered'});
+                if(error){
+                    if(error.code==='23505') this.toast('You are already registered for this event.','info');
+                    else this.toast('Registration failed: '+error.message,'error');
+                    return;
+                }
+                this.toast('Event registration confirmed.','success');
+                await this.loadCloudData();
+                this.navigate('events');
+            }
+
+            async cancelEventRegistration(eventId) {
+                if(!this.currentUser?.memberId) return;
+                const {error}=await this.supabaseClient.from('events_attendance').update({status:'cancelled'}).eq('event_id',eventId).eq('member_id',this.currentUser.memberId);
+                if(error){this.toast('Could not cancel registration: '+error.message,'error');return;}
+                this.toast('Event registration cancelled.','success');
+                this.navigate('events');
+            }
+
+            async openEventAttendanceManager(eventId) {
+                if(!['admin','super_admin','secretary_general','vice_president','welfare_officer'].includes(this.currentUser?.roleKey)) { this.toast('Event manager access required.','error'); return; }
+                const rows=await this.getEventAttendance(eventId);
+                const event=this.db.events.find(x=>x.id===eventId);
+                const members=this.db.members;
+                const byId=Object.fromEntries(members.map(m=>[m.id,m]));
+                const registered=rows.filter(r=>r.status!=='cancelled').length;
+                const attended=rows.filter(r=>r.status==='attended').length;
+                const rate=registered?Math.round(attended/registered*100):0;
+                const container=document.getElementById('appViewport');
+                container.innerHTML=`
+                    <div class="max-w-6xl mx-auto space-y-5 animate-fadeIn">
+                        <div class="rounded-3xl ribacom-header-gradient text-white p-6">
+                            <button onclick="app.navigate('events')" class="text-xs font-bold mb-3"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Events</button>
+                            <h2 class="text-2xl font-extrabold">Attendance Manager</h2>
+                            <p class="text-sm text-gray-300 mt-1">${esc(event?.title||'Event')}</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="bg-white rounded-2xl border p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Registered</div><div class="text-2xl font-extrabold">${registered}</div></div>
+                            <div class="bg-white rounded-2xl border p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Attended</div><div class="text-2xl font-extrabold text-emerald-600">${attended}</div></div>
+                            <div class="bg-white rounded-2xl border p-4"><div class="text-[10px] uppercase font-bold text-gray-400">Rate</div><div class="text-2xl font-extrabold text-ribacom-navy">${rate}%</div></div>
+                        </div>
+                        <div class="bg-white rounded-3xl border p-4 sm:p-6">
+                            <div class="flex justify-between items-center mb-4"><h3 class="font-extrabold">Registered Members</h3><button onclick="app.openEventAttendanceManager('${eventId}')" class="text-xs font-bold bg-slate-100 px-3 py-2 rounded-xl">Refresh</button></div>
+                            <div class="space-y-2">
+                                ${rows.map(r=>{const m=byId[r.member_id]||{};return `<div class="border rounded-2xl p-3 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                                    <div><div class="font-bold text-sm">${esc(m.full_name||'Member')}</div><div class="text-[11px] text-gray-500">${esc(m.membership_number||'')} • ${esc(r.status)}</div></div>
+                                    ${r.status==='registered'?'<button onclick="app.checkInEventMember(\''+eventId+'\',\''+r.member_id+'\')" class="bg-ribacom-green text-white px-3 py-2 rounded-xl text-xs font-extrabold">Check In</button>':r.status==='attended'?'<span class="text-xs font-bold text-emerald-700">✓ Checked in</span>':'<span class="text-xs text-gray-400">Cancelled</span>'}
+                                </div>`}).join('')||'<p class="text-sm text-gray-500">No registrations yet.</p>'}
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            async checkInEventMember(eventId,memberId) {
+                if(!['admin','super_admin','secretary_general','vice_president','welfare_officer'].includes(this.currentUser?.roleKey)) return;
+                const {error}=await this.supabaseClient.from('events_attendance').update({status:'attended',checked_in_at:new Date().toISOString(),checked_in_by:this.currentUser.id}).eq('event_id',eventId).eq('member_id',memberId);
+                if(error){this.toast('Check-in failed: '+error.message,'error');return;}
+                this.toast('Member checked in successfully.','success');
+                await this.openEventAttendanceManager(eventId);
+            }
+
+            renderEventsView() {
+                const manager=['admin','super_admin','secretary_general','vice_president','welfare_officer'].includes(this.currentUser?.roleKey);
+                const memberId=this.currentUser?.memberId;
+                const events=[...this.db.events].sort((a,b)=>new Date(a.event_date||a.date||0)-new Date(b.event_date||b.date||0));
+                return `
+                    <div class="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
+                            <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ribacom-gold">RIBACOM DIGITAL ECOSYSTEM</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Events & Attendance</h2>
+                            <p class="text-sm text-gray-300 mt-2">Meetings, programmes and community activities with digital registration and attendance tracking.</p>
+                        </div>
+                        ${events.length?'<div class="grid grid-cols-1 md:grid-cols-2 gap-5">'+events.map(e=>{
+                            const mine=memberId&&this.db.eventAttendance?this.db.eventAttendance.find(r=>r.event_id===e.id&&r.member_id===memberId):null;
+                            const when=e.event_date||e.date||'';
+                            return `<article class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden">
+                                ${e.image_url||e.image?'<img src="'+esc(e.image_url||e.image)+'" class="w-full h-44 object-cover" onerror="this.style.display=\'none\'">':''}
+                                <div class="p-5">
+                                    <div class="text-[10px] uppercase font-extrabold text-ribacom-green">${esc(when?new Date(when).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'Date to be announced')}</div>
+                                    <h3 class="text-xl font-extrabold text-ribacom-navy mt-2">${esc(e.title||'RIBACOM Event')}</h3>
+                                    <p class="text-sm text-gray-600 mt-2">${esc(e.description||'')}</p>
+                                    ${e.location?'<div class="text-xs text-gray-500 mt-3"><i class="fa-solid fa-location-dot mr-1"></i>'+esc(e.location)+'</div>':''}
+                                    <div class="flex flex-wrap gap-2 mt-4">
+                                      ${memberId?(mine?.status==='registered'?'<button onclick="app.cancelEventRegistration(\''+e.id+'\')" class="bg-amber-100 text-amber-800 px-3 py-2 rounded-xl text-xs font-extrabold">Cancel Registration</button>':mine?.status==='attended'?'<span class="bg-emerald-100 text-emerald-800 px-3 py-2 rounded-xl text-xs font-extrabold">✓ Attended</span>':'<button onclick="app.registerForEvent(\''+e.id+'\')" class="bg-ribacom-green text-white px-3 py-2 rounded-xl text-xs font-extrabold">Register</button>'):'<button onclick="app.openLoginModal()" class="bg-ribacom-navy text-white px-3 py-2 rounded-xl text-xs font-extrabold">Login to Register</button>'}
+                                      ${manager?'<button onclick="app.openEventAttendanceManager(\''+e.id+'\')" class="bg-slate-100 text-ribacom-navy px-3 py-2 rounded-xl text-xs font-extrabold">Attendance Manager</button>':''}
+                                    </div>
+                                </div>
+                            </article>`;
+                        }).join('')+'</div>':'<div class="bg-white rounded-3xl border p-8 text-center text-gray-500">No events have been published yet.</div>'}
+                    </div>`;
+            }
+
             renderEcosystemActivityView() {
                 const u=this.currentUser||{};
                 const role=(u.roleKey||'guest').toLowerCase();
