@@ -562,7 +562,7 @@
                     {position:'Special Adviser — Cultural Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Cultural+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Cultural Affairs.'}
                 ];
                 const executives = (this.db.leadership && this.db.leadership.length)
-                    ? [...this.db.leadership].sort((a,b)=>(a.order||0)-(b.order||0))
+                    ? [...this.db.leadership].sort((a,b)=>Number(a.display_order??a.order??0)-Number(b.display_order??b.order??0))
                     : fallbackExecutives;
                 const advisers = (this.db.advisers && this.db.advisers.length)
                     ? this.db.advisers
