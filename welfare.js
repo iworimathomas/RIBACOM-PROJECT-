@@ -1,6 +1,8 @@
 /* RIBACOM D6 — welfare workflow. Amounts follow the Master Constitution settings. */
 (function(){
-  const amounts={wedding:1000,birth:500,loss_parent:1500,loss_spouse:1500,loss_child:1500,other:0};
+  const fallbackAmounts={wedding:10000,birth:5000,loss_parent:15000,loss_spouse:15000,loss_child:15000,other:0};
+  const getAmounts=()=>({wedding:Number(app?.db?.welfareSettings?.wedding?.amount||fallbackAmounts.wedding),birth:Number(app?.db?.welfareSettings?.birth?.amount||fallbackAmounts.birth),loss_parent:Number(app?.db?.welfareSettings?.loss_parent?.amount||fallbackAmounts.loss_parent),loss_spouse:Number(app?.db?.welfareSettings?.loss_spouse?.amount||fallbackAmounts.loss_spouse),loss_child:Number(app?.db?.welfareSettings?.loss_child?.amount||fallbackAmounts.loss_child),other:0});
+  const amounts=new Proxy({}, {get:(t,k)=>getAmounts()[k]});
   const labels={wedding:'Wedding',birth:'Birth',loss_parent:'Loss of Parent',loss_spouse:'Loss of Spouse',loss_child:'Loss of Child',other:'Other'};
   window.RIBACOM_WELFARE_AMOUNTS=amounts;
 
@@ -32,6 +34,6 @@
 
   RibacomApp.prototype.renderWelfareD6Summary = function(){
     const rows=this.db.welfareRequests||[];
-    return `<div class="bg-white rounded-2xl p-4 border"><h3 class="font-extrabold text-ribacom-navy">Welfare Benefits</h3><div class="grid grid-cols-2 gap-2 mt-3 text-xs">${Object.entries(amounts).filter(([k])=>k!=='other').map(([k,v])=>`<div class="bg-gray-50 rounded-xl p-3"><b>${labels[k]}</b><div class="text-ribacom-green font-extrabold mt-1">D${v}</div></div>`).join('')}</div><p class="text-[10px] text-gray-500 mt-3">Final approval and payment remain subject to the applicable RIBACOM rules and Executive review.</p></div>`;
+    return `<div class="bg-white rounded-2xl p-4 border"><h3 class="font-extrabold text-ribacom-navy">Welfare Benefits</h3><div class="grid grid-cols-2 gap-2 mt-3 text-xs">${Object.entries(amounts).filter(([k])=>k!=='other').map(([k,v])=>`<div class="bg-gray-50 rounded-xl p-3"><b>${labels[k]}</b><div class="text-ribacom-green font-extrabold mt-1">Up to D${v.toLocaleString()}</div></div>`).join('')}</div><p class="text-[10px] text-gray-500 mt-3">Final approval and payment remain subject to the applicable RIBACOM rules and Executive review.</p></div>`;
   };
 })();
