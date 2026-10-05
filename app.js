@@ -446,7 +446,17 @@
                 const patch={status,updated_at:new Date().toISOString()};
                 if(status==='approved'){
                     const currentNo=member.membershipNo||member.membership_number;
-                    if(!currentNo) patch.membership_number=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+                    if(!currentNo){
+                        let uniqueNo=null;
+                        for(let attempt=0;attempt<8;attempt++){
+                            const candidate=`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}${attempt?'-'+attempt:''}`;
+                            const {data:conflict,error:checkError}=await this.supabaseClient.from('members').select('id').eq('membership_number',candidate).maybeSingle();
+                            if(checkError){this.toast(checkError.message,'error');return;}
+                            if(!conflict){uniqueNo=candidate;break;}
+                        }
+                        if(!uniqueNo){this.toast('Unable to generate a unique membership number. Please try again.','error');return;}
+                        patch.membership_number=uniqueNo;
+                    }
                 }
                 const {data,error}=await this.supabaseClient.from('members').update(patch).eq('id',id).select().maybeSingle();
                 if(error){this.toast(error.message,'error');return;}
