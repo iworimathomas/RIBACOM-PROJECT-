@@ -253,10 +253,10 @@
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-3">
-                            <button onclick="app.navigate('digital-id')" class="bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-id-card mr-1"></i> Digital ID</button>
+                            ${status==='approved'?'<button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-id-card mr-1"></i> Digital ID</button>':'<button onclick="app.toast(\'Digital ID becomes available after membership approval.\',\'warning\')" class="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-lock mr-1"></i> Digital ID after Approval</button>'}
                             <button onclick="app.navigate('welfare')" class="bg-ribacom-gold text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-hand-holding-heart mr-1"></i> Welfare</button>
                             <button onclick="app.navigate('members')" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-extrabold">My Record</button>
-                        </div>
+                        </div>iv>
                     </div>`;
             }
 
