@@ -186,6 +186,17 @@
     this.showElectionResults(id);
   };
 
+  RibacomApp.prototype.renderPublicElectionResults=async function(id){
+    if(!id) return '<div class="max-w-3xl mx-auto p-8 text-center">Election results link is incomplete.</div>';
+    const {data:e,error}=await this.supabaseClient.from('elections').select('id,title,description,status,results_publication_status,results_published_at').eq('id',id).single();
+    if(error||!e||e.results_publication_status!=='approved') return '<div class="max-w-3xl mx-auto p-8"><div class="bg-white rounded-3xl border shadow p-8 text-center"><div class="text-red-600 text-4xl mb-3">!</div><h1 class="text-2xl font-black text-ribacom-navy">Official Results Not Available</h1><p class="text-sm text-gray-600 mt-2">These election results have not been officially approved for public release.</p></div></div>';
+    const {data:pub}=await this.supabaseClient.from('publications').select('id,title,approval_status,is_published,source_type,source_id').eq('source_type','election_results').eq('source_id',id).eq('approval_status','approved').eq('is_published',true).order('created_at',{ascending:false}).limit(1);
+    if(!pub?.length) return '<div class="max-w-3xl mx-auto p-8 text-center">The official publication record is not yet available.</div>';
+    const {data:log}=await this.supabaseClient.from('election_audit_logs').select('details,created_at').eq('election_id',id).eq('action','results_finalized').order('created_at',{ascending:false}).limit(1);
+    const snapshot=log?.[0]?.details?.snapshot||[];
+    return '<div class="max-w-5xl mx-auto px-4 py-8"><div class="bg-ribacom-navy text-white rounded-3xl p-7 border-b-4 border-ribacom-gold"><div class="text-xs font-black uppercase tracking-widest text-ribacom-gold">RIBACOM Digital Ecosystem</div><h1 class="text-3xl font-black mt-1">Official Election Results</h1><p class="text-sm text-gray-300 mt-2">'+esc(e.title)+'</p><div class="mt-4 inline-flex items-center gap-2 bg-emerald-600/20 border border-emerald-400/40 rounded-full px-3 py-1 text-xs font-bold text-emerald-200">✓ Officially Approved & Published</div></div><div class="mt-5 space-y-5">'+snapshot.map(pos=>'<section class="bg-white rounded-2xl border shadow-sm p-5"><h2 class="text-xl font-black text-ribacom-navy">'+esc(pos.position_title)+'</h2><div class="mt-3 space-y-2">'+(pos.candidates||[]).map((cand,i)=>'<div class="flex justify-between gap-3 border rounded-xl p-3 '+(pos.winner?.candidate_id===cand.candidate_id?'border-ribacom-gold bg-yellow-50':'')+'"><span class="font-semibold">'+esc(cand.candidate_name)+(pos.winner?.candidate_id===cand.candidate_id?' <span class="text-xs font-black text-ribacom-green">WINNER</span>':'')+'</span><strong>'+Number(cand.votes||0)+' vote(s)</strong></div>').join('')+'</div></section>').join('')+'</div><div class="mt-6 bg-gray-50 border rounded-2xl p-4 text-xs text-gray-600">Published through the RIBACOM Presidential Approval Centre. Individual member voting choices are confidential and are not displayed.</div></div>';
+  };
+
   RibacomApp.prototype.showElectionResults=async function(id){
     if(!isManager()){this.toast('Results access denied.','error');return;}
     const {data:e}=await this.supabaseClient.from('elections').select('*').eq('id',id).single();
