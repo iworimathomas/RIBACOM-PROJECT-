@@ -255,6 +255,10 @@
                         if (!this.currentUser) { this.toast('Please log in to view your activity centre.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
                         container.innerHTML = this.renderEcosystemActivityView();
                         break;
+                    case 'ecosystem-search':
+                        if (!this.currentUser) { this.toast('Please log in to use Unified Ecosystem Search.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
+                        container.innerHTML = this.renderEcosystemSearchView();
+                        break;
                     case 'digital-ecosystem':
                         container.innerHTML = this.renderDigitalEcosystemView();
                         break;
@@ -386,6 +390,46 @@
                     </div>`;
             }
 
+            renderEcosystemSearchView() {
+                const u=this.currentUser||{};
+                if(!u.id) return '<div class="max-w-3xl mx-auto p-8 text-center">Please log in to use Unified Ecosystem Search.</div>';
+                return `
+                    <div class="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
+                            <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ribacom-gold">RIBACOM DIGITAL ECOSYSTEM</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Unified Ecosystem Search</h2>
+                            <p class="text-sm text-gray-300 mt-2">Search the RIBACOM records available to your account from one central place.</p>
+                        </div>
+                        <div class="bg-white rounded-3xl border border-gray-100 card-shadow p-5 sm:p-6">
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input id="ecosystemSearchInput" type="search" placeholder="Search members, announcements, events, publications, IDs..." oninput="app.runEcosystemSearch(this.value)" class="w-full pl-11 pr-4 py-4 rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-3 text-[10px] font-bold text-gray-500">
+                                <span class="px-3 py-1.5 bg-slate-50 rounded-full">Members</span><span class="px-3 py-1.5 bg-slate-50 rounded-full">Digital IDs</span><span class="px-3 py-1.5 bg-slate-50 rounded-full">News</span><span class="px-3 py-1.5 bg-slate-50 rounded-full">Events</span><span class="px-3 py-1.5 bg-slate-50 rounded-full">Publications</span>
+                            </div>
+                        </div>
+                        <div id="ecosystemSearchResults"></div>
+                        <button onclick="app.navigate('digital-ecosystem')" class="bg-ribacom-navy text-white px-4 py-2.5 rounded-xl text-xs font-bold">Back to Ecosystem</button>
+                    </div>`;
+            }
+
+            runEcosystemSearch(term='') {
+                const root=document.getElementById('ecosystemSearchResults');
+                if(!root) return;
+                const q=String(term||'').trim().toLowerCase();
+                if(!q){ root.innerHTML='<div class="text-center text-sm text-gray-400 py-8">Start typing to search authorized ecosystem records.</div>'; return; }
+                const out=[];
+                const add=(type,title,desc,action,icon)=>out.push({type,title,desc,action,icon});
+                this.db.members.filter(m=>[m.fullName,m.membershipNo,m.email,m.phone,m.stateOfOrigin,m.lga,m.category].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,12).forEach(m=>add('Member',m.fullName,m.membershipNo||m.email||m.phone||'RIBACOM member','members','fa-user'));
+                this.db.digitalIds.filter(d=>String(d.idCardNumber||'').toLowerCase().includes(q)).slice(0,8).forEach(d=>add('Digital ID',d.idCardNumber,'Official RIBACOM digital identity','digital-id','fa-id-card'));
+                this.db.announcements.filter(a=>[a.title,a.content,a.description].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,8).forEach(a=>add('Announcement',a.title,a.description||'RIBACOM announcement','announcements','fa-bullhorn'));
+                this.db.events.filter(e=>[e.title,e.description,e.location].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,8).forEach(e=>add('Event',e.title,e.description||e.location||'RIBACOM event','events','fa-calendar-days'));
+                this.db.publications.filter(p=>[p.title,p.description,p.content].some(v=>String(v||'').toLowerCase().includes(q))).slice(0,8).forEach(p=>add('Publication',p.title,p.description||'RIBACOM publication','publications','fa-book-open'));
+                if(!out.length){root.innerHTML='<div class="bg-white rounded-3xl border border-gray-100 p-8 text-center text-sm text-gray-500">No matching authorized records found.</div>';return;}
+                root.innerHTML='<div class="space-y-3">'+out.map(x=>`<button onclick="app.navigate('${x.action}')" class="w-full text-left bg-white rounded-2xl border border-gray-100 card-shadow p-4 flex items-center gap-4 hover:border-ribacom-green transition"><div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center"><i class="fa-solid ${x.icon}"></i></div><div class="min-w-0 flex-1"><div class="text-[9px] uppercase font-extrabold text-gray-400">${x.type}</div><div class="font-extrabold text-ribacom-navy truncate">${esc(x.title)}</div><div class="text-xs text-gray-500 truncate">${esc(x.desc)}</div></div><i class="fa-solid fa-arrow-right text-gray-300"></i></button>`).join('')+'</div>';
+            }
+
             renderDigitalEcosystemView() {
                 const u=this.currentUser||{};
                 const role=(u.roleKey||'guest').toLowerCase();
@@ -455,6 +499,7 @@
                     {id:'approval-center',icon:'fa-check-double',title:'Approval Centre',desc:'Review official executive submissions.'}
                 ];
 
+                const canSearch=!!u.id;
                 const modules=[
                     {id:'membership',icon:'fa-users',title:'Membership',desc:'Applications, member records and membership services.',show:true},
                     {id:'digital-id',icon:'fa-id-card',title:'Digital ID & Verification',desc:'View and verify official RIBACOM Digital IDs.',show:true},
@@ -475,6 +520,7 @@
                     {id:'approval-center',icon:'fa-check-double',title:'Executive Approval Centre',desc:'Review and approve official submissions.',show:isExec||isAdmin},
                     {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Executive tasks and organizational work.',show:isExec||isAdmin}
                 ];
+                modules.push({id:'ecosystem-search',icon:'fa-magnifying-glass',title:'Unified Ecosystem Search',desc:'Search authorized RIBACOM records from one place.',show:canSearch});
                 const visible=modules.filter(x=>x.show);
 
                 return `
