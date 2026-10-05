@@ -31,7 +31,7 @@
   RibacomApp.prototype.verifyDigitalId = async function(idNumber) {
     const number=String(idNumber||'').trim();
     if(!number) return {valid:false,message:'Enter a Digital ID number.'};
-    const {data,error}=await this.supabaseClient.from('digital_ids').select('id,id_card_number,status,expires_at,member_id,member_id').eq('id_card_number',number).maybeSingle();
+    const {data,error}=await this.supabaseClient.from('digital_ids').select('id,id_card_number,status,expires_at,member_id').eq('id_card_number',number).maybeSingle();
     if(error) return {valid:false,message:error.message};
     if(!data) return {valid:false,message:'Digital ID not found.'};
     const expired=data.expires_at && new Date(data.expires_at).getTime()<Date.now();
