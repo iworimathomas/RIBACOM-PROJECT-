@@ -5,6 +5,8 @@
                 this.currentUser = null;
                 this.loginMode = 'member';
                 this.currentView = 'home';
+                this.pendingElectionResultsId = new URLSearchParams(window.location.search).get('election_results');
+                if (this.pendingElectionResultsId) this.currentView = 'election-results';
                 this.supabaseClient = null;
                 this.cloudMode = false;
                 this.testMode=false;
@@ -262,6 +264,11 @@
                     case 'ecosystem-communication':
                         if (!this.currentUser) { this.toast('Please log in to access Communications.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
                         container.innerHTML = this.renderEcosystemCommunicationView();
+                        break;
+                    case 'election-results':
+                        container.innerHTML = typeof this.renderPublicElectionResults==='function'
+                            ? await this.renderPublicElectionResults(this.pendingElectionResultsId)
+                            : '<div class="p-8 text-center">Election results are loading.</div>';
                         break;
                     case 'elections':
                         if (!this.currentUser) { this.toast('Please log in to access RIBACOM Elections.', 'warning'); this.openLoginModal(); this.navigate('home'); return; }
