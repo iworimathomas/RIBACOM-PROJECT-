@@ -47,14 +47,23 @@
 
   RibacomApp.prototype.submitElectionBallot = async function(electionId){
     const state=this.currentElectionVoting;if(!state)return;
-    const choices={};for(const p of state.positions){const el=document.querySelector('input[name="position-'+p.id+'"]:checked');if(!el){this.toast('Please select a candidate for '+p.title+'.','warning');return;}choices[p.id]=el.value;}
+    const choices={};
+    for(const p of state.positions){
+      const el=document.querySelector('input[name="position-'+p.id+'"]:checked');
+      if(!el){this.toast('Please select a candidate for '+p.title+'.','warning');return;}
+      choices[p.id]=el.value;
+    }
     if(!confirm('Submit your RIBACOM election ballot? You will not be able to vote again in this election.'))return;
     const {data:ballot,error:be}=await this.supabaseClient.from('election_ballots').insert({election_id:electionId,voter_member_id:state.member.id}).select('id').single();
     if(be){this.toast(be.code==='23505'?'You have already voted in this election.':'Unable to create ballot: '+be.message,'error');return;}
     const rows=Object.entries(choices).map(([position_id,candidate_id])=>({ballot_id:ballot.id,position_id,candidate_id}));
     const {error:ve}=await this.supabaseClient.from('election_votes').insert(rows);
-    if(ve){await this.supabaseClient.from('election_ballots').delete().eq('id',ballot.id);this.toast('Ballot was not submitted: '+ve.message,'error');return;}
-    await this.supabaseClient.from('election_ballots').update({submitted_at:new Date().toISOString()}).eq('id',ballot.id);
+    if(ve){
+      await this.supabaseClient.from('election_ballots').delete().eq('id',ballot.id);
+      this.toast('Ballot was not submitted: '+ve.message,'error');return;
+    }
+    const {error:ue}=await this.supabaseClient.from('election_ballots').update({submitted_at:new Date().toISOString()}).eq('id',ballot.id);
+    if(ue){this.toast('Vote was recorded but submission confirmation failed. Please contact the Secretariat.','error');return;}
     await this.supabaseClient.from('election_audit_logs').insert({election_id:electionId,actor_user_id:this.currentUser.id,action:'ballot_submitted',details:{positions:Object.keys(choices).length}});
     this.toast('Your ballot has been submitted successfully.','success');this.currentElectionVoting=null;this.navigate('elections');
   };
