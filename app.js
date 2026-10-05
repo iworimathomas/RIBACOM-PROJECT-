@@ -163,6 +163,11 @@
                     this.db.digitalIds = digitalIds.map(x => ({...x, idCardNumber:x.id_card_number, memberId:x.member_id, qrCodeData:x.qr_code_data}));
                     this.db.membershipApplications = membershipApplications.filter(x=>!this.currentUser?.memberId || x.user_id===this.currentUser.id);
                     this.db.financeTransactions = financeTransactions.filter(x=>!this.currentUser?.memberId || x.member_id===this.currentUser.memberId);
+                    this.db.eventAttendance = [];
+                    if (this.currentUser?.memberId && this.supabaseClient) {
+                        const {data:attendanceRows,error:attendanceError}=await this.supabaseClient.from('events_attendance').select('*').eq('member_id',this.currentUser.memberId);
+                        if(!attendanceError) this.db.eventAttendance=attendanceRows||[];
+                    }
                     this.cloudDataLoaded = true;
                 } catch (e) { console.warn('RIBACOM cloud sync failed:', e); }
             }
