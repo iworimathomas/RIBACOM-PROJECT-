@@ -356,7 +356,7 @@
                         container.innerHTML = this.renderAdminDigitalIdsView();
                         break;
                     case 'admin-dashboard':
-                        if (!this.currentUser || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Super Admin')) {
+                        if (!this.currentUser || !['admin','super_admin'].includes(String(this.currentUser.roleKey || '').toLowerCase())) {
                             this.toast('Access denied. Administrator privileges required.', 'error');
                             this.navigate('home');
                             return;
