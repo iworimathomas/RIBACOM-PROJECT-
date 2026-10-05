@@ -87,8 +87,19 @@
     if(type==='gallery') payload={title:val('#ew_title'),caption:val('#ew_content'),image_url:val('#ew_url'),created_by:this.currentUser.id,submitted_by:this.currentUser.id,is_published:false,approval_status:'pending'};
     if(!payload.title) return this.toast('Please enter a title.','warning');
     const table=tableMap[type];
-    const {error}=await this.supabaseClient.from(table).insert(payload);
+    const {data:created,error}=await this.supabaseClient.from(table).insert(payload).select('id,title').single();
     if(error) return this.toast(error.message,'error');
+    const {error:approvalError}=await this.supabaseClient.from('approval_requests').insert({
+      content_type:type,
+      content_id:created.id,
+      title:created.title || payload.title,
+      submitted_by:this.currentUser.id,
+      status:'pending'
+    });
+    if(approvalError){
+      console.error('Approval request creation failed:',approvalError);
+      return this.toast('Content saved as unpublished, but the approval request could not be created: '+approvalError.message,'error');
+    }
     this.toast('Submitted to the President for approval. It is not public yet.','success');
     this.navigate('approval-center');
   };
