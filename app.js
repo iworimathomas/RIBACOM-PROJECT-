@@ -235,6 +235,13 @@
                     case 'contact':
                         container.innerHTML = this.renderContactView();
                         break;
+                    case 'verify-membership':
+                        container.innerHTML=this.renderMembershipVerificationView();
+                        const vf=document.getElementById('verifyMembershipForm');
+                        if(vf) vf.onsubmit=(e)=>{e.preventDefault();this.verifyMembershipId(document.getElementById('verifyMembershipId').value.trim());};
+                        const initialVerify=document.getElementById('verifyMembershipId')?.value?.trim();
+                        if(initialVerify) this.verifyMembershipId(initialVerify);
+                        break;
                     case 'member-dashboard':
                         if (!this.currentUser) {
                             this.toast('Please log in to access your portal.', 'warning');
@@ -297,6 +304,51 @@
                             <button onclick="app.navigate('members')" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-extrabold">My Record</button>
                         </div>
                     </div>`;
+            }
+            renderMembershipVerificationView() {
+                const params=new URLSearchParams(window.location.search);
+                const preset=(params.get('verify')||params.get('id')||'').trim();
+                const safe=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+                return `
+                <div class="max-w-xl mx-auto space-y-5 animate-fadeIn">
+                  <div class="text-center">
+                    <img src="ribacom-crest.jpg" class="w-20 h-20 mx-auto rounded-full bg-white object-cover border-2 border-ribacom-gold shadow" alt="RIBACOM Crest">
+                    <p class="text-[10px] font-extrabold tracking-widest text-ribacom-green mt-3">RIVERS BAYELSA COMMUNITY THE GAMBIA</p>
+                    <h2 class="text-2xl font-extrabold text-ribacom-navy mt-1">Membership Verification</h2>
+                    <p class="text-sm text-gray-500 mt-1">Official RIBACOM membership verification service</p>
+                  </div>
+                  <div class="bg-white rounded-3xl border card-shadow p-5">
+                    <form id="verifyMembershipForm" class="flex gap-2">
+                      <input id="verifyMembershipId" value="${safe(preset)}" class="flex-1 min-w-0 border rounded-xl px-4 py-3 text-sm font-bold uppercase" placeholder="Enter Membership ID" autocomplete="off" required>
+                      <button class="bg-ribacom-green text-white px-4 py-3 rounded-xl text-sm font-extrabold">Verify</button>
+                    </form>
+                    <div id="membershipVerificationResult" class="mt-5"></div>
+                  </div>
+                  <p class="text-[10px] text-center text-gray-500">Only limited identity information is displayed. Private contact, address, financial and emergency information is never shown.</p>
+                </div>`;
+            }
+
+            async verifyMembershipId(id) {
+                const box=document.getElementById('membershipVerificationResult');
+                if(!box) return;
+                box.innerHTML='<div class="text-center py-6 text-sm text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Verifying membership…</div>';
+                try {
+                    const res=await fetch('https://pvgdcqzglafkhqvzxxbi.supabase.co/functions/v1/verify-membership-id?id='+encodeURIComponent(id));
+                    const data=await res.json();
+                    if(!res.ok || !data.valid) {
+                        box.innerHTML='<div class="rounded-2xl bg-red-50 border border-red-100 p-5 text-center"><div class="text-3xl text-red-600">✕</div><h3 class="font-extrabold text-red-700 mt-2">MEMBERSHIP NOT VERIFIED</h3><p class="text-xs text-red-600 mt-1">'+safe(data.message||'This membership ID is not valid or active.')+'</p></div>';
+                        return;
+                    }
+                    const expiry=data.expires_at?new Date(data.expires_at):null;
+                    const expired=expiry && expiry<new Date();
+                    box.innerHTML='<div class="rounded-3xl border-2 '+(expired?'border-amber-300 bg-amber-50':'border-emerald-300 bg-emerald-50')+' p-5">'+
+                      '<div class="text-center"><div class="text-4xl '+(expired?'text-amber-600':'text-emerald-600')+'">'+(expired?'⚠':'✓')+'</div><h3 class="font-extrabold text-xl '+(expired?'text-amber-700':'text-emerald-700')+' mt-1">'+(expired?'ID EXPIRED':'VALID RIBACOM MEMBER')+'</h3></div>'+
+                      '<div class="flex items-center gap-4 mt-5 bg-white rounded-2xl p-4 border">'+
+                      '<img src="'+safe(data.photo_url||'ribacom-crest.jpg')+'" class="w-20 h-24 rounded-xl object-cover bg-gray-100" alt="Member photo">'+
+                      '<div class="text-sm space-y-1 min-w-0"><p class="font-extrabold text-ribacom-navy break-words">'+safe(data.full_name)+'</p><p><b>Membership:</b> '+safe(data.membership_number)+'</p><p><b>Category:</b> '+safe(data.category)+'</p><p><b>State:</b> '+safe(data.state_of_origin)+'</p><p><b>Status:</b> '+safe(data.membership_status)+'</p></div></div>'+
+                      '<div class="grid grid-cols-2 gap-3 mt-4 text-xs"><div class="bg-white rounded-xl p-3"><span class="text-gray-400">Issued</span><b class="block mt-1">'+safe(data.issued_at?new Date(data.issued_at).toLocaleDateString():'—')+'</b></div><div class="bg-white rounded-xl p-3"><span class="text-gray-400">Expires</span><b class="block mt-1">'+safe(data.expires_at?new Date(data.expires_at).toLocaleDateString():'Perpetual')+'</b></div></div>'+
+                      '<p class="text-[10px] text-center text-gray-500 mt-4">Verified by RIBACOM • TRUTH • UNITY • SERVICE</p></div>';
+                } catch(e) { box.innerHTML='<div class="rounded-2xl bg-amber-50 p-5 text-center text-sm text-amber-700">Verification service is temporarily unavailable.</div>'; }
             }
             renderHomeView() {
                 const announcements = this.db.announcements.slice(0, 3);
