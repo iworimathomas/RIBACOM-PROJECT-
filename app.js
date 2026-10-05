@@ -1230,6 +1230,69 @@
                 `;
             }
 
+
+            renderMembershipVerificationView() {
+                const params=new URLSearchParams(window.location.search);
+                const preset=params.get('id')||'';
+                return `
+                    <div class="max-w-4xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
+                            <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ribacom-gold">RIBACOM DIGITAL ID</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Membership Verification</h2>
+                            <p class="text-sm text-gray-300 mt-2">Verify an official RIBACOM membership ID without exposing private member information.</p>
+                        </div>
+                        <form id="verifyMembershipForm" class="bg-white rounded-3xl border p-5 sm:p-6 card-shadow">
+                            <label class="text-xs font-extrabold text-gray-600">Membership ID Number</label>
+                            <div class="flex flex-col sm:flex-row gap-3 mt-2">
+                                <input id="verifyMembershipId" value="${esc(preset)}" placeholder="e.g. RBC-ID-2026-ABC123" class="flex-1 border rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500" required>
+                                <button class="bg-ribacom-green text-white px-6 py-3 rounded-2xl font-extrabold">Verify ID</button>
+                            </div>
+                        </form>
+                        <div id="membershipVerificationResult"></div>
+                    </div>`;
+            }
+
+            async verifyMembershipId(id) {
+                id=String(id||'').trim();
+                const out=document.getElementById('membershipVerificationResult');
+                if(!out) return;
+                if(!id) { out.innerHTML=''; return; }
+                if(!/^RBC-ID-[A-Z0-9-]+$/i.test(id)) {
+                    out.innerHTML='<div class="bg-red-50 border border-red-200 text-red-700 rounded-3xl p-6 text-center font-extrabold">MEMBERSHIP NOT VERIFIED</div>';
+                    return;
+                }
+                out.innerHTML='<div class="bg-white border rounded-3xl p-8 text-center text-sm text-gray-500">Verifying membership ID…</div>';
+                try {
+                    const base=(window.RIBACOM_CONFIG?.supabaseUrl||'').replace(/\/$/,'');
+                    const res=await fetch(base+'/functions/v1/verify-membership-id?id='+encodeURIComponent(id),{headers:{'Accept':'application/json'}});
+                    const data=await res.json().catch(()=>({}));
+                    if(!res.ok||!data?.valid) {
+                        out.innerHTML='<div class="bg-red-50 border border-red-200 text-red-700 rounded-3xl p-6 text-center"><div class="text-lg font-extrabold">MEMBERSHIP NOT VERIFIED</div><div class="text-xs mt-2">The ID is invalid, inactive, suspended, revoked or not found.</div></div>';
+                        return;
+                    }
+                    out.innerHTML=`
+                        <div class="bg-white rounded-3xl border border-emerald-200 card-shadow overflow-hidden">
+                            <div class="bg-emerald-50 p-5 text-center border-b border-emerald-100">
+                                <div class="text-emerald-700 text-xs font-extrabold uppercase tracking-widest"><i class="fa-solid fa-circle-check mr-1"></i> Verified RIBACOM Membership</div>
+                            </div>
+                            <div class="p-5 sm:p-7 grid sm:grid-cols-[120px_1fr] gap-6 items-center">
+                                ${data.photo_url?'<img src="'+esc(data.photo_url)+'" class="w-28 h-28 rounded-2xl object-cover border mx-auto sm:mx-0" onerror="this.style.display=\'none\'">':'<div class="w-28 h-28 rounded-2xl bg-slate-100 flex items-center justify-center text-3xl text-slate-400 mx-auto sm:mx-0"><i class="fa-solid fa-user"></i></div>'}
+                                <div class="space-y-2">
+                                    <h3 class="text-2xl font-extrabold text-ribacom-navy">${esc(data.full_name||data.name||'RIBACOM Member')}</h3>
+                                    <div class="text-sm"><b>Membership ID:</b> ${esc(data.id_card_number||data.membership_number||id)}</div>
+                                    <div class="text-sm"><b>Category:</b> ${esc(data.category||'—')}</div>
+                                    <div class="text-sm"><b>State:</b> ${esc(data.state_of_origin||'—')}</div>
+                                    <div class="text-sm"><b>Status:</b> <span class="text-emerald-700 font-extrabold">${esc(data.status||'Active')}</span></div>
+                                    <div class="text-xs text-gray-500">Issued: ${esc((data.issued_at||'').slice(0,10)||'—')} • Expires: ${esc((data.expires_at||'').slice(0,10)||'—')}</div>
+                                </div>
+                            </div>
+                            <div class="px-5 pb-5 text-center text-[10px] font-bold text-gray-400">RIVERS BAYELSA COMMUNITY IN DIASPORA THE GAMBIA • TRUTH • UNITY • SERVICE</div>
+                        </div>`;
+                } catch(e) {
+                    out.innerHTML='<div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-3xl p-6 text-center"><div class="font-extrabold">Verification service unavailable</div><div class="text-xs mt-2">Please try again shortly.</div></div>';
+                }
+            }
+
             renderEcosystemActivityView() {
                 const u=this.currentUser||{};
                 const role=(u.roleKey||'guest').toLowerCase();
