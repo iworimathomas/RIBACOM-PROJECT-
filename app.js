@@ -198,23 +198,56 @@
             }
             async hydrateCurrentUser(user) {
                 if (!user || !this.supabaseClient) return;
-                const [{ data: profile }, { data: member }] = await Promise.all([
+                const [{ data: profile }, { data: member }, { data: latestApplication }] = await Promise.all([
                     this.supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-                    this.supabaseClient.from('members').select('*').eq('user_id', user.id).maybeSingle()
+                    this.supabaseClient.from('members').select('*').eq('user_id', user.id).maybeSingle(),
+                    this.supabaseClient.from('membership_applications').select('*').eq('user_id', user.id).order('created_at',{ascending:false}).limit(1).maybeSingle()
                 ]);
+
+                // Email verification can leave a newly registered applicant without a
+                // members row because the initial anonymous signup cannot satisfy the
+                // protected members INSERT policy. Once the user is authenticated, safely
+                // create/synchronize that member record from their latest application.
+                let activeMember = member;
+                if (!activeMember && latestApplication) {
+                    const memberPayload = {
+                        user_id: user.id,
+                        full_name: latestApplication.full_name || profile?.full_name || user.email,
+                        email: latestApplication.email || user.email,
+                        phone: latestApplication.phone || profile?.phone || '',
+                        state_of_origin: latestApplication.state_of_origin || '',
+                        lga: latestApplication.lga || '',
+                        address: latestApplication.current_address || '',
+                        photo_url: latestApplication.photo_url || null,
+                        nationality: latestApplication.nationality || 'Nigerian',
+                        category: String(latestApplication.membership_category || '').toLowerCase().includes('associate') ? 'associate' : 'regular',
+                        status: latestApplication.status || 'pending'
+                    };
+                    const { data: createdMember, error: memberSyncError } = await this.supabaseClient
+                        .from('members')
+                        .upsert(memberPayload,{onConflict:'user_id'})
+                        .select('*')
+                        .maybeSingle();
+                    if (memberSyncError) {
+                        console.warn('Post-verification member sync:', memberSyncError.message);
+                    } else {
+                        activeMember = createdMember;
+                    }
+                }
+
                 const role = profile?.role || 'member';
                 this.currentUser = {
                     id: user.id,
                     userId: user.id,
                     email: user.email,
-                    fullName: profile?.full_name || member?.full_name || user.email,
-                    phone: profile?.phone || member?.phone || '',
+                    fullName: profile?.full_name || activeMember?.full_name || latestApplication?.full_name || user.email,
+                    phone: profile?.phone || activeMember?.phone || '',
                     role: ({super_admin:'Super Admin',admin:'Admin',president:'President / Chairman',vice_president:'Vice President',secretary_general:'Secretary General',assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',visitor:'Visitor'}[role] || 'Member'),
                     roleKey: role,
-                    membershipNumber: member?.membership_number || '',
-                    memberId: member?.id || null,
-                    status: member?.status || null,
-                    photoUrl: profile?.avatar_url || member?.photo_url || ''
+                    membershipNumber: activeMember?.membership_number || '',
+                    memberId: activeMember?.id || null,
+                    status: activeMember?.status || latestApplication?.status || null,
+                    photoUrl: profile?.avatar_url || activeMember?.photo_url || latestApplication?.photo_url || ''
                 };
                 this.updateAuthHeaderUI();
             }
