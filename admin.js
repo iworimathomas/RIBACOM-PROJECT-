@@ -222,7 +222,32 @@
   RibacomApp.prototype.rejectMembershipApplication = async function(id){
     if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
     const note=prompt('Reason for rejection (optional):')||null;
-    const {error}=await this.supabaseClient.from('membership_applications').update({status:'rejected',admin_notes:note,reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id);
-    if(error) return this.toast(error.message,'error'); this.toast('Membership application rejected.','warning'); await this.openMembershipApplications();
+    const {data:application,error:readError}=await this.supabaseClient.from('membership_applications').select('id,user_id,email').eq('id',id).maybeSingle();
+    if(readError) return this.toast(readError.message,'error');
+    if(!application) return this.toast('Membership application not found.','error');
+
+    const now=new Date().toISOString();
+    const {error}=await this.supabaseClient.from('membership_applications').update({
+      status:'rejected',admin_notes:note,reviewed_by:this.currentUser.id,reviewed_at:now,updated_at:now
+    }).eq('id',id);
+    if(error) return this.toast(error.message,'error');
+
+    // Keep the member record synchronized with the rejected application.
+    // Do not delete the account: the applicant may submit a corrected application later.
+    if(application.user_id){
+      const {error:memberError}=await this.supabaseClient.from('members').update({
+        status:'rejected',updated_at:now
+      }).eq('user_id',application.user_id);
+      if(memberError) console.warn('Rejected-member sync:',memberError.message);
+
+      // A rejected applicant must not retain an active Digital ID.
+      const {error:digitalError}=await this.supabaseClient.from('digital_ids').update({
+        status:'revoked',updated_at:now
+      }).eq('member_id',(await this.supabaseClient.from('members').select('id').eq('user_id',application.user_id).maybeSingle()).data?.id);
+      if(digitalError) console.warn('Rejected Digital ID sync:',digitalError.message);
+    }
+
+    this.toast('Membership application rejected and member records synchronized.','warning');
+    await this.openMembershipApplications();
   };
 })();
