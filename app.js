@@ -830,7 +830,7 @@
                 qrContainer.innerHTML = "";
                 const member = this.currentUser?.memberId ? this.db.members.find(m => m.id === this.currentUser.memberId) : null;
                 const id = member ? this.db.digitalIds.find(x => x.memberId === member.id) : null; if (!id) return;
-                const verificationUrl = new URL(window.location.origin + window.location.pathname); verificationUrl.searchParams.set('page','verify-membership'); verificationUrl.searchParams.set('id',id.idCardNumber); new QRCode(qrContainer,{text:verificationUrl.toString(),width:128,height:128,colorDark:'#0A2540',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+                const verificationUrl = new URL(window.location.origin + window.location.pathname); verificationUrl.searchParams.set('page','verify-membership'); verificationUrl.searchParams.set('id',id.idCardNumber); verificationUrl.searchParams.set('verify','1'); id.qrCodeData=verificationUrl.toString(); new QRCode(qrContainer,{text:verificationUrl.toString(),width:160,height:160,colorDark:'#0A2540',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
             }
 
             renderWelfareView() {
