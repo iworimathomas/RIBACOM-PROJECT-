@@ -352,9 +352,6 @@
                                         <i class="fa-solid fa-star text-[10px]"></i> Official Community Platform
                                     </div>
                                 </div>
-                                <div class="inline-flex items-center gap-2 bg-ribacom-gold/20 text-ribacom-gold border border-ribacom-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
-                                    <i class="fa-solid fa-star text-[10px]"></i> Official Community Platform
-                                </div>
                                 <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">
                                     Rivers & Bayelsa Citizens in Diaspora, <span class="text-ribacom-gold">The Gambia</span>
                                 </h2>
