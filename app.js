@@ -360,6 +360,8 @@
                     else if(this.currentView==='approval-center') html=this.renderApprovalCenter?.();
                     else if(this.currentView==='executive-work') html=this.renderExecutiveWorkCenter?.();
                     else if(this.currentView==='digital-id') html=this.renderDigitalIdView?.();
+                    else if(this.currentView==='welfare') html=this.renderWelfareView?.();
+                    else if(this.currentView==='notifications') html=this.renderNotificationsView?.();
                     else if(this.currentView==='elections') html=this.renderElectionsView?.();
                     else html=this.renderBasicPublicView(this.currentView);
                     const target=document.getElementById('appViewport');
