@@ -6,8 +6,61 @@
                 this.currentView = 'home';
                 this.supabaseClient = null;
                 this.cloudMode = false;
+                this.testMode=false;
+                this.testMember=null;
+                this.testDigitalId=null;
+                this.initTestMode();
                 this.initSupabase();
                 this.restoreSupabaseSession().then(() => this.loadCloudData()).then(() => this.navigate(this.currentView));
+            }
+
+            initTestMode() {
+                const params = new URLSearchParams(window.location.search);
+                this.testMode = params.get('test') === '1';
+                if (!this.testMode) return;
+                this.testMember = {
+                    id:'TEST-RIBACOM-001',
+                    full_name:'RIBACOM Test Member',
+                    email:'test-member@ribacom.test',
+                    phone:'+220 000 0000',
+                    nationality:'Nigerian',
+                    state_of_origin:'Rivers',
+                    lga:'Test LGA',
+                    category:'Regular Member',
+                    status:'pending',
+                    membership_number:'',
+                    photo_url:'',
+                    address:'TEST MODE — no real member data',
+                    created_at:new Date().toISOString()
+                };
+                this.testDigitalId = null;
+            }
+
+            getTestMember() {
+                if (!this.testMode) return null;
+                if (this.testDigitalId) this.testMember.status='approved';
+                return this.testMember;
+            }
+
+            runTestApproval() {
+                if (!this.testMode) return;
+                this.testMember.status='approved';
+                this.testMember.membership_number='RBC-TEST-0001';
+                this.testDigitalId={
+                    id:'TEST-DIGITAL-ID-001',
+                    memberId:this.testMember.id,
+                    membership_number:this.testMember.membership_number,
+                    status:'active',
+                    issue_date:new Date().toISOString(),
+                    expiry_date:new Date(Date.now()+365*24*60*60*1000).toISOString()
+                };
+                this.toast('TEST MODE: Membership approved and Digital ID generated. No real database record was changed.','success');
+                this.navigate('member-dashboard');
+            }
+
+            renderTestModeBanner() {
+                if (!this.testMode) return '';
+                return '<div class="mx-4 mt-3 rounded-2xl border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 text-xs font-bold"><i class="fa-solid fa-flask mr-1"></i> TEST MODE — RIBACOM test data only. No real member records are being changed.</div>';
             }
 
             loadInitialDB() { return this.db; }
