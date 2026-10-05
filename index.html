@@ -373,5 +373,127 @@
 <script src="approval.js"></script>
 <script src="elections.js"></script>
 <script src="secretariat.js"></script>
+<script>
+/* RIBACOM About & Community Information Centre — identity/content repair */
+window.addEventListener('DOMContentLoaded', function () {
+    if (!window.app) return;
+    const originalRenderBasicPublicView = window.app.renderBasicPublicView.bind(window.app);
+    window.app.renderBasicPublicView = function(view) {
+        if (view !== 'about') return originalRenderBasicPublicView(view);
+        const escSafe = (v) => typeof window.esc === 'function' ? window.esc(v) : String(v ?? '');
+        return `
+        <div class="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+            <section class="bg-ribacom-navy text-white rounded-3xl p-7 sm:p-10 border-b-4 border-ribacom-gold shadow-xl">
+                <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                    <div class="w-28 h-28 rounded-full bg-white p-1 shadow-lg overflow-hidden border-2 border-ribacom-gold flex-shrink-0">
+                        <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg?v=20261005" alt="Official RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <span class="text-ribacom-gold text-xs font-black uppercase tracking-widest">Official Community Information Centre</span>
+                        <h1 class="text-3xl sm:text-4xl font-extrabold mt-2">RIVERS BAYELSA COMMUNITY THE GAMBIA</h1>
+                        <p class="text-gray-200 mt-2 font-semibold">RIBACOM</p>
+                        <p class="text-ribacom-gold font-extrabold tracking-widest mt-3">TRUTH • UNITY • SERVICE</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid md:grid-cols-2 gap-5">
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-landmark text-ribacom-green mr-2"></i>Official Identity</h2>
+                    <div class="mt-4 space-y-2 text-sm text-gray-700">
+                        <p><strong>Official Name:</strong> Rivers Bayelsa Community in Diaspora The Gambia</p>
+                        <p><strong>Short Name:</strong> RIBACOM</p>
+                        <p><strong>App Display Name:</strong> RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM)</p>
+                        <p><strong>Motto:</strong> <span class="font-extrabold text-ribacom-green">TRUTH • UNITY • SERVICE</span></p>
+                    </div>
+                </article>
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-people-group text-ribacom-green mr-2"></i>Who We Are</h2>
+                    <p class="mt-4 text-sm leading-7 text-gray-700">
+                        RIBACOM is the community organization serving people of Rivers and Bayelsa State origin and their families and associates living in The Gambia. It provides a platform for unity, welfare, cultural identity, mutual support, community development and responsible representation.
+                    </p>
+                </article>
+            </section>
+
+            <section class="grid md:grid-cols-2 gap-5">
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-clock-rotate-left text-ribacom-green mr-2"></i>Our History</h2>
+                    <p class="mt-4 text-sm leading-7 text-gray-700">
+                        RIBACOM grew from the need for Rivers and Bayelsa people in The Gambia to remain connected, organized and supportive of one another while preserving their shared heritage. The community continues to develop its governance, welfare, cultural, membership and digital structures in service of its members.
+                    </p>
+                    <p class="mt-3 text-xs text-gray-500">This section is designed for the Secretariat to expand with verified historical milestones as the official community archive develops.</p>
+                </article>
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-bullseye text-ribacom-green mr-2"></i>Mission</h2>
+                    <p class="mt-4 text-sm leading-7 text-gray-700">
+                        To promote truth, unity and service by protecting the welfare and dignity of members, preserving Rivers and Bayelsa cultural heritage, strengthening mutual support and contributing positively to community life in The Gambia.
+                    </p>
+                </article>
+            </section>
+
+            <section class="bg-gradient-to-br from-white to-gray-50 rounded-2xl border p-6 shadow-sm">
+                <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-eye text-ribacom-green mr-2"></i>Vision</h2>
+                <p class="mt-4 text-sm sm:text-base leading-7 text-gray-700">
+                    To build a united, organized, prosperous and culturally conscious Rivers-Bayelsa community in The Gambia, where members support one another, preserve their heritage and contribute meaningfully to society.
+                </p>
+            </section>
+
+            <section class="bg-white rounded-2xl border p-6 shadow-sm">
+                <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-user-check text-ribacom-green mr-2"></i>Membership Community</h2>
+                <div class="grid sm:grid-cols-2 gap-4 mt-5">
+                    <div class="rounded-xl bg-green-50 border border-green-100 p-4">
+                        <h3 class="font-extrabold text-ribacom-green">Regular Member</h3>
+                        <p class="text-sm text-gray-700 mt-2">Membership by birth or Rivers/Bayelsa ancestry.</p>
+                    </div>
+                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+                        <h3 class="font-extrabold text-ribacom-navy">Associate Member</h3>
+                        <p class="text-sm text-gray-700 mt-2">Membership by marriage and by genuine interest in identifying with and supporting the community.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-2xl border p-6 shadow-sm">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-people-roof text-ribacom-green mr-2"></i>Community Leadership</h2>
+                        <p class="text-xs text-gray-500 mt-1">Current leadership information</p>
+                    </div>
+                    <button onclick="app.navigate('leadership')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl text-xs font-bold">View Leadership Centre</button>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
+                    <div class="border rounded-xl p-4"><b>President</b><p class="text-sm text-gray-700 mt-1">Iworima M. Thomas</p></div>
+                    <div class="border rounded-xl p-4"><b>Vice President</b><p class="text-sm text-gray-700 mt-1">Odika Nnenne</p></div>
+                    <div class="border rounded-xl p-4"><b>Secretary General</b><p class="text-sm text-gray-700 mt-1">Juliet Ejila</p></div>
+                    <div class="border rounded-xl p-4"><b>Treasurer</b><p class="text-sm text-gray-700 mt-1">Ruth Doubra Julius</p></div>
+                    <div class="border rounded-xl p-4"><b>Public Relations Officer</b><p class="text-sm text-gray-700 mt-1">Uche Destiny Chikezie</p></div>
+                    <div class="border rounded-xl p-4"><b>Welfare Officer / Provost</b><p class="text-sm text-gray-700 mt-1">Emeka Thank God Elechi</p></div>
+                </div>
+            </section>
+
+            <section class="bg-ribacom-navy text-white rounded-2xl p-6 shadow-lg">
+                <h2 class="text-xl font-extrabold text-ribacom-gold"><i class="fa-solid fa-address-book mr-2"></i>Contact & Secretariat</h2>
+                <div class="grid md:grid-cols-2 gap-4 mt-5 text-sm">
+                    <div class="space-y-3">
+                        <p><i class="fa-solid fa-phone text-ribacom-gold mr-2"></i><strong>Chairman / President:</strong> <a href="tel:+220877991397" class="hover:text-ribacom-gold">+220 877991397</a></p>
+                        <p><i class="fa-solid fa-phone text-ribacom-gold mr-2"></i><strong>Secretary General:</strong> <a href="tel:+220833586955" class="hover:text-ribacom-gold">+220 833586955</a></p>
+                        <p><i class="fa-solid fa-phone text-ribacom-gold mr-2"></i><strong>Welfare Officer:</strong> <a href="tel:+220877039287" class="hover:text-ribacom-gold">+220 877039287</a></p>
+                    </div>
+                    <div class="space-y-3">
+                        <p><i class="fa-solid fa-envelope text-ribacom-gold mr-2"></i><strong>Email:</strong> <a href="mailto:ribacomgambia@gmail.com" class="hover:text-ribacom-gold">ribacomgambia@gmail.com</a></p>
+                        <p><i class="fa-solid fa-location-dot text-ribacom-gold mr-2"></i><strong>Secretariat / Meeting Address:</strong> Agricultural Hall, Opposite Charles Jaw School, Bundung.</p>
+                    </div>
+                </div>
+                <button onclick="app.navigate('contact')" class="mt-5 bg-ribacom-gold text-ribacom-navy px-5 py-2.5 rounded-xl font-extrabold text-sm">Open Contact Centre</button>
+            </section>
+
+            <section class="text-center bg-ribacom-green text-white rounded-2xl p-6">
+                <p class="text-xs uppercase tracking-widest font-black">RIBACOM Community Principle</p>
+                <p class="text-2xl font-extrabold mt-2">TRUTH • UNITY • SERVICE</p>
+                <p class="text-sm mt-2 text-white/90">Together as one community, serving with integrity and purpose.</p>
+            </section>
+        </div>`;
+    };
+});
+</script>
 </body>
 </html>
