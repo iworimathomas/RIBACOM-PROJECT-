@@ -326,9 +326,70 @@
                 const canFinance=['treasurer','admin','super_admin'].includes(role);
                 const canWelfare=['welfare_officer','admin','super_admin','president','vice_president'].includes(role);
                 const canMembership=['secretary_general','admin','super_admin','president','vice_president'].includes(role);
+                const roleNames={
+                    super_admin:'Super Administrator',admin:'Administrator',president:'President / Chairman',
+                    vice_president:'Vice President',secretary_general:'Secretary General',
+                    assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',
+                    welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',
+                    member:'Member',visitor:'Visitor',guest:'Guest'
+                };
+                const roleTitle=roleNames[role]||'RIBACOM Member';
+                const pendingApplications=this.db.membershipApplications.filter(x=>x.status==='pending').length;
+                const pendingWelfare=this.db.welfareRequests.filter(x=>['pending','under_review'].includes(x.status)).length;
+                const activeIds=this.db.digitalIds.filter(x=>x.status==='active').length;
+                const pendingApprovals=this.db.announcements.filter(x=>x.approval_status==='pending').length+
+                    this.db.events.filter(x=>x.approval_status==='pending').length+
+                    this.db.gallery.filter(x=>x.approval_status==='pending').length+
+                    this.db.publications.filter(x=>x.approval_status==='pending').length;
+
+                const roleActions={
+                    member:[
+                        {id:'member-dashboard',icon:'fa-user-circle',title:'My RIBACOM Portal',desc:'Membership status, profile, dues and personal services.'},
+                        {id:'digital-id',icon:'fa-id-card',title:'My Digital ID',desc:'Open your official RIBACOM Digital ID and QR verification.'},
+                        {id:'welfare',icon:'fa-hand-holding-heart',title:'Welfare Support',desc:'View benefits and submit a welfare request.'}
+                    ],
+                    treasurer:[
+                        {id:'treasurer-dashboard',icon:'fa-file-invoice-dollar',title:'Treasurer Workspace',desc:'Manage dues, receipts, transactions and financial reports.'},
+                        {id:'finance',icon:'fa-coins',title:'Finance & Dues',desc:'Review the RIBACOM financial ledger and member payment records.'}
+                    ],
+                    welfare_officer:[
+                        {id:'welfare',icon:'fa-hand-holding-heart',title:'Welfare Workspace',desc:'Review and manage member welfare support.'},
+                        {id:'members',icon:'fa-address-book',title:'Member Directory',desc:'Access member records needed for welfare administration.'}
+                    ],
+                    secretary_general:[
+                        {id:'admin-members',icon:'fa-users-gear',title:'Membership Administration',desc:'Review membership applications and maintain member records.'},
+                        {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Coordinate executive tasks and organizational work.'}
+                    ],
+                    pro:[
+                        {id:'announcements',icon:'fa-bullhorn',title:'News & Announcements',desc:'Manage and monitor official RIBACOM communications.'},
+                        {id:'publications',icon:'fa-book-open',title:'Publications',desc:'Manage official publications and documents.'},
+                        {id:'gallery',icon:'fa-images',title:'Media Gallery',desc:'Manage the RIBACOM media archive.'}
+                    ],
+                    vice_president:[
+                        {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Coordinate executive assignments and oversight.'},
+                        {id:'approval-center',icon:'fa-check-double',title:'Approval Centre',desc:'Review executive submissions requiring approval.'}
+                    ],
+                    president:[
+                        {id:'approval-center',icon:'fa-check-double',title:'Presidential Approval Centre',desc:'Final review of official submissions and publications.'},
+                        {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Full executive coordination and oversight.'}
+                    ],
+                    assistant_secretary_general:[
+                        {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Manage assigned executive tasks and records.'},
+                        {id:'admin-members',icon:'fa-users-gear',title:'Membership Administration',desc:'Support membership administration.'}
+                    ]
+                };
+
+                let quick=roleActions[role]||[];
+                if(isAdmin) quick=[
+                    {id:'admin-dashboard',icon:'fa-shield-halved',title:'Administration',desc:'Full system administration and management.'},
+                    {id:'admin-members',icon:'fa-users-gear',title:'Membership Administration',desc:'Applications, approvals and member records.'},
+                    {id:'treasurer-dashboard',icon:'fa-file-invoice-dollar',title:'Finance Oversight',desc:'Review financial management and reports.'},
+                    {id:'approval-center',icon:'fa-check-double',title:'Approval Centre',desc:'Review official executive submissions.'}
+                ];
+
                 const modules=[
                     {id:'membership',icon:'fa-users',title:'Membership',desc:'Applications, member records and membership services.',show:true},
-                    {id:'digital-id',icon:'fa-id-card',title:'Digital ID & Verification',desc:'View your Digital ID and verify RIBACOM membership.',show:true},
+                    {id:'digital-id',icon:'fa-id-card',title:'Digital ID & Verification',desc:'View and verify official RIBACOM Digital IDs.',show:true},
                     {id:'finance',icon:'fa-coins',title:'Finance & Dues',desc:'Dues, payment records and financial services.',show:!!u.id||isAdmin},
                     {id:'welfare',icon:'fa-hand-holding-heart',title:'Welfare',desc:'Welfare benefits, claims and support.',show:true},
                     {id:'announcements',icon:'fa-bullhorn',title:'News & Announcements',desc:'Official RIBACOM communications.',show:true},
@@ -343,38 +404,69 @@
                     {id:'member-dashboard',icon:'fa-user-circle',title:'My RIBACOM Portal',desc:'Profile, membership status and personal services.',show:!!u.id},
                     {id:'admin-dashboard',icon:'fa-shield-halved',title:'Administration',desc:'System administration and management.',show:isAdmin},
                     {id:'treasurer-dashboard',icon:'fa-file-invoice-dollar',title:'Treasurer Workspace',desc:'Financial management and reports.',show:canFinance},
-                    {id:'welfare',icon:'fa-heart',title:'Welfare Officer Workspace',desc:'Manage welfare support and claims.',show:canWelfare&&['welfare_officer','admin','super_admin','president','vice_president'].includes(role)},
-                    {id:'approval-centre',icon:'fa-check-double',title:'Executive Approval Centre',desc:'Review and approve official submissions.',show:isExec||isAdmin},
+                    {id:'approval-center',icon:'fa-check-double',title:'Executive Approval Centre',desc:'Review and approve official submissions.',show:isExec||isAdmin},
                     {id:'executive-work',icon:'fa-briefcase',title:'Executive Work Centre',desc:'Executive tasks and organizational work.',show:isExec||isAdmin}
                 ];
                 const visible=modules.filter(x=>x.show);
+
                 return `
                     <div class="max-w-7xl mx-auto space-y-6 animate-fadeIn">
                         <div class="rounded-3xl ribacom-header-gradient text-white p-6 sm:p-8">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
                                 <div>
                                     <span class="text-[10px] font-extrabold uppercase tracking-[0.2em] text-ribacom-gold">RIBACOM DIGITAL ECOSYSTEM</span>
-                                    <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">One Community. One Digital Platform.</h2>
-                                    <p class="text-sm text-gray-300 mt-2">A central gateway to RIBACOM membership, identity, finance, welfare, communications and administration.</p>
+                                    <h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Welcome, ${esc(u.fullName||'RIBACOM Member')}</h2>
+                                    <p class="text-sm text-gray-300 mt-2">Your role-based command centre for the connected RIBACOM digital ecosystem.</p>
                                 </div>
-                                <div class="rounded-2xl bg-white/10 border border-white/20 px-4 py-3 text-xs">
-                                    <div class="text-gray-300">Access level</div>
-                                    <div class="font-extrabold text-ribacom-gold mt-1">${esc(role.replaceAll('_',' '))}</div>
+                                <div class="rounded-2xl bg-white/10 border border-white/20 px-5 py-4 min-w-[210px]">
+                                    <div class="text-[10px] uppercase tracking-wider text-gray-300 font-bold">Current access</div>
+                                    <div class="font-extrabold text-ribacom-gold mt-1">${esc(roleTitle)}</div>
+                                    <div class="text-[10px] text-gray-300 mt-2">${u.email?esc(u.email):'Public access'}</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${visible.map(m=>`
-                                <button onclick="app.navigate('${m.id}')" class="text-left bg-white rounded-3xl border border-gray-100 card-shadow p-5 hover:-translate-y-0.5 hover:border-ribacom-green transition">
-                                    <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-ribacom-green flex items-center justify-center mb-4"><i class="fa-solid ${m.icon} text-lg"></i></div>
-                                    <h3 class="font-extrabold text-ribacom-navy">${m.title}</h3>
-                                    <p class="text-xs text-gray-500 mt-1 leading-5">${m.desc}</p>
-                                    <span class="inline-flex items-center gap-1 mt-4 text-[10px] font-extrabold uppercase text-ribacom-green">Open <i class="fa-solid fa-arrow-right"></i></span>
-                                </button>`).join('')}
+
+                        ${u.id?`
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] text-gray-400 font-bold uppercase">Membership</div><div class="text-xl font-extrabold text-ribacom-navy mt-1">${this.db.members.length}</div><div class="text-[10px] text-gray-500">records visible</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] text-gray-400 font-bold uppercase">Digital IDs</div><div class="text-xl font-extrabold text-ribacom-green mt-1">${activeIds}</div><div class="text-[10px] text-gray-500">active</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] text-gray-400 font-bold uppercase">Welfare</div><div class="text-xl font-extrabold text-amber-600 mt-1">${pendingWelfare}</div><div class="text-[10px] text-gray-500">awaiting action</div></div>
+                            <div class="bg-white rounded-2xl border border-gray-100 p-4"><div class="text-[10px] text-gray-400 font-bold uppercase">Applications</div><div class="text-xl font-extrabold text-purple-600 mt-1">${pendingApplications}</div><div class="text-[10px] text-gray-500">pending</div></div>
+                        </div>`:''}
+
+                        <div class="bg-white rounded-3xl border border-gray-100 card-shadow p-5 sm:p-6">
+                            <div class="flex items-center justify-between gap-3 mb-4">
+                                <div><h3 class="font-extrabold text-ribacom-navy">Your Priority Workspace</h3><p class="text-xs text-gray-500 mt-1">Tools assigned to your RIBACOM role.</p></div>
+                                ${pendingApprovals&&isExec||isAdmin?'<span class="text-[10px] font-extrabold bg-amber-100 text-amber-800 px-3 py-1.5 rounded-full">Approval activity available</span>':''}
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                ${quick.map(x=>`
+                                    <button onclick="app.navigate('${x.id}')" class="text-left rounded-2xl border border-gray-100 bg-slate-50 hover:bg-emerald-50 hover:border-ribacom-green p-4 transition">
+                                        <i class="fa-solid ${x.icon} text-ribacom-green"></i>
+                                        <h4 class="font-extrabold text-sm text-ribacom-navy mt-3">${x.title}</h4>
+                                        <p class="text-[11px] text-gray-500 mt-1 leading-5">${x.desc}</p>
+                                    </button>`).join('')}
+                            </div>
                         </div>
-                        <div class="bg-white rounded-3xl border border-gray-100 p-5 sm:p-6">
-                            <h3 class="font-extrabold text-ribacom-navy">RIBACOM Digital Ecosystem</h3>
-                            <p class="text-xs text-gray-500 mt-1">All services operate through the RIBACOM platform and its connected Supabase data services. Access is controlled by account role.</p>
+
+                        <div>
+                            <div class="flex items-end justify-between mb-3"><div><h3 class="font-extrabold text-ribacom-navy">All Ecosystem Services</h3><p class="text-xs text-gray-500 mt-1">One RIBACOM platform, connected modules and role-based access.</p></div></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${visible.map(m=>`
+                                    <button onclick="app.navigate('${m.id}')" class="text-left bg-white rounded-3xl border border-gray-100 card-shadow p-5 hover:-translate-y-0.5 hover:border-ribacom-green transition">
+                                        <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-ribacom-green flex items-center justify-center mb-4"><i class="fa-solid ${m.icon} text-lg"></i></div>
+                                        <h3 class="font-extrabold text-ribacom-navy">${m.title}</h3>
+                                        <p class="text-xs text-gray-500 mt-1 leading-5">${m.desc}</p>
+                                        <span class="inline-flex items-center gap-1 mt-4 text-[10px] font-extrabold uppercase text-ribacom-green">Open <i class="fa-solid fa-arrow-right"></i></span>
+                                    </button>`).join('')}
+                            </div>
+                        </div>
+
+                        <div class="bg-ribacom-navy rounded-3xl p-5 sm:p-6 text-white">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div><h3 class="font-extrabold">RIBACOM Digital Ecosystem</h3><p class="text-xs text-gray-300 mt-1">One identity • one Supabase backend • connected services • role-based access.</p></div>
+                                <button onclick="app.navigate('home')" class="bg-white/10 border border-white/20 px-4 py-2 rounded-xl text-xs font-bold">Back to Public Home</button>
+                            </div>
                         </div>
                     </div>`;
             }
@@ -721,7 +813,7 @@
                     this.toast('This login is reserved for the RIBACOM Treasurer account.', 'error');
                     return;
                 }
-                const displayRole = role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : role === 'treasurer' ? 'Treasurer' : role === 'visitor' ? 'Visitor' : 'Member';
+                const displayRole = ({super_admin:'Super Admin',admin:'Admin',president:'President / Chairman',vice_president:'Vice President',secretary_general:'Secretary General',assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',visitor:'Visitor'}[role] || 'Member');
                 this.currentUser = {
                     id: user.id,
                     userId: user.id,
@@ -739,7 +831,7 @@
                 this.closeAuthModal();
                 this.updateAuthHeaderUI();
                 this.toast(`Welcome back, ${this.currentUser.fullName}`, 'success');
-                this.navigate(role === 'treasurer' ? 'treasurer-dashboard' : (['super_admin','admin'].includes(role) ? 'admin-dashboard' : 'member-dashboard'));
+                this.navigate('digital-ecosystem');
             }
 
             async restoreSupabaseSession() {
@@ -766,7 +858,7 @@
                     email: user.email,
                     fullName: profile?.full_name || member?.full_name || user.email,
                     phone: profile?.phone || member?.phone || '',
-                    role: role === 'super_admin' ? 'Super Admin' : role === 'admin' ? 'Admin' : role === 'treasurer' ? 'Treasurer' : role === 'visitor' ? 'Visitor' : 'Member',
+                    role: ({super_admin:'Super Admin',admin:'Admin',president:'President / Chairman',vice_president:'Vice President',secretary_general:'Secretary General',assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',visitor:'Visitor'}[role] || 'Member'),
                     roleKey: role,
                     membershipNumber: member?.membership_number || '',
                     memberId: member?.id || null,
