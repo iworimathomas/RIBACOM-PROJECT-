@@ -451,6 +451,785 @@
                     </div>`;
             }
 
+            renderHomeView() {
+                const announcements = this.db.announcements.slice(0, 3);
+                const events = this.db.events.slice(0, 2);
+                const leaders = this.db.leadership.slice(0, 4);
+
+                return `
+                    <div class="space-y-8 animate-fadeIn">
+                        <!-- Hero Banner -->
+                        <div class="relative rounded-3xl overflow-hidden ribacom-header-gradient text-white p-6 sm:p-10 shadow-2xl border border-ribacom-gold/20">
+                            <div class="absolute -right-10 -bottom-10 opacity-10 text-[200px] pointer-events-none">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div class="relative z-10 max-w-3xl space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white p-1.5 shadow-2xl border-2 border-ribacom-gold/70 flex-shrink-0 overflow-hidden">
+                                        <img src="ribacom-crest.jpg" alt="Official Rivers Bayelsa Community RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                                    </div>
+                                    <div class="inline-flex items-center gap-2 bg-ribacom-gold/20 text-ribacom-gold border border-ribacom-gold/40 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                                        <i class="fa-solid fa-star text-[10px]"></i> Official Community Platform
+                                    </div>
+                                </div>
+                                <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+                                    Rivers & Bayelsa Citizens in Diaspora, <span class="text-ribacom-gold">The Gambia</span>
+                                </h2>
+                                <p class="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                                    Promoting unity, welfare support, cultural heritage, and solidarity among all sons, daughters, and associates of Rivers and Bayelsa States.
+                                </p>
+                                <div class="p-3 bg-white/10 rounded-xl border border-white/10 text-xs flex items-center justify-between">
+                                    <div>
+                                        <span class="text-ribacom-gold font-bold block">OFFICIAL MOTTO</span>
+                                        <span class="font-extrabold tracking-wider text-sm">TRUTH • UNITY • SERVICE</span>
+                                    </div>
+                                    <i class="fa-solid fa-handshake-angle text-2xl text-ribacom-gold opacity-80"></i>
+                                </div>
+                                <div class="pt-2 flex flex-wrap gap-3">
+                                    <button onclick="app.navigate('membership')" class="bg-ribacom-gold text-ribacom-navy hover:bg-yellow-400 font-extrabold px-5 py-2.5 rounded-xl text-xs sm:text-sm shadow-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-user-plus"></i> Join RIBACOM Today
+                                    </button>
+                                    <button onclick="app.navigate('about')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-2.5 rounded-xl text-xs sm:text-sm border border-white/20 transition flex items-center gap-2">
+                                        <i class="fa-solid fa-circle-info"></i> Learn More
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Key Info Cards -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center text-lg flex-shrink-0">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500 uppercase font-semibold">Active Members</p>
+                                    <h4 class="font-extrabold text-base text-gray-800">${this.db.members.length}+ Members</h4>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg flex-shrink-0">
+                                    <i class="fa-solid fa-hand-holding-heart"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500 uppercase font-semibold">Welfare Benefits</p>
+                                    <h4 class="font-extrabold text-base text-gray-800">Up to Up to D${(this.db.welfareSettings.loss_parent?.amount||15000).toLocaleString()}</h4>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg flex-shrink-0">
+                                    <i class="fa-solid fa-coins"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500 uppercase font-semibold">Monthly Dues</p>
+                                    <h4 class="font-extrabold text-base text-gray-800">D50 / Month</h4>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg flex-shrink-0">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-500 uppercase font-semibold">Congress Meeting</p>
+                                    <h4 class="font-extrabold text-xs text-gray-800">Last Sun @ 4PM</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Announcements & Events Grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Announcements Column -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-extrabold text-lg text-gray-800 flex items-center gap-2">
+                                        <i class="fa-solid fa-bullhorn text-ribacom-green"></i> Latest Announcements
+                                    </h3>
+                                    <button onclick="app.navigate('announcements')" class="text-xs text-ribacom-green font-bold hover:underline">View All</button>
+                                </div>
+
+                                <div class="space-y-3">
+                                    ${announcements.map(ann => `
+                                        <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow hover:border-ribacom-green/30 transition space-y-2">
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="bg-emerald-50 text-ribacom-green font-bold px-2 py-0.5 rounded-md">${ann.category}</span>
+                                                <span class="text-gray-400"><i class="fa-regular fa-clock mr-1"></i>${ann.date}</span>
+                                            </div>
+                                            <h4 class="font-bold text-gray-800 text-sm">${ann.title}</h4>
+                                            <p class="text-xs text-gray-600 line-clamp-2">${ann.content}</p>
+                                            <div class="text-[11px] text-gray-400 pt-1 border-t border-gray-50">
+                                                Issued by: <strong>${ann.author}</strong>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Upcoming Events Column -->
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-extrabold text-lg text-gray-800 flex items-center gap-2">
+                                        <i class="fa-solid fa-calendar-day text-ribacom-gold"></i> Key Events
+                                    </h3>
+                                    <button onclick="app.navigate('events')" class="text-xs text-ribacom-green font-bold hover:underline">View All</button>
+                                </div>
+
+                                <div class="space-y-3">
+                                    ${events.map(evt => `
+                                        <div class="bg-white rounded-2xl border border-gray-100 card-shadow overflow-hidden">
+                                            <img src="${evt.image}" alt="${evt.title}" class="w-full h-28 object-cover">
+                                            <div class="p-3 space-y-1.5">
+                                                <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">${evt.status}</span>
+                                                <h4 class="font-bold text-xs text-gray-800">${evt.title}</h4>
+                                                <p class="text-[11px] text-gray-500"><i class="fa-regular fa-clock mr-1 text-ribacom-green"></i> ${evt.date} @ ${evt.time}</p>
+                                                <p class="text-[11px] text-gray-500"><i class="fa-solid fa-location-dot mr-1 text-red-500"></i> ${evt.location}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Executive Leadership Teaser -->
+                        <div class="space-y-4 pt-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-extrabold text-lg text-gray-800">Executive Leadership</h3>
+                                    <p class="text-xs text-gray-500">Serving the Rivers & Bayelsa Diaspora in The Gambia</p>
+                                </div>
+                                <button onclick="app.navigate('leadership')" class="text-xs text-ribacom-green font-bold hover:underline">Full Executive Roster &rarr;</button>
+                            </div>
+
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                ${leaders.map(l => `
+                                    <div class="bg-white p-3 rounded-2xl border border-gray-100 card-shadow text-center space-y-2">
+                                        <img src="${l.photo}" class="w-16 h-16 rounded-full object-cover mx-auto ring-2 ring-ribacom-gold/50 shadow-md">
+                                        <div>
+                                            <h4 class="font-bold text-xs text-gray-800 truncate">${l.name}</h4>
+                                            <p class="text-[10px] text-ribacom-green font-semibold uppercase">${l.position}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderAboutView() {
+                const a = this.db.about;
+                return `
+                    <div class="space-y-8 animate-fadeIn max-w-4xl mx-auto">
+                        <div class="text-center space-y-2">
+                            <span class="bg-ribacom-green/10 text-ribacom-green font-bold text-xs px-3 py-1 rounded-full uppercase">Official Identity</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-ribacom-navy">${a.displayName}</h2>
+                            <p class="text-ribacom-gold font-extrabold tracking-widest text-sm">MOTTO: ${a.motto}</p>
+                        </div>
+
+                        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 card-shadow space-y-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-ribacom-navy border-b pb-2 mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-landmark text-ribacom-green"></i> History & Background
+                                </h3>
+                                <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">${a.history}</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100 space-y-2">
+                                    <h4 class="font-bold text-ribacom-green text-sm flex items-center gap-2"><i class="fa-solid fa-eye"></i> Our Vision</h4>
+                                    <p class="text-xs text-gray-700 leading-relaxed">${a.vision}</p>
+                                </div>
+                                <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 space-y-2">
+                                    <h4 class="font-bold text-ribacom-navy text-sm flex items-center gap-2"><i class="fa-solid fa-bullseye"></i> Our Mission</h4>
+                                    <p class="text-xs text-gray-700 leading-relaxed">${a.mission}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-bold text-ribacom-navy border-b pb-2 mb-3 flex items-center gap-2">
+                                    <i class="fa-solid fa-gem text-ribacom-gold"></i> Core Values
+                                </h3>
+                                <div class="flex flex-wrap gap-2">
+                                    ${a.coreValues.map(v => `<span class="bg-ribacom-navy text-white text-xs font-semibold px-3 py-1.5 rounded-lg">${v}</span>`).join('')}
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 text-xs space-y-2">
+                                <p><strong>General Meeting Schedule:</strong> ${a.generalMeeting}</p>
+                                <p><strong>Official Secretariat Address:</strong> ${a.address}</p>
+                                <p><strong>Contact Helpline:</strong> ${a.contactPhone}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderLeadershipView() {
+                const fallbackExecutives = [
+                    {position:'Chairman / President', name:'Iworima M. Thomas', phone:'', photo:'https://ui-avatars.com/api/?name=Iworima+M+Thomas&background=0b3b60&color=fff', bio:'Chairman and President of Rivers Bayelsa Community in Diaspora The Gambia (RIBACOM).'},
+                    {position:'Vice Chairman / Vice President', name:'Odika Nnenne', phone:'', photo:'https://ui-avatars.com/api/?name=Odika+Nnenne&background=0b3b60&color=fff', bio:'Vice Chairman / Vice President of RIBACOM.'},
+                    {position:'Secretary General', name:'Juliet Ejila', phone:'', photo:'https://ui-avatars.com/api/?name=Juliet+Ejila&background=0b3b60&color=fff', bio:'Secretary General responsible for administration and official records.'},
+                    {position:'Assistant Secretary General', name:'To be updated', phone:'', photo:'https://ui-avatars.com/api/?name=Assistant+Secretary+General&background=0b3b60&color=fff', bio:'Assistant Secretary General. Name and profile will be updated when officially supplied.'},
+                    {position:'Treasurer', name:'Ruth Doubra Julius', phone:'', photo:'https://ui-avatars.com/api/?name=Ruth+Doubra+Julius&background=0b3b60&color=fff', bio:'Treasurer responsible for community financial administration.'},
+                    {position:'Public Relations Officer', name:'Uche Destiny Chikezie', phone:'', photo:'https://ui-avatars.com/api/?name=Uche+Destiny+Chikezie&background=0b3b60&color=fff', bio:'Public Relations Officer responsible for communication and public information.'},
+                    {position:'Welfare Officer / Provost', name:'Emeka Thank God Elechi', phone:'', photo:'https://ui-avatars.com/api/?name=Emeka+Thank+God+Elechi&background=0b3b60&color=fff', bio:'Welfare Officer / Provost responsible for member welfare and community support.'}
+                ];
+                const fallbackAdvisers = [
+                    {position:'Special Adviser — Legal Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Legal+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Legal Affairs.'},
+                    {position:'Special Adviser — Protocol', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Protocol&background=0b3b60&color=fff', bio:'Special Adviser on Protocol.'},
+                    {position:'Special Adviser — Youth Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Youth+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Youth Affairs.'},
+                    {position:'Special Adviser — Cultural Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Cultural+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Cultural Affairs.'}
+                ];
+                const executives = (this.db.leadership && this.db.leadership.length)
+                    ? [...this.db.leadership].sort((a,b)=>Number(a.display_order??a.order??0)-Number(b.display_order??b.order??0))
+                    : fallbackExecutives;
+                const advisers = (this.db.advisers && this.db.advisers.length)
+                    ? this.db.advisers
+                    : fallbackAdvisers;
+
+                const card = (person, adviser=false) => `
+                    <div class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden">
+                        <div class="p-5 sm:p-6 text-center space-y-3">
+                            <img src="${person.photo || person.photo_url || 'https://ui-avatars.com/api/?name=RIBACOM&background=0b3b60&color=fff'}"
+                                 class="w-24 h-24 rounded-full object-cover mx-auto ring-4 ring-ribacom-gold/40 shadow-lg"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=RIBACOM&background=0b3b60&color=fff'">
+                            <div>
+                                <span class="inline-block bg-ribacom-green/10 text-ribacom-green text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                                    ${person.position || (adviser ? 'Special Adviser' : 'Executive Member')}
+                                </span>
+                                <h3 class="font-extrabold text-base text-gray-800 mt-2">${person.name || 'To be updated'}</h3>
+                            </div>
+                            <p class="text-xs text-gray-500 leading-relaxed">${person.bio || person.biography || 'RIBACOM community leadership profile.'}</p>
+                        </div>
+                        ${!adviser && person.phone ? `
+                        <div class="bg-gray-50 p-3 text-center border-t border-gray-100 text-xs text-gray-600 font-medium">
+                            <i class="fa-solid fa-phone text-ribacom-green mr-1"></i> ${person.phone}
+                        </div>` : ''}
+                    </div>`;
+
+                return `
+                    <div class="space-y-8 animate-fadeIn">
+                        <div class="text-center max-w-3xl mx-auto space-y-2">
+                            <span class="inline-block bg-ribacom-green/10 text-ribacom-green font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Official Community Leadership</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-ribacom-navy">RIBACOM Community Leadership</h2>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">The elected executive leadership and four special advisers serving Rivers Bayelsa Community The Gambia.</p>
+                            <p class="text-[11px] text-ribacom-gold font-bold tracking-widest uppercase">TRUTH • UNITY • SERVICE</p>
+                        </div>
+
+                        <section class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-ribacom-navy">Executive Members</h3>
+                                    <p class="text-xs text-gray-500">Seven executive positions of the RIBACOM governing structure.</p>
+                                </div>
+                                <span class="bg-ribacom-navy text-white text-[10px] font-bold px-2.5 py-1 rounded-full">7 POSITIONS</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                ${executives.map(p => card(p, false)).join('')}
+                            </div>
+                        </section>
+
+                        <section class="space-y-4 pt-2">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-ribacom-navy">Four Special Advisers</h3>
+                                    <p class="text-xs text-gray-500">Advisory support in legal, protocol, youth and cultural affairs.</p>
+                                </div>
+                                <span class="bg-ribacom-gold text-ribacom-navy text-[10px] font-bold px-2.5 py-1 rounded-full">4 ADVISERS</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                                ${advisers.slice(0,4).map(p => card(p, true)).join('')}
+                            </div>
+                        </section>
+
+                        <div class="bg-ribacom-navy text-white rounded-3xl p-5 sm:p-6 text-center shadow-xl">
+                            <p class="text-xs text-gray-200">Leadership information is maintained as an official community record and may be updated by authorized administrators.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderConstitutionView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-4xl mx-auto">
+                        <div class="bg-ribacom-navy text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div>
+                                <span class="text-ribacom-gold text-xs font-bold uppercase tracking-wider">Supreme Governing Document</span>
+                                <h2 class="text-2xl font-extrabold">Master Constitution</h2>
+                                <p class="text-xs text-gray-300 mt-1">Contains 13 Chapters & 97 Articles governing RIBACOM The Gambia</p>
+                            </div>
+                            <button onclick="app.toast('Downloading PDF Constitution...', 'info')" class="bg-ribacom-gold text-ribacom-navy hover:bg-yellow-400 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow transition flex-shrink-0">
+                                <i class="fa-solid fa-file-pdf"></i> Download Official PDF
+                            </button>
+                        </div>
+
+                        <div class="space-y-4">
+                            ${this.db.constitution.map(chap => `
+                                <div class="bg-white rounded-2xl border border-gray-200 card-shadow overflow-hidden">
+                                    <div class="bg-gray-50 p-4 font-bold text-ribacom-navy text-sm border-b border-gray-200 flex justify-between items-center">
+                                        <span>${chap.title}</span>
+                                        <span class="text-xs bg-ribacom-green text-white px-2 py-0.5 rounded">${chap.articles.length} Articles</span>
+                                    </div>
+                                    <div class="p-4 space-y-3">
+                                        ${chap.articles.map(art => `
+                                            <div class="p-3 rounded-xl bg-gray-50/60 border border-gray-100 space-y-1">
+                                                <h4 class="font-bold text-xs text-ribacom-green">${art.title}</h4>
+                                                <p class="text-xs text-gray-600 leading-relaxed">${art.content}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderMembershipView() {
+                return `
+                    <div class="max-w-4xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-2">
+                            <span class="inline-flex items-center gap-2 bg-emerald-50 text-ribacom-green px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider">
+                                <i class="fa-solid fa-user-plus"></i> RIBACOM Membership
+                            </span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-ribacom-navy">Membership Application</h2>
+                            <p class="text-xs sm:text-sm text-gray-600">Complete the form below. Your application will remain <strong>Pending</strong> until reviewed by the RIBACOM Secretariat.</p>
+                        </div>
+
+                        <div class="bg-white p-5 sm:p-8 rounded-3xl border border-gray-100 card-shadow">
+                            <form onsubmit="app.handleMembershipSubmit(event)" class="space-y-7">
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-id-card text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">1. Personal Information</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Full Name *</label><input required id="m_fullName" class="form-input" placeholder="Full legal name"></div>
+                                        <div><label class="form-label">Previous / Other Name</label><input id="m_otherName" class="form-input" placeholder="Maiden or former name, if applicable"></div>
+                                        <div><label class="form-label">Date of Birth</label><input type="date" id="m_dob" class="form-input"></div>
+                                        <div><label class="form-label">Gender</label><select id="m_gender" class="form-input"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+                                        <div><label class="form-label">Nationality *</label><input required id="m_nationality" value="Nigerian" class="form-input"></div>
+                                        <div><label class="form-label">Marital Status</label><select id="m_marital" class="form-input"><option value="">Select</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></div>
+                                        <div><label class="form-label">Passport / National ID Number</label><input id="m_idNumber" class="form-input" placeholder="Optional"></div>
+                                        <div><label class="form-label">Passport Photograph</label><input type="file" id="m_photo_file" accept="image/*" class="form-input"><input type="hidden" id="m_photo"><p class="text-[10px] text-gray-500 mt-1">Upload directly from your phone. Maximum 5 MB.</p></div>
+                                    </div>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-map-location-dot text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">2. Rivers / Bayelsa Origin & Membership</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">State of Origin *</label><select required id="m_state" class="form-input"><option value="Rivers State">Rivers State</option><option value="Bayelsa State">Bayelsa State</option><option value="Other / Associate">Associate (Other State/Nationality)</option></select></div>
+                                        <div><label class="form-label">L.G.A</label><input id="m_lga" class="form-input" placeholder="Local Government Area"></div>
+                                        <div><label class="form-label">Town / Community</label><input id="m_originCommunity" class="form-input" placeholder="Town, village or community"></div>
+                                        <div><label class="form-label">Clan / Ward</label><input id="m_clanWard" class="form-input" placeholder="Clan or ward"></div>
+                                        <div><label class="form-label">Membership Category *</label><select required id="m_category" class="form-input"><option value="Regular Member">Regular Member — by birth/ancestry</option><option value="Associate Member">Associate Member — by marriage/affiliation</option></select></div>
+                                        <div><label class="form-label">Previous Community Association</label><input id="m_previousAssociation" class="form-input" placeholder="If applicable"></div>
+                                    </div>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-house-user text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">3. Contact & Residence in The Gambia</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Phone / WhatsApp *</label><input required type="tel" id="m_phone" class="form-input" placeholder="+220 ..."></div>
+                                        <div><label class="form-label">Email Address *</label><input required type="email" id="m_email" class="form-input" placeholder="name@example.com"></div>
+                                    </div>
+                                    <div><label class="form-label">Gambia Residential Address *</label><input required id="m_address" class="form-input" placeholder="Area, street, compound, etc."></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Emergency Contact Name</label><input id="m_emergencyName" class="form-input"></div>
+                                        <div><label class="form-label">Emergency Contact Phone</label><input type="tel" id="m_emergencyPhone" class="form-input"></div>
+                                    </div>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-people-roof text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">4. Family & Next of Kin</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Spouse Name</label><input id="m_spouse" class="form-input"></div>
+                                        <div><label class="form-label">Number of Children</label><input type="number" min="0" id="m_children" class="form-input" placeholder="0"></div>
+                                        <div><label class="form-label">Next of Kin</label><input id="m_nextOfKin" class="form-input"></div>
+                                        <div><label class="form-label">Next of Kin Phone</label><input type="tel" id="m_nextOfKinPhone" class="form-input"></div>
+                                    </div>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-briefcase text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">5. Occupation & Skills</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Occupation / Profession</label><input id="m_occupation" class="form-input"></div>
+                                        <div><label class="form-label">Employer / Business</label><input id="m_employer" class="form-input"></div>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Work Address</label><input id="m_workAddress" class="form-input"></div>
+                                        <div><label class="form-label">Skills / Expertise</label><input id="m_skills" class="form-input" placeholder="e.g. ICT, accounting, construction"></div>
+                                    </div>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-handshake-angle text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">6. Community Participation</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_welfareInterest"> Welfare activities</label>
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_youthInterest"> Youth activities</label>
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_culturalInterest"> Cultural activities</label>
+                                        <label class="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border"><input type="checkbox" id="m_volunteer"> Volunteer / service</label>
+                                    </div>
+                                </section>
+
+                                <section class="space-y-4">
+                                    <div class="flex items-center gap-2 border-b pb-2"><i class="fa-solid fa-lock text-ribacom-green"></i><h3 class="font-extrabold text-ribacom-navy">7. Account & Declaration</h3></div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div><label class="form-label">Password *</label><input type="password" required minlength="8" id="m_password" class="form-input" placeholder="At least 8 characters"></div>
+                                        <div><label class="form-label">Confirm Password *</label><input type="password" required minlength="8" id="m_passwordConfirm" class="form-input"></div>
+                                    </div>
+                                    <label class="flex gap-3 text-xs text-gray-600"><input type="checkbox" required id="m_constitutionConsent" class="mt-0.5"> I agree to abide by the RIBACOM Constitution and lawful decisions of the Community.</label>
+                                    <label class="flex gap-3 text-xs text-gray-600"><input type="checkbox" required id="m_declaration" class="mt-0.5"> I declare that the information supplied in this application is true and correct to the best of my knowledge.</label>
+                                </section>
+
+                                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                                    <p class="font-extrabold"><i class="fa-solid fa-coins mr-1"></i> Monthly Dues</p>
+                                    <p>Membership Application Form Fee: <strong>D${(this.db.welfareSettings.membership_application_fee?.amount||100).toLocaleString()}</strong><br>Monthly membership dues: <strong>D${(this.db.welfareSettings.monthly_dues?.amount||50).toLocaleString()} per month</strong>. Your application is submitted as <strong>Pending</strong> for Secretariat review. Approval is required before full member benefits and Digital ID issuance.</p>
+                                </div>
+                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg transition"><i class="fa-solid fa-paper-plane mr-2"></i> Submit Membership Application</button>
+                            </form>
+                        </div>
+                    </div>
+                    <style>
+                        .form-label{display:block;font-size:.7rem;font-weight:800;color:#374151;text-transform:uppercase;margin-bottom:.25rem}
+                        .form-input{width:100%;padding:.6rem .75rem;border:1px solid #e5e7eb;border-radius:.75rem;font-size:.875rem;outline:none}
+                        .form-input:focus{box-shadow:0 0 0 2px rgba(16,185,129,.25);border-color:#10b981}
+                    </style>
+                `;
+            }
+
+                        renderMembersView() {
+                const isAdmin=['admin','super_admin'].includes(this.currentUser?.roleKey);
+                const records=isAdmin ? this.db.members : this.db.members.filter(m=>m.id===this.currentUser?.memberId);
+                return `
+                    <div class="space-y-6 animate-fadeIn">
+                        <div class="text-center">
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-ribacom-green">RIBACOM Members</span>
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Members Directory</h2>
+                            <p class="text-xs text-gray-500 mt-1">${isAdmin?'Administrator view — complete member records.':'Your membership record — private to your account.'}</p>
+                        </div>
+                        <div class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden">
+                            <div class="p-4 bg-gray-50 border-b flex items-center justify-between">
+                                <span class="text-sm font-extrabold text-ribacom-navy">${records.length} record${records.length===1?'':'s'}</span>
+                                ${!isAdmin?'<button onclick="app.navigate(\'member-dashboard\')" class="text-xs font-bold text-ribacom-green">Open My Dashboard</button>':''}
+                            </div>
+                            <div class="divide-y">
+                                ${records.length?records.map(m=>`
+                                    <div class="p-4 flex items-center gap-3">
+                                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                            ${m.photo_url?'<img src="'+m.photo_url+'" class="w-full h-full object-cover" alt="Member">':'<i class="fa-solid fa-user text-ribacom-green"></i>'}
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="font-extrabold text-sm text-ribacom-navy">${m.full_name||'Member'}</div>
+                                            <div class="text-[11px] text-gray-500">${m.state_of_origin||'—'} • ${m.category||'member'}</div>
+                                            <div class="text-[11px] mt-1"><span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold">${m.status||'pending'}</span></div>
+                                        </div>
+                                    </div>`).join(''):'<div class="p-8 text-center text-sm text-gray-500">No membership record found.</div>'}
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+                        renderDigitalIdView() {
+                const member = this.currentUser?.memberId ? this.db.members.find(m => m.id === this.currentUser.memberId) : null;
+                const id = member ? this.db.digitalIds.find(x => x.memberId === member.id) : null;
+                if (!this.currentUser || !member) return `<div class="max-w-xl mx-auto bg-white rounded-3xl p-8 text-center card-shadow"><h2 class="font-extrabold text-xl text-ribacom-navy">Digital Membership ID</h2><p class="text-sm text-gray-500 mt-2">Please sign in to view your Digital ID.</p><button onclick="app.openLoginModal()" class="mt-4 bg-ribacom-green text-white px-5 py-2.5 rounded-xl font-bold">Sign In</button></div>`;
+                if (member.status !== 'approved') return `<div class="max-w-xl mx-auto bg-white rounded-3xl p-8 text-center card-shadow"><div class="w-16 h-16 mx-auto rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-hourglass-half"></i></div><h2 class="font-extrabold text-xl text-ribacom-navy mt-4">Digital ID Not Yet Issued</h2><p class="text-sm text-gray-500 mt-2">Your membership is currently <strong>${member.status || 'pending'}</strong>. A Digital ID becomes available after Secretariat approval and issuance.</p></div>`;
+                if (!id || id.status !== 'active') return `<div class="max-w-xl mx-auto bg-white rounded-3xl p-8 text-center card-shadow"><div class="w-16 h-16 mx-auto rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-id-card"></i></div><h2 class="font-extrabold text-xl text-ribacom-navy mt-4">Digital ID Pending</h2><p class="text-sm text-gray-500 mt-2">Your membership is approved, but the Digital ID has not been issued or is not currently active.</p></div>`;
+                const expires = id.expires_at || 'Perpetual';
+                const qrData = id.qrCodeData || `RIBACOM-GAMBIA|ID:${id.idCardNumber}|MEMBER:${member.id}|NAME:${member.fullName}`;
+                return `
+                    <div class="max-w-md mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1"><span class="bg-ribacom-gold/20 text-ribacom-navy font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">Official Identity</span><h2 class="text-xl font-extrabold text-ribacom-navy">Digital Membership ID Card</h2><p class="text-xs text-gray-500">Issued from the RIBACOM membership system.</p></div>
+                        <div id="digitalIdCard" class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-ribacom-gold/60 text-white bg-gradient-to-br from-ribacom-navy via-slate-900 to-ribacom-green p-6 space-y-4">
+                            <div class="flex items-center justify-between border-b border-white/20 pb-3"><div><h3 class="font-extrabold text-xs tracking-wider">RIVERS BAYELSA COMMUNITY THE GAMBIA</h3><p class="text-[9px] text-ribacom-gold tracking-widest font-semibold">RIBACOM • TRUTH • UNITY • SERVICE</p></div><span class="text-[9px] bg-emerald-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase">${id.status}</span></div>
+                            <div class="flex items-center space-x-4 py-2"><img src="${member.photo || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop'}" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-ribacom-gold shadow-md flex-shrink-0"><div class="space-y-1 overflow-hidden"><h4 class="font-extrabold text-base truncate">${member.fullName}</h4><p class="text-xs text-ribacom-gold font-bold">${id.idCardNumber}</p><p class="text-[11px] text-gray-300">${member.category || 'Regular Member'}</p><p class="text-[10px] text-gray-400">${member.stateOfOrigin || 'Nigerian'}</p></div></div>
+                            <div class="pt-3 border-t border-white/20 flex items-center justify-between"><div class="space-y-0.5"><p class="text-[9px] text-gray-400">ISSUED: <span class="text-white font-medium">${id.issued_at?.slice(0,10) || '—'}</span></p><p class="text-[9px] text-gray-400">EXPIRES: <span class="text-ribacom-gold font-medium">${expires}</span></p></div><div id="qrcode" class="p-1.5 bg-white rounded-lg shadow-md"></div></div>
+                        </div>
+                        <div class="flex gap-3"><button onclick="window.print()" class="flex-1 bg-ribacom-navy text-white font-bold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-print"></i> Print ID Card</button><button onclick="app.copyDigitalId('${id.idCardNumber}')" class="flex-1 bg-ribacom-green text-white font-bold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-copy"></i> Copy ID No.</button></div>
+                    </div>`;
+            }
+
+                        generateQRCode() {
+                const qrContainer = document.getElementById("qrcode"); if (!qrContainer || typeof QRCode === 'undefined') return;
+                qrContainer.innerHTML = "";
+                const member = this.currentUser?.memberId ? this.db.members.find(m => m.id === this.currentUser.memberId) : null;
+                const id = member ? this.db.digitalIds.find(x => x.memberId === member.id) : null; if (!id) return;
+                new QRCode(qrContainer,{text:id.qrCodeData || `RIBACOM-GAMBIA|ID:${id.idCardNumber}|MEMBER:${member.id}|NAME:${member.fullName}`,width:64,height:64,colorDark:'#0A2540',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+            }
+
+                        renderWelfareView() {
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Welfare Scheme & Benefits</h2>
+                            <p class="text-xs text-gray-600">Official assistance framework for members during key life events.</p>
+                        </div>
+
+                        <!-- Approved Benefits Tier Banner -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
+                                <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="fa-solid fa-rings-wedding"></i>
+                                </div>
+                                <h4 class="font-bold text-xs text-gray-800">Wedding Benefit</h4>
+                                <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.wedding?.amount||10000).toLocaleString()}</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="fa-solid fa-baby"></i>
+                                </div>
+                                <h4 class="font-bold text-xs text-gray-800">Birthday Benefit</h4>
+                                <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.birth?.amount||5000).toLocaleString()}</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="fa-solid fa-ribbon"></i>
+                                </div>
+                                <h4 class="font-bold text-xs text-gray-800">Bereavement</h4>
+                                <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.loss_parent?.amount||15000).toLocaleString()}</p>
+                                <p class="text-[9px] text-gray-400">Parent / Spouse / Child — subject to applicable maximum</p>
+                            </div>
+                        </div>
+
+                        <!-- Application Form -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <h3 class="font-bold text-base text-ribacom-navy flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-ribacom-green"></i> Submit Welfare Claim / Application
+                            </h3>
+                            <form onsubmit="app.handleWelfareSubmit(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Category *</label>
+                                        <select required id="w_type" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                            <option value="wedding">Wedding Benefit — up to D${(this.db.welfareSettings.wedding?.amount||10000).toLocaleString()}</option>
+                                            <option value="birth">Birthday Benefit — up to D${(this.db.welfareSettings.birth?.amount||5000).toLocaleString()}</option>
+                                            <option value="loss_parent">Loss of Parent — up to D${(this.db.welfareSettings.loss_parent?.amount||15000).toLocaleString()}</option>
+                                            <option value="loss_spouse">Loss of Spouse — up to D${(this.db.welfareSettings.loss_spouse?.amount||15000).toLocaleString()}</option>
+                                            <option value="loss_child">Loss of Child — up to D${(this.db.welfareSettings.loss_child?.amount||15000).toLocaleString()}</option>
+                                            <option value="other">Other Special Welfare</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Full Name / ID</label>
+                                        <input type="text" required id="w_memberName" placeholder="Name or Membership No" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description / Claim Details *</label>
+                                    <textarea required id="w_desc" rows="3" placeholder="Provide background information, dates, and documentation references..." class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none"></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full bg-ribacom-navy hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm transition shadow">
+                                    Submit Claim to Welfare Officer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderAnnouncementsView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-3xl mx-auto">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Official Bulletins & Notices</h2>
+                            <p class="text-xs text-gray-600">Official circulars released by the Executive Council.</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            ${this.db.announcements.map(a => `
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="bg-ribacom-green/10 text-ribacom-green font-bold text-xs px-3 py-1 rounded-full">${a.category}</span>
+                                        <span class="text-xs text-gray-400">${a.date}</span>
+                                    </div>
+                                    <h3 class="font-bold text-base text-gray-800">${a.title}</h3>
+                                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">${a.content}</p>
+                                    <div class="pt-3 border-t border-gray-100 text-xs text-gray-400 flex items-center justify-between">
+                                        <span>Issued by: <strong>${a.author}</strong></span>
+                                        <button onclick="app.toast('Notice copied to clipboard', 'info')" class="hover:text-ribacom-green"><i class="fa-regular fa-copy"></i> Copy</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderPublicationsView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-3xl mx-auto">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Official Publications & Documents</h2>
+                            <p class="text-xs text-gray-600">Access approved policy documents, election guidelines, and official reports.</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            ${this.db.publications.map(p => `
+                                <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center justify-between gap-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg flex-shrink-0">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-sm text-gray-800">${p.title}</h4>
+                                            <p class="text-xs text-gray-500">${p.description}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="app.toast('Opening publication document...', 'info')" class="bg-gray-100 hover:bg-ribacom-green hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex-shrink-0">
+                                        View
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderGalleryView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn">
+                        <div class="text-center max-w-2xl mx-auto space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Community Photo Gallery</h2>
+                            <p class="text-xs text-gray-600">Highlights from congresses, cultural dances, and community gatherings.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            ${this.db.gallery.map(g => `
+                                <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 card-shadow space-y-2">
+                                    <img src="${g.image_url}" class="w-full h-48 object-cover hover:scale-105 transition duration-300">
+                                    <div class="p-3">
+                                        <h4 class="font-bold text-xs text-gray-800">${g.title}</h4>
+                                        <p class="text-[11px] text-gray-500">${g.caption}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderYouthView() {
+                const raw = this.db.youth || {};
+                const title = raw.title || 'RIBACOM Youth Wing';
+                const content = raw.content || 'The RIBACOM Youth Wing provides a platform for youth participation, leadership development, community service, skills development and cultural activities.';
+                const image = raw.image || '';
+                const leader = raw.leader || 'Youth Wing Leadership — To Be Announced';
+                const activities = Array.isArray(raw.activities) && raw.activities.length
+                    ? raw.activities
+                    : ['Youth leadership and capacity development','Skills acquisition and entrepreneurship','Community service and volunteering','Cultural and social programmes','Sports and youth engagement'];
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="bg-gradient-to-r from-ribacom-navy to-ribacom-green text-white p-8 rounded-3xl shadow-xl space-y-4">
+                            <span class="bg-ribacom-gold text-ribacom-navy font-black text-[10px] px-2.5 py-1 rounded-full uppercase">Youth Wing</span>
+                            <h2 class="text-2xl font-extrabold">${title}</h2>
+                            ${image ? `<img src="${image}" alt="RIBACOM Youth Wing" class="w-full max-h-56 object-cover rounded-2xl border border-white/20">` : ''}
+                            <p class="text-xs text-gray-200 leading-relaxed">${content}</p>
+                            <div class="pt-2">
+                                <span class="text-xs text-ribacom-gold font-bold"><i class="fa-solid fa-user-shield mr-1"></i> Leadership: ${leader}</span>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-3">
+                            <h3 class="font-bold text-base text-gray-800">Youth Initiatives & Projects</h3>
+                            <ul class="space-y-2">
+                                ${activities.map(act => `
+                                    <li class="p-3 bg-gray-50 rounded-xl text-xs font-semibold text-gray-700 flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-ribacom-green"></i> ${act}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderAdvisersView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-3xl mx-auto">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Council of Advisers</h2>
+                            <p class="text-xs text-gray-600">Elders and patrons providing legal, cultural, and strategic counsel.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${this.db.advisers.map(adv => `
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow flex items-center space-x-4">
+                                    <img src="${adv.photo}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-ribacom-gold">
+                                    <div>
+                                        <span class="bg-amber-100 text-amber-800 font-bold text-[10px] px-2 py-0.5 rounded">${adv.category}</span>
+                                        <h4 class="font-bold text-sm text-gray-800 mt-1">${adv.name}</h4>
+                                        <p class="text-xs text-gray-500">${adv.bio}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+                        renderContactView() {
+                const contacts = [
+                    { role: 'Chairman / President', phone: '+220 877991397', icon: 'fa-user-tie' },
+                    { role: 'Secretary General', phone: '+220 833586955', icon: 'fa-user-pen' },
+                    { role: 'Welfare Officer', phone: '+220 877039287', icon: 'fa-hand-holding-heart' }
+                ];
+                const email = 'ribacomgambia@gmail.com';
+                const address = 'Agricultural Hall, Opposite St Charles, Tabokoto Road';
+
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1">
+                            <span class="text-[10px] font-extrabold uppercase tracking-widest text-ribacom-green">RIBACOM Secretariat</span>
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Contact Secretariat</h2>
+                            <p class="text-xs text-gray-600">Reach out to RIBACOM for official enquiries, membership support and community assistance.</p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center"><i class="fa-solid fa-location-dot"></i></div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-extrabold text-gray-400">Secretariat / Meeting Address</div>
+                                    <div class="text-sm font-bold text-ribacom-navy mt-1">${esc(address)}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center"><i class="fa-solid fa-envelope"></i></div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-extrabold text-gray-400">RIBACOM Secretariat Email</div>
+                                    <a href="mailto:${email}" class="text-sm font-bold text-ribacom-green mt-1 inline-block">${email}</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-3 sm:grid-cols-3">
+                            ${contacts.map(c => `
+                                <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-ribacom-green flex items-center justify-center mb-3"><i class="fa-solid ${c.icon}"></i></div>
+                                    <div class="text-[11px] font-extrabold text-ribacom-navy">${esc(c.role)}</div>
+                                    <a href="tel:${c.phone.replace(/[^+\\d]/g, '')}" class="text-sm font-bold text-ribacom-green mt-1 inline-block">${esc(c.phone)}</a>
+                                    <a href="https://wa.me/${c.phone.replace(/\\D/g, '')}" target="_blank" rel="noopener noreferrer" class="block text-[10px] font-bold text-gray-500 mt-2">
+                                        <i class="fa-brands fa-whatsapp mr-1"></i> WhatsApp
+                                    </a>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div>
+                                <h3 class="font-extrabold text-ribacom-navy">Send a Message</h3>
+                                <p class="text-[11px] text-gray-500 mt-1">Use the form below to send an enquiry to the RIBACOM Secretariat.</p>
+                            </div>
+                            <form onsubmit="event.preventDefault(); const f=this; const body=encodeURIComponent('Name: '+f.name.value.trim()+'\\nEmail: '+f.email.value.trim()+'\\n\\nMessage:\\n'+f.message.value.trim()); window.location.href='mailto:ribacomgambia@gmail.com?subject=RIBACOM%20Secretariat%20Enquiry&body='+body;" class="space-y-3">
+                                <input name="name" type="text" required placeholder="Your Name" class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <input name="email" type="email" required placeholder="Your Email" class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <textarea name="message" required rows="4" placeholder="Message content..." class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none"></textarea>
+                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition">Email Secretariat</button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
             renderEcosystemActivityView() {
                 const u=this.currentUser||{};
                 const role=(u.roleKey||'guest').toLowerCase();
