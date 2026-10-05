@@ -388,29 +388,85 @@
             }
 
             renderLeadershipView() {
+                const fallbackExecutives = [
+                    {position:'Chairman / President', name:'Iworima M. Thomas', phone:'', photo:'https://ui-avatars.com/api/?name=Iworima+M+Thomas&background=0b3b60&color=fff', bio:'Chairman and President of Rivers Bayelsa Community in Diaspora The Gambia (RIBACOM).'},
+                    {position:'Vice Chairman / Vice President', name:'Odika Nnenne', phone:'', photo:'https://ui-avatars.com/api/?name=Odika+Nnenne&background=0b3b60&color=fff', bio:'Vice Chairman / Vice President of RIBACOM.'},
+                    {position:'Secretary General', name:'Juliet Ejila', phone:'', photo:'https://ui-avatars.com/api/?name=Juliet+Ejila&background=0b3b60&color=fff', bio:'Secretary General responsible for administration and official records.'},
+                    {position:'Assistant Secretary General', name:'To be updated', phone:'', photo:'https://ui-avatars.com/api/?name=Assistant+Secretary+General&background=0b3b60&color=fff', bio:'Assistant Secretary General. Name and profile will be updated when officially supplied.'},
+                    {position:'Treasurer', name:'Ruth Doubra Julius', phone:'', photo:'https://ui-avatars.com/api/?name=Ruth+Doubra+Julius&background=0b3b60&color=fff', bio:'Treasurer responsible for community financial administration.'},
+                    {position:'Public Relations Officer', name:'Uche Destiny Chikezie', phone:'', photo:'https://ui-avatars.com/api/?name=Uche+Destiny+Chikezie&background=0b3b60&color=fff', bio:'Public Relations Officer responsible for communication and public information.'},
+                    {position:'Welfare Officer / Provost', name:'Emeka Thank God Elechi', phone:'', photo:'https://ui-avatars.com/api/?name=Emeka+Thank+God+Elechi&background=0b3b60&color=fff', bio:'Welfare Officer / Provost responsible for member welfare and community support.'}
+                ];
+                const fallbackAdvisers = [
+                    {position:'Special Adviser — Legal Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Legal+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Legal Affairs.'},
+                    {position:'Special Adviser — Protocol', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Protocol&background=0b3b60&color=fff', bio:'Special Adviser on Protocol.'},
+                    {position:'Special Adviser — Youth Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Youth+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Youth Affairs.'},
+                    {position:'Special Adviser — Cultural Affairs', name:'To be updated', photo:'https://ui-avatars.com/api/?name=Cultural+Affairs&background=0b3b60&color=fff', bio:'Special Adviser on Cultural Affairs.'}
+                ];
+                const executives = (this.db.leadership && this.db.leadership.length)
+                    ? [...this.db.leadership].sort((a,b)=>(a.order||0)-(b.order||0))
+                    : fallbackExecutives;
+                const advisers = (this.db.advisers && this.db.advisers.length)
+                    ? this.db.advisers
+                    : fallbackAdvisers;
+
+                const card = (person, adviser=false) => `
+                    <div class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden">
+                        <div class="p-5 sm:p-6 text-center space-y-3">
+                            <img src="${person.photo || person.photo_url || 'https://ui-avatars.com/api/?name=RIBACOM&background=0b3b60&color=fff'}"
+                                 class="w-24 h-24 rounded-full object-cover mx-auto ring-4 ring-ribacom-gold/40 shadow-lg"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=RIBACOM&background=0b3b60&color=fff'">
+                            <div>
+                                <span class="inline-block bg-ribacom-green/10 text-ribacom-green text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                                    ${person.position || (adviser ? 'Special Adviser' : 'Executive Member')}
+                                </span>
+                                <h3 class="font-extrabold text-base text-gray-800 mt-2">${person.name || 'To be updated'}</h3>
+                            </div>
+                            <p class="text-xs text-gray-500 leading-relaxed">${person.bio || person.biography || 'RIBACOM community leadership profile.'}</p>
+                        </div>
+                        ${!adviser && person.phone ? `
+                        <div class="bg-gray-50 p-3 text-center border-t border-gray-100 text-xs text-gray-600 font-medium">
+                            <i class="fa-solid fa-phone text-ribacom-green mr-1"></i> ${person.phone}
+                        </div>` : ''}
+                    </div>`;
+
                 return `
-                    <div class="space-y-6 animate-fadeIn">
-                        <div class="text-center max-w-2xl mx-auto space-y-2">
-                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Executive Leadership Roster</h2>
-                            <p class="text-xs text-gray-600">The democratically elected executive council managing the operations of RIBACOM The Gambia.</p>
+                    <div class="space-y-8 animate-fadeIn">
+                        <div class="text-center max-w-3xl mx-auto space-y-2">
+                            <span class="inline-block bg-ribacom-green/10 text-ribacom-green font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">Official Community Leadership</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold text-ribacom-navy">RIBACOM Community Leadership</h2>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">The elected executive leadership and four special advisers serving Rivers Bayelsa Community The Gambia.</p>
+                            <p class="text-[11px] text-ribacom-gold font-bold tracking-widest uppercase">TRUTH • UNITY • SERVICE</p>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            ${this.db.leadership.map(l => `
-                                <div class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden flex flex-col justify-between">
-                                    <div class="p-6 text-center space-y-3">
-                                        <img src="${l.photo}" class="w-24 h-24 rounded-full object-cover mx-auto ring-4 ring-ribacom-gold/40 shadow-lg">
-                                        <div>
-                                            <span class="bg-ribacom-green/10 text-ribacom-green text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">${l.position}</span>
-                                            <h3 class="font-extrabold text-base text-gray-800 mt-2">${l.name}</h3>
-                                        </div>
-                                        <p class="text-xs text-gray-500 leading-relaxed">${l.bio}</p>
-                                    </div>
-                                    <div class="bg-gray-50 p-3 text-center border-t border-gray-100 text-xs text-gray-600 font-medium">
-                                        <i class="fa-solid fa-phone text-ribacom-green mr-1"></i> ${l.phone}
-                                    </div>
+                        <section class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-ribacom-navy">Executive Members</h3>
+                                    <p class="text-xs text-gray-500">Seven executive positions of the RIBACOM governing structure.</p>
                                 </div>
-                            `).join('')}
+                                <span class="bg-ribacom-navy text-white text-[10px] font-bold px-2.5 py-1 rounded-full">7 POSITIONS</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                                ${executives.map(p => card(p, false)).join('')}
+                            </div>
+                        </section>
+
+                        <section class="space-y-4 pt-2">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-extrabold text-ribacom-navy">Four Special Advisers</h3>
+                                    <p class="text-xs text-gray-500">Advisory support in legal, protocol, youth and cultural affairs.</p>
+                                </div>
+                                <span class="bg-ribacom-gold text-ribacom-navy text-[10px] font-bold px-2.5 py-1 rounded-full">4 ADVISERS</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                                ${advisers.slice(0,4).map(p => card(p, true)).join('')}
+                            </div>
+                        </section>
+
+                        <div class="bg-ribacom-navy text-white rounded-3xl p-5 sm:p-6 text-center shadow-xl">
+                            <p class="text-xs text-gray-200">Leadership information is maintained as an official community record and may be updated by authorized administrators.</p>
                         </div>
                     </div>
                 `;
