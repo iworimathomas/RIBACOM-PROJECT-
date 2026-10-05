@@ -483,6 +483,20 @@
                 if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
                 const member=this.db.members.find(m=>m.id===id);
                 if(!member){this.toast('Member record not found.','error');return;}
+                // Route approval through the full application workflow when an application exists.
+                // This keeps member status, membership number, application status and Digital ID synchronized.
+                if(status==='approved' && member.user_id && typeof this.approveMembershipApplication==='function'){
+                    const {data:pendingApplication,error:pendingError}=await this.supabaseClient
+                        .from('membership_applications')
+                        .select('id,status')
+                        .eq('user_id',member.user_id)
+                        .in('status',['pending','under_review'])
+                        .order('created_at',{ascending:false})
+                        .limit(1)
+                        .maybeSingle();
+                    if(pendingError){this.toast(pendingError.message,'error');return;}
+                    if(pendingApplication?.id) return this.approveMembershipApplication(pendingApplication.id);
+                }
                 const patch={status,updated_at:new Date().toISOString()};
                 if(status==='approved'){
                     const currentNo=member.membershipNo||member.membership_number;
