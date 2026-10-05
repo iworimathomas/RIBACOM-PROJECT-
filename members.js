@@ -104,7 +104,7 @@
   RibacomApp.prototype.renderMemberDashboardView = function(){
     const u=this.currentUser||{};
     const member=(this.db.members||[]).find(m=>m.id===u.memberId)||{};
-    const application=(this.db.membershipApplications||[]).filter(a=>a.user_id===u.id).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)[0]||{};
+    const application=((this.db.membershipApplications||[]).filter(a=>a.user_id===u.id).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0])||{};
     const digital=(this.db.digitalIds||[]).find(d=>d.memberId===u.memberId||d.member_id===u.memberId)||null;
     const status=String(member.status||application.status||u.status||'pending').toLowerCase();
     const statusLabel=status.charAt(0).toUpperCase()+status.slice(1);
