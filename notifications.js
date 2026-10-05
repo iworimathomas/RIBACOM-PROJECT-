@@ -19,6 +19,7 @@
     if(error)return this.toast(error.message,'error');
     this.navigate('notifications');
   };
+  RibacomApp.prototype.renderNotificationsView=async function(){ return this.renderNotifications(); };
   RibacomApp.prototype.renderNotifications=async function(){
     if(!this.currentUser)return '<div class="bg-white rounded-3xl p-8 text-center">Please sign in to view notifications.</div>';
     const rows=await this.loadNotifications(), unread=rows.filter(x=>!x.is_read).length;
