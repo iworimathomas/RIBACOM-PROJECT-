@@ -451,6 +451,36 @@
                     </div>`;
             }
 
+            renderMemberDashboardView() {
+                const member = (this.db.members || []).find(x => x.id === this.currentUser?.memberId) || {};
+                const application = (this.db.membershipApplications || []).find(x => x.user_id === this.currentUser?.id) || {};
+                const status = String(member.status || application.status || 'pending').toLowerCase();
+                const name = member.full_name || this.currentUser?.fullName || this.currentUser?.email || 'RIBACOM Member';
+                const digitalId = (this.db.digitalIds || []).find(x => x.memberId === member.id || x.member_id === member.id);
+                const payments = (this.db.financeTransactions || []).filter(x => x.status === 'confirmed' && (x.member_id === member.id || x.memberId === member.id));
+                const paid = payments.filter(x => x.direction === 'income').reduce((n,x)=>n+Number(x.amount||0),0);
+                const badge = status === 'approved' ? 'bg-emerald-50 text-emerald-700' : status === 'rejected' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700';
+                const escv = v => this.esc ? this.esc(v) : String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+                return '<div class="max-w-5xl mx-auto space-y-5 animate-fadeIn">'+
+                  '<div class="rounded-3xl ribacom-header-gradient text-white p-6"><div class="flex items-center gap-4"><div class="w-16 h-16 rounded-full bg-white/10 overflow-hidden flex items-center justify-center">'+
+                  (member.photo_url?'<img src="'+escv(member.photo_url)+'" class="w-full h-full object-cover" alt="Profile">':'<i class="fa-solid fa-user text-2xl text-ribacom-gold"></i>')+
+                  '</div><div><p class="text-xs text-gray-300">RIBACOM MEMBER PORTAL</p><h2 class="text-xl font-extrabold">'+escv(name)+'</h2><p class="text-xs text-gray-300">'+escv(this.currentUser?.email||member.email||'')+'</p></div></div></div>'+
+                  '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3">'+
+                  '<div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Membership</p><span class="inline-block mt-2 px-2 py-1 rounded-full text-xs font-extrabold '+badge+'">'+escv(status)+'</span></div>'+
+                  '<div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Membership No.</p><p class="font-extrabold text-sm mt-2">'+escv(member.membership_number||'Pending')+'</p></div>'+
+                  '<div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Category</p><p class="font-extrabold text-sm mt-2">'+escv(member.category||'—')+'</p></div>'+
+                  '<div class="bg-white rounded-2xl p-4 border card-shadow"><p class="text-[10px] text-gray-500 uppercase">Confirmed Payments</p><p class="font-extrabold text-sm mt-2">D'+paid.toLocaleString()+'</p></div></div>'+
+                  '<div class="bg-white rounded-3xl border card-shadow p-5"><h3 class="font-extrabold text-ribacom-navy mb-4">Application Status</h3><div class="grid sm:grid-cols-3 gap-4 text-sm"><div><span class="text-[10px] uppercase text-gray-400 font-bold">Submitted</span><p class="font-semibold mt-1">'+(application.created_at?new Date(application.created_at).toLocaleDateString():'—')+'</p></div><div><span class="text-[10px] uppercase text-gray-400 font-bold">Reviewed</span><p class="font-semibold mt-1">'+(application.reviewed_at?new Date(application.reviewed_at).toLocaleDateString():'Awaiting review')+'</p></div><div><span class="text-[10px] uppercase text-gray-400 font-bold">Admin Note</span><p class="font-semibold mt-1">'+escv(application.admin_notes||'No note')+'</p></div></div></div>'+
+                  '<div class="bg-white rounded-3xl border card-shadow p-5"><h3 class="font-extrabold text-ribacom-navy mb-4">My Profile</h3><div class="grid sm:grid-cols-2 gap-3 text-sm">'+
+                  '<p><b>Phone:</b> '+escv(member.phone||'—')+'</p><p><b>Email:</b> '+escv(member.email||this.currentUser?.email||'—')+'</p><p><b>State:</b> '+escv(member.state_of_origin||'—')+'</p><p><b>LGA:</b> '+escv(member.lga||'—')+'</p><p class="sm:col-span-2"><b>Address:</b> '+escv(member.address||'—')+'</p></div></div>'+
+                  '<div class="flex flex-wrap gap-2">'+
+                  (status==='approved'&&digitalId?'<button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-id-card mr-1"></i> Digital ID</button>':'<button onclick="app.toast(\'Digital ID becomes available after approval.\',\'warning\')" class="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-xl text-xs font-extrabold">Digital ID after Approval</button>')+
+                  '<button onclick="app.navigate(\'events\')" class="bg-ribacom-navy text-white px-4 py-2.5 rounded-xl text-xs font-extrabold">Events & Attendance</button>'+
+                  '<button onclick="app.navigate(\'welfare\')" class="bg-ribacom-gold text-ribacom-navy px-4 py-2.5 rounded-xl text-xs font-extrabold">Welfare</button>'+
+                  '<button onclick="app.navigate(\'finance\')" class="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-extrabold">Finance & Dues</button>'+
+                  '</div></div>';
+            }
+
             renderHomeView() {
                 const announcements = this.db.announcements.slice(0, 3);
                 const events = this.db.events.slice(0, 2);
