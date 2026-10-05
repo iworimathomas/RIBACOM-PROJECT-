@@ -45,9 +45,7 @@
             async loadCloudData() {
                 if (!this.supabaseClient) return this.db;
                 this.cloudErrors = [];
-                const sources = {
-                    members: 'members',
-                    digitalIds: 'digital_ids',
+                const publicSources = {
                     leadership: 'leadership',
                     advisers: 'advisers',
                     constitution: 'constitution',
@@ -55,13 +53,21 @@
                     events: 'events',
                     gallery: 'gallery',
                     publications: 'publications',
-                    paymentSettings: 'payment_settings',
-                    welfareRequests: 'welfare_requests',
-                    financeTransactions: 'finance_transactions',
-                    membershipApplications: 'membership_applications',
                     youthContent: 'youth_content',
                     aboutContent: 'ribacom_about_content'
                 };
+                // Only request protected datasets after authentication. RLS remains the
+                // authoritative security boundary; this prevents guest startup from
+                // generating expected permission errors for admin/member-only tables.
+                const privateSources = this.currentUser ? {
+                    members: 'members',
+                    digitalIds: 'digital_ids',
+                    paymentSettings: 'payment_settings',
+                    welfareRequests: 'welfare_requests',
+                    financeTransactions: 'finance_transactions',
+                    membershipApplications: 'membership_applications'
+                } : {};
+                const sources = {...publicSources, ...privateSources};
                 const results = await Promise.all(Object.entries(sources).map(async ([key, table]) => {
                     try {
                         const { data, error } = await this.supabaseClient.from(table).select('*');
@@ -223,11 +229,17 @@
             }
             async hydrateCurrentUser(user) {
                 if (!user || !this.supabaseClient) return;
-                const [{ data: profile }, { data: member }, { data: latestApplication }] = await Promise.all([
+                const [profileResult, memberResult, applicationResult] = await Promise.all([
                     this.supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
                     this.supabaseClient.from('members').select('*').eq('user_id', user.id).maybeSingle(),
                     this.supabaseClient.from('membership_applications').select('*').eq('user_id', user.id).order('created_at',{ascending:false}).limit(1).maybeSingle()
                 ]);
+                if (profileResult.error) console.warn('Profile hydration:', profileResult.error.message);
+                if (memberResult.error) console.warn('Member hydration:', memberResult.error.message);
+                if (applicationResult.error) console.warn('Application hydration:', applicationResult.error.message);
+                const profile = profileResult.data;
+                const member = memberResult.data;
+                const latestApplication = applicationResult.data;
 
                 // Email verification can leave a newly registered applicant without a
                 // members row because the initial anonymous signup cannot satisfy the
