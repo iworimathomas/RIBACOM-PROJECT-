@@ -62,12 +62,13 @@
   RibacomApp.prototype.submitExecutiveWork=async function(type,e){
     e.preventDefault();
     if(!canSubmit(this)) return this.toast('Executive access required.','error');
-    const val=id=>document.getElementById(id)?.value?.trim()||'';
+    const form=e.currentTarget;
+    const val=sel=>form.querySelector(sel)?.value?.trim()||'';
     let payload={};
-    if(type==='announcement') payload={title:val('ew_title'),content:val('ew_content'),author_id:this.currentUser.id,is_published:false};
-    if(type==='event') payload={title:val('ew_title'),description:val('ew_content'),event_date:document.getElementById('ew_date')?.value||new Date().toISOString(),location:val('ew_location'),organizer:val('ew_organizer')||'RIBACOM Executive Body',is_published:false};
-    if(type==='publication') payload={title:val('ew_title'),description:val('ew_content'),file_url:val('ew_url'),category:document.getElementById('ew_category')?.value||'general',publication_date:document.getElementById('ew_date')?.value||new Date().toISOString().slice(0,10),is_published:false};
-    if(type==='gallery') payload={title:val('ew_title'),caption:val('ew_content'),image_url:val('ew_url'),created_by:this.currentUser.id,is_published:false};
+    if(type==='announcement') payload={title:val('#ew_title'),content:val('#ew_content'),author_id:this.currentUser.id,is_published:false};
+    if(type==='event') payload={title:val('#ew_title'),description:val('#ew_content'),event_date:form.querySelector('#ew_date')?.value||new Date().toISOString(),location:val('#ew_location'),organizer:val('#ew_organizer')||'RIBACOM Executive Body',is_published:false};
+    if(type==='publication') payload={title:val('#ew_title'),description:val('#ew_content'),file_url:val('#ew_url'),category:form.querySelector('#ew_category')?.value||'general',publication_date:form.querySelector('#ew_date')?.value||new Date().toISOString().slice(0,10),is_published:false};
+    if(type==='gallery') payload={title:val('#ew_title'),caption:val('#ew_content'),image_url:val('#ew_url'),created_by:this.currentUser.id,is_published:false};
     if(!payload.title) return this.toast('Please enter a title.','warning');
     const table=tableMap[type];
     const {error}=await this.supabaseClient.from(table).insert(payload);
