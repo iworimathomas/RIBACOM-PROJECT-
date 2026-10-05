@@ -830,7 +830,7 @@
                 qrContainer.innerHTML = "";
                 const member = this.currentUser?.memberId ? this.db.members.find(m => m.id === this.currentUser.memberId) : null;
                 const id = member ? this.db.digitalIds.find(x => x.memberId === member.id) : null; if (!id) return;
-                new QRCode(qrContainer,{text:id.qrCodeData || `RIBACOM-GAMBIA|ID:${id.idCardNumber}|MEMBER:${member.id}|NAME:${member.fullName}`,width:64,height:64,colorDark:'#0A2540',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+                const verificationUrl = new URL(window.location.origin + window.location.pathname); verificationUrl.searchParams.set('page','verify-membership'); verificationUrl.searchParams.set('id',id.idCardNumber); new QRCode(qrContainer,{text:verificationUrl.toString(),width:128,height:128,colorDark:'#0A2540',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
             }
 
             renderWelfareView() {
