@@ -1,7 +1,7 @@
 // Empty in-memory UI cache; Supabase is the authoritative data source.
         class RibacomApp {
             constructor() {
-                this.db = {members:[],digitalIds:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
+                this.db = {members:[],digitalIds:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
                 this.currentUser = null;
                 this.currentView = 'home';
                 this.supabaseClient = null;
@@ -111,7 +111,7 @@
                     return data || [];
                 };
                 try {
-                    const [about, leadership, advisers, constitution, announcements, events, gallery, publications, youth, payments] = await Promise.all([
+                    const [about, leadership, advisers, constitution, announcements, events, gallery, publications, youth, payments, welfareSettings] = await Promise.all([
                         q('ribacom_about_content', {limit:1}),
                         q('leadership', {order:'display_order'}),
                         q('advisers', {order:'created_at', ascending:false}),
@@ -121,7 +121,8 @@
                         q('gallery', {order:'created_at', ascending:false}),
                         q('publications', {order:'publication_date', ascending:false}),
                         q('youth_content', {order:'created_at', ascending:false}),
-                        q('payment_settings', {order:'method_name'})
+                        q('payment_settings', {order:'method_name'}),
+                        q('welfare_settings', {order:'setting_key'})
                     ]);
                     const members = this.currentUser?.roleKey && ['admin','super_admin'].includes(this.currentUser.roleKey)
                         ? await q('members', {order:'created_at', ascending:false})
@@ -146,6 +147,7 @@
                     this.db.publications = publications.map(x => ({...x, date:x.publication_date}));
                     this.db.youth = youth[0] ? {title:youth[0].section_title, content:youth[0].body_content, image:youth[0].image_url} : {title:'RIBACOM Youth',content:'',image:''};
                     this.db.paymentSettings = payments.map(x => ({...x, method:x.method_name, accountNo:x.account_number, accountName:x.account_name, active:x.is_active}));
+                    this.db.welfareSettings = Object.fromEntries(welfareSettings.map(x => [x.setting_key, x]));
                     if (constitution.length) {
                         const grouped = {};
                         constitution.forEach(x => { const k=x.chapter_number; if(!grouped[k]) grouped[k]={chapter:k,title:x.chapter_title,articles:[]}; grouped[k].articles.push({id:x.id,chapter_number:x.chapter_number,chapter_title:x.chapter_title,number:x.article_number,title:x.article_title,content:x.content,is_published:x.is_published}); });
@@ -395,7 +397,7 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-gray-500 uppercase font-semibold">Welfare Benefits</p>
-                                    <h4 class="font-extrabold text-base text-gray-800">Up to D1,500</h4>
+                                    <h4 class="font-extrabold text-base text-gray-800">Up to Up to D${(this.db.welfareSettings.loss_parent?.amount||15000).toLocaleString()}</h4>
                                 </div>
                             </div>
                             <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center space-x-3">
@@ -762,7 +764,7 @@
 
                                 <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1">
                                     <p class="font-extrabold"><i class="fa-solid fa-coins mr-1"></i> Monthly Dues</p>
-                                    <p>RIBACOM membership dues are <strong>D50 per month</strong>. Your application is submitted as <strong>Pending</strong> for Secretariat review. Approval is required before full member benefits and Digital ID issuance.</p>
+                                    <p>Membership Application Form Fee: <strong>D${(this.db.welfareSettings.membership_application_fee?.amount||100).toLocaleString()}</strong><br>Monthly membership dues: <strong>D${(this.db.welfareSettings.monthly_dues?.amount||50).toLocaleString()} per month</strong>. Your application is submitted as <strong>Pending</strong> for Secretariat review. Approval is required before full member benefits and Digital ID issuance.</p>
                                 </div>
                                 <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg transition"><i class="fa-solid fa-paper-plane mr-2"></i> Submit Membership Application</button>
                             </form>
@@ -819,7 +821,7 @@
                                     <i class="fa-solid fa-rings-wedding"></i>
                                 </div>
                                 <h4 class="font-bold text-xs text-gray-800">Wedding Benefit</h4>
-                                <p class="text-lg font-extrabold text-ribacom-green">D1,000</p>
+                                <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.wedding?.amount||10000).toLocaleString()}</p>
                             </div>
 
                             <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
@@ -827,7 +829,7 @@
                                     <i class="fa-solid fa-baby"></i>
                                 </div>
                                 <h4 class="font-bold text-xs text-gray-800">Child Birth</h4>
-                                <p class="text-lg font-extrabold text-ribacom-green">D500</p>
+                                <p class="text-lg font-extrabold text-ribacom-green">Up to D${(this.db.welfareSettings.birth?.amount||5000).toLocaleString()}</p>
                             </div>
 
                             <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
