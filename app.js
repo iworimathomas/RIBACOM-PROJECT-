@@ -34,6 +34,7 @@
                     created_at:new Date().toISOString()
                 };
                 this.testDigitalId = null;
+                if (this.testMode) this.currentUser={id:'TEST-USER-001',memberId:'TEST-RIBACOM-001',roleKey:'member',email:'test-member@ribacom.test',full_name:'RIBACOM Test Member'};
             }
 
             getTestMember() {
@@ -55,7 +56,7 @@
                     expiry_date:new Date(Date.now()+365*24*60*60*1000).toISOString()
                 };
                 this.toast('TEST MODE: Membership approved and Digital ID generated. No real database record was changed.','success');
-                this.navigate('member-dashboard');
+                this.navigate('digital-id');
             }
 
             renderTestModeBanner() {
@@ -165,7 +166,7 @@
                 // Render specific view
                 switch(viewId) {
                     case 'home':
-                        container.innerHTML = this.renderHomeView();
+                        container.innerHTML = this.renderTestModeBanner()+this.renderHomeView();
                         break;
                     case 'about':
                         container.innerHTML = this.renderAboutView();
