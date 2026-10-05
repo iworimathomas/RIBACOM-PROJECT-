@@ -99,6 +99,30 @@
     await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'status_changed',details:{status}});
     this.renderElectionManager();
   };
+  RibacomApp.prototype.lockElectionVoterRoll=async function(id){
+    if(!isManager()){this.toast('Election manager access denied.','error');return;}
+    const {data:e,error}=await this.supabaseClient.from('elections').select('id,status,voter_roll_locked').eq('id',id).single();
+    if(error||!e){this.toast('Election could not be loaded.','error');return;}
+    if(e.status!=='draft'&&e.status!=='scheduled'){this.toast('Lock the voter roll before the election opens.','warning');return;}
+    const {data:members,error:me}=await this.supabaseClient.from('members').select('id').eq('status','approved');
+    if(me){this.toast(me.message,'error');return;}
+    const rows=(members||[]).map(m=>({election_id:id,member_id:m.id,eligibility_status:'eligible',reason:'Approved member at voter-roll lock'}));
+    const {error:ins}=rows.length?await this.supabaseClient.from('election_voter_roll').upsert(rows,{onConflict:'election_id,member_id'}):{error:null};
+    if(ins){this.toast(ins.message,'error');return;}
+    const {error:up}=await this.supabaseClient.from('elections').update({voter_roll_locked:true,voter_roll_locked_at:new Date().toISOString(),voter_roll_locked_by:this.currentUser.id,updated_at:new Date().toISOString()}).eq('id',id);
+    if(up){this.toast(up.message,'error');return;}
+    await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'voter_roll_locked',details:{eligible_members:rows.length}});
+    this.toast('Voter roll locked with '+rows.length+' eligible approved members.','success');
+    this.manageElectionDetails(id);
+  };
+
+  RibacomApp.prototype.refreshElectionVoterRoll=async function(id){
+    const {data:rows,error}=await this.supabaseClient.from('election_voter_roll').select('member_id,eligibility_status,reason,added_at,members(full_name,membership_number,status)').eq('election_id',id).order('added_at');
+    if(error){this.toast(error.message,'error');return;}
+    const box=document.getElementById('electionVoterRoll'); if(!box)return;
+    box.innerHTML=(rows||[]).map(r=>'<div class="flex justify-between gap-3 border rounded-xl p-3"><div><strong>'+esc(r.members?.full_name||'Member')+'</strong><div class="text-xs text-gray-500">'+esc(r.members?.membership_number||'No number')+'</div></div><span class="text-xs font-bold '+(r.eligibility_status==='eligible'?'text-ribacom-green':'text-red-600')+'">'+esc(r.eligibility_status)+'</span></div>').join('')||'<p class="text-sm text-gray-500">No voter-roll entries.</p>';
+  };
+
   RibacomApp.prototype.manageElectionDetails=async function(id){
     const {data:e}=await this.supabaseClient.from('elections').select('*').eq('id',id).single();
     const {data:p}=await this.supabaseClient.from('election_positions').select('*').eq('election_id',id).order('display_order');
