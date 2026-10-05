@@ -87,6 +87,69 @@
 
             saveDB() { /* Supabase is the authoritative database. */ }
 
+            async restoreSupabaseSession() {
+                if (!this.supabaseClient) return;
+                try {
+                    const { data, error } = await this.supabaseClient.auth.getSession();
+                    if (error) throw error;
+                    const user = data?.session?.user;
+                    if (!user) {
+                        this.currentUser = null;
+                        return;
+                    }
+
+                    let profile = null;
+                    let member = null;
+
+                    const profileResult = await this.supabaseClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .maybeSingle();
+                    if (!profileResult.error) profile = profileResult.data || null;
+
+                    const memberResult = await this.supabaseClient
+                        .from('members')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .maybeSingle();
+                    if (!memberResult.error) member = memberResult.data || null;
+
+                    const role = String(profile?.role || (member ? 'member' : 'visitor')).toLowerCase();
+                    const displayRoles = {
+                        super_admin: 'Super Admin',
+                        admin: 'Admin',
+                        member: 'Member',
+                        visitor: 'Visitor',
+                        treasurer: 'Treasurer',
+                        secretary_general: 'Secretary General',
+                        welfare_officer: 'Welfare Officer',
+                        pro: 'Public Relations Officer',
+                        vice_president: 'Vice President',
+                        assistant_secretary_general: 'Assistant Secretary General'
+                    };
+
+                    this.currentUser = {
+                        id: user.id,
+                        email: user.email || profile?.email || member?.email || '',
+                        fullName: profile?.full_name || member?.full_name || user.email || 'RIBACOM User',
+                        phone: profile?.phone || member?.phone || '',
+                        role: displayRoles[role] || role,
+                        roleKey: role,
+                        membershipNumber: member?.membership_number || '',
+                        memberId: member?.id || null,
+                        status: member?.status || null,
+                        category: member?.category || null,
+                        photoUrl: profile?.avatar_url || member?.photo_url || '',
+                        profile: profile || null,
+                        member: member || null
+                    };
+                } catch (e) {
+                    console.warn('RIBACOM session restore failed:', e);
+                    this.currentUser = null;
+                }
+            }
+
             initSupabase() {
                 const url = window.RIBACOM_CONFIG?.supabaseUrl;
                 const key = window.RIBACOM_CONFIG?.supabaseKey;
