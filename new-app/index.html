@@ -1592,72 +1592,44 @@ async function renderMembership() {
 ========================================================= */
 
 async function renderDigitalID() {
+  const member = AppState.currentMember;
+  const user = AppState.currentUser;
+  const approved = String(member?.status || "").toLowerCase() === "approved";
+  const membershipNo = member?.membership_number || member?.membershipNo || "Not issued";
+  const name = member?.full_name || member?.fullName || user?.user_metadata?.full_name || "Member";
+  const photo = member?.photo_url || "";
   app.innerHTML = `
-    ${page(
-      "Digital ID",
-      "RIBACOM digital membership identity"
-    )}
-
+    ${page("Digital ID","RIBACOM digital membership identity")}
     <section class="card">
-
-      <div class="digital-id">
-
-        <div class="digital-id-header">
-          <strong>
-            RIVERS BAYELSA COMMUNITY
-          </strong>
-
-          <small>
-            THE GAMBIA
-          </small>
-        </div>
-
-        <div class="digital-id-body">
-
-          <div class="digital-id-photo">
-            <span
-              style="
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                height:100%;
-                font-size:2rem;
-              "
-            >
-              👤
-            </span>
+      ${member && approved ? `
+        <div class="digital-id">
+          <div class="digital-id-header">
+            <strong>RIVERS BAYELSA COMMUNITY</strong>
+            <small>THE GAMBIA</small>
           </div>
-
-          <p>
-            <strong>Name:</strong>
-            Member Name
-          </p>
-
-          <p>
-            <strong>Membership No:</strong>
-            RIBACOM-000000
-          </p>
-
-          <p>
-            <strong>Status:</strong>
-            <span class="badge badge-warning">
-              Pending
-            </span>
-          </p>
-
+          <div class="digital-id-body">
+            <div class="digital-id-photo">
+              ${photo ? `<img src="${escapeHTML(photo)}" alt="Member photo" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">` : `<span style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;">👤</span>`}
+            </div>
+            <p><strong>Name:</strong> ${escapeHTML(name)}</p>
+            <p><strong>Membership No:</strong> ${escapeHTML(membershipNo)}</p>
+            <p><strong>Status:</strong> <span class="badge badge-success">Approved</span></p>
+          </div>
         </div>
-
-      </div>
-
+        <div class="alert alert-info">This Digital ID is displayed from your authenticated RIBACOM member profile. Keep your account credentials private.</div>
+      ` : `
+        <div class="alert alert-warning">
+          <strong>Digital ID not issued yet.</strong><br>
+          Your Digital ID will appear here after your membership application has been approved by the RIBACOM Secretariat.
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <p><strong>Current membership status:</strong> ${escapeHTML(member?.status || "Not yet registered")}</p>
+          <p><strong>Membership number:</strong> ${escapeHTML(membershipNo)}</p>
+        </div>
+      `}
     </section>
-
-    <div class="alert alert-info">
-      Your real Digital ID will be generated from
-      your approved Supabase member profile.
-    </div>
   `;
 }
-
 /* =========================================================
    WELFARE
 ========================================================= */
