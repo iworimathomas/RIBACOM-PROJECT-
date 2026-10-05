@@ -197,8 +197,11 @@
     const membershipNumber=existing?.membership_number||`RBC-GM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
     const {data:m,error:me}=await this.supabaseClient.from('members').upsert({user_id:a.user_id,membership_number:membershipNumber,full_name:a.full_name,email:a.email,phone:a.phone,photo_url:a.photo_url,date_of_birth:a.date_of_birth,gender:a.gender,address:a.current_address,nationality:a.nationality||'Nigerian',state_of_origin:['Rivers','Bayelsa'].includes(a.state_of_origin)?a.state_of_origin:'Other',lga:a.lga,rivers_bayelsa_connection:a.rivers_bayelsa_connection,category:(a.membership_category||'').toLowerCase().includes('associate')?'associate':'regular',status:'approved',emergency_contact_name:a.emergency_contact_name,emergency_contact_phone:a.emergency_contact_phone,updated_at:new Date().toISOString()},{onConflict:'user_id'}).select().maybeSingle();
     if(me){this.toast(me.message,'error');return;}
-    const qr=`RIBACOM-GAMBIA|ID:${membershipNumber}|MEMBER:${m?.id||existing?.id}|NAME:${a.full_name}`;
-    const {error:de}=await this.supabaseClient.from('digital_ids').upsert({member_id:m?.id||existing?.id,id_card_number:membershipNumber,qr_code_data:qr,status:'active',issued_at:new Date().toISOString()},{onConflict:'member_id'});
+    const memberId=m?.id||existing?.id;
+    const issuedAt=new Date();
+    const expiresAt=new Date(issuedAt); expiresAt.setFullYear(expiresAt.getFullYear()+1);
+    const qr=`RIBACOM-GAMBIA|ID:${membershipNumber}|MEMBER:${memberId}|NAME:${a.full_name}`;
+    const {error:de}=await this.supabaseClient.from('digital_ids').upsert({member_id:memberId,id_card_number:membershipNumber,qr_code_data:qr,status:'active',issued_at:issuedAt.toISOString(),expires_at:expiresAt.toISOString()},{onConflict:'member_id'});
     if(de){this.toast(de.message,'error');return;}
     const {error:rv}=await this.supabaseClient.from('membership_applications').update({status:'approved',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',id);
     if(rv){this.toast(rv.message,'error');return;}
