@@ -366,6 +366,21 @@
                 this.currentView=view||'home';
                 try { localStorage.setItem('ribacom_last_view',this.currentView); } catch (_) {}
                 const protectedViews=['member-dashboard','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
+                const roleRoutes={
+                    'admin-dashboard':['admin','super_admin'],'admin-members':['admin','super_admin'],'admin-digital-ids':['admin','super_admin'],
+                    'admin-constitution':['admin','super_admin'],'admin-gallery':['admin','super_admin'],'admin-leadership':['admin','super_admin'],
+                    'admin-advisers':['admin','super_admin'],'admin-announcements':['admin','super_admin'],'admin-events':['admin','super_admin'],
+                    'admin-publications':['admin','super_admin'],'admin-youth':['admin','super_admin'],'admin-payments':['admin','super_admin'],
+                    'admin-about':['admin','super_admin'],'admin-system':['admin','super_admin'],
+                    'treasurer-dashboard':['treasurer','admin','super_admin'],'finance':['treasurer','admin','super_admin'],
+                    'finance-reports':['treasurer','admin','super_admin'],'approval-center':['president','admin','super_admin'],
+                    'executive-work':['president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro','admin','super_admin']
+                };
+                const requiredRoles=roleRoutes[this.currentView];
+                if(requiredRoles && !requiredRoles.includes(String(this.currentUser?.roleKey||'').toLowerCase())){
+                    this.toast('You are not authorized to access this portal.','error');
+                    return;
+                }
                 const roleAccess={
                     'member-dashboard':['member','admin','super_admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'],
                     'treasurer-dashboard':['treasurer','admin','super_admin'],
