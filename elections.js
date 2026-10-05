@@ -154,8 +154,11 @@
     const {data:v}=ids.length?await this.supabaseClient.from('election_votes').select('candidate_id,position_id').in('position_id',ids):{data:[]};
     const counts={};(v||[]).forEach(x=>counts[x.candidate_id]=(counts[x.candidate_id]||0)+1);
     const snapshot=(p||[]).map(pos=>{const cs=(c||[]).filter(x=>x.position_id===pos.id&&x.status==='approved');const ranked=cs.map(x=>({candidate_id:x.id,candidate_name:x.full_name,votes:counts[x.id]||0})).sort((a,b)=>b.votes-a.votes);return {position_id:pos.id,position_title:pos.title,candidates:ranked,winner:ranked.length&&ranked[0].votes>0?ranked[0]:null};});
-    const {error:ae}=await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'results_finalized',details:{snapshot,finalized_at:new Date().toISOString()}});
+    const finalizedAt=new Date().toISOString();
+    const {error:ae}=await this.supabaseClient.from('election_audit_logs').insert({election_id:id,actor_user_id:this.currentUser.id,action:'results_finalized',details:{snapshot,finalized_at:finalizedAt}});
     if(ae){this.toast('Could not record finalization: '+ae.message,'error');return;}
+    const {error:fe}=await this.supabaseClient.from('elections').update({results_finalized_at:finalizedAt,results_finalized_by:this.currentUser.id,results_publication_status:'not_submitted',updated_at:finalizedAt}).eq('id',id);
+    if(fe){this.toast('Results were recorded but election finalization metadata could not be updated: '+fe.message,'error');return;}
     this.toast('Official election results snapshot recorded.','success');this.showElectionResults(id);
   };
 
@@ -205,7 +208,7 @@
     const {data:v}=await this.supabaseClient.from('election_votes').select('candidate_id,position_id').in('position_id',(p||[]).map(x=>x.id));
     const counts={};(v||[]).forEach(x=>counts[x.candidate_id]=(counts[x.candidate_id]||0)+1);
     const {data:finalLogs}=await this.supabaseClient.from('election_audit_logs').select('created_at,details,actor_user_id').eq('election_id',id).eq('action','results_finalized').order('created_at',{ascending:false}).limit(1);
-    const finalized=!!(finalLogs&&finalLogs.length); const finalize=e?.status==='closed'&&!finalized?'<button onclick="app.finalizeElection(\\''+id+'\\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl font-bold text-sm">Finalize Official Results</button>':(finalized?'<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold text-sm">✓ Results Finalized</span>':'');\n    const publishButton=e?.status==='closed'?'<button onclick="app.submitElectionResultsForPublication(\\''+id+'\\')" class="border border-ribacom-green text-ribacom-green px-4 py-2 rounded-xl font-bold text-sm">Submit Results for Publication</button>':'';
+    const finalized=!!(finalLogs&&finalLogs.length); const finalize=e?.status==='closed'&&!finalized?'<button onclick="app.finalizeElection(\\''+id+'\\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl font-bold text-sm">Finalize Official Results</button>':(finalized?'<span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold text-sm">✓ Results Finalized</span>':'');\n    const publishButton=e?.status==='closed'&&finalized&&e?.results_publication_status!=='approved'&&e?.results_publication_status!=='pending'?'
     const box=document.getElementById('managerElections');box.innerHTML='<div class="bg-white rounded-2xl shadow border p-5"><button onclick="app.renderElectionManager()" class="text-sm text-ribacom-green font-bold mb-4">← Manager</button><div class="flex flex-wrap justify-between items-center gap-3"><h2 class="text-xl font-black text-ribacom-navy">'+esc(e.title)+' — Results</h2>'+finalize+(publishButton||'')+'</div>'+(p||[]).map(x=>'<section class="mt-5"><h3 class="font-black">'+esc(x.title)+'</h3><div class="space-y-2 mt-2">'+(c||[]).filter(z=>z.position_id===x.id).map(z=>'<div class="flex justify-between border rounded-xl p-3"><span>'+esc(z.full_name)+'</span><strong>'+((counts[z.id]||0))+' vote(s)</strong></div>').join('')+'</div></section>').join('')+'<div class="mt-6 text-xs text-gray-500">Results are calculated from submitted ballots. Individual vote choices are not shown in the member-facing interface.</div></div>';
   };
 })();
