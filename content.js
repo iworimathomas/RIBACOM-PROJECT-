@@ -16,4 +16,29 @@
   RibacomApp.prototype.saveFinance=async function(e){e.preventDefault();if(!A(this))return this.toast('Treasurer/Admin access required.','error');const amount=Number(document.getElementById('fa')?.value);if(!Number.isFinite(amount)||amount<=0)return this.toast('Enter a valid amount.','error');const {error}=await this.supabaseClient.from('finance_transactions').insert({direction:document.getElementById('fd').value,category:document.getElementById('fc').value,member_id:document.getElementById('fm').value||null,amount,payment_method:document.getElementById('fp').value,reference_number:document.getElementById('fr').value.trim()||null,description:document.getElementById('fn').value.trim()||null,status:'confirmed',recorded_by:this.currentUser.id});if(error)return this.toast(error.message,'error');this.toast('Transaction recorded.','success');this.navigate('finance')};
   RibacomApp.prototype.voidFinance=async function(id){if(!A(this))return this.toast('Administrator access required.','error');if(!confirm('Void this transaction?'))return;const {error}=await this.supabaseClient.from('finance_transactions').update({status:'voided',updated_at:new Date().toISOString()}).eq('id',id);if(error)return this.toast(error.message,'error');this.toast('Transaction voided.','success');this.navigate('finance')};
   const oldNav=RibacomApp.prototype.navigate;RibacomApp.prototype.navigate=function(v,p=null){if(v==='finance'){this.currentView=v;const c=document.getElementById('appViewport');this.renderFinanceView().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI()});return}return oldNav.call(this,v,p)};
+
+  RibacomApp.prototype.renderFinanceReports=async function(){
+    if(!A(this)) return this.toast('Administrator access required.','error');
+    const rows=(await this.financeRows()).filter(r=>r.status==='confirmed');
+    const income=rows.filter(r=>r.direction==='income').reduce((s,r)=>s+Number(r.amount||0),0);
+    const expense=rows.filter(r=>r.direction==='expense').reduce((s,r)=>s+Number(r.amount||0),0);
+    const byCat={}; rows.forEach(r=>{const k=r.category||'other';byCat[k]=(byCat[k]||0)+Number(r.amount||0)});
+    const byMethod={}; rows.filter(r=>r.direction==='income').forEach(r=>{const k=r.payment_method||'Not specified';byMethod[k]=(byMethod[k]||0)+Number(r.amount||0)});
+    const dues=byCat.monthly_dues||0, welfare=(byCat.welfare_levy||0), welfarePaid=(byCat.welfare_payment||0);
+    const lines=Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr class="border-t"><td class="p-3">'+E(k.replaceAll('_',' '))+'</td><td class="p-3 text-right font-bold">'+M(v)+'</td></tr>').join('');
+    const methods=Object.entries(byMethod).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr class="border-t"><td class="p-3">'+E(k)+'</td><td class="p-3 text-right font-bold">'+M(v)+'</td></tr>').join('');
+    return '<div id="financeReport" class="space-y-5"><div class="flex flex-wrap justify-between gap-3 print:hidden"><div><span class="text-[10px] font-extrabold text-ribacom-green uppercase">Treasurer Report</span><h2 class="text-2xl font-extrabold text-ribacom-navy">Finance Reports</h2><p class="text-xs text-gray-500">Confirmed transactions only.</p></div><div class="flex gap-2"><button onclick="window.print()" class="px-4 py-2 rounded-xl bg-ribacom-green text-white text-xs font-bold">Print / Save PDF</button><button onclick="app.navigate(\'finance\')" class="px-4 py-2 rounded-xl bg-ribacom-navy text-white text-xs font-bold">← Ledger</button></div></div><div class="bg-white border rounded-3xl p-5"><h1 class="text-xl font-extrabold text-ribacom-navy">RIBACOM Financial Statement</h1><p class="text-xs text-gray-500">'+new Date().toLocaleDateString()+'</p><div class="grid sm:grid-cols-4 gap-3 mt-4"><div><small>INCOME</small><div class="font-extrabold text-ribacom-green">'+M(income)+'</div></div><div><small>EXPENSES</small><div class="font-extrabold text-red-600">'+M(expense)+'</div></div><div><small>BALANCE</small><div class="font-extrabold">'+M(income-expense)+'</div></div><div><small>TRANSACTIONS</small><div class="font-extrabold">'+rows.length+'</div></div></div></div><div class="grid md:grid-cols-2 gap-5"><div class="bg-white border rounded-3xl p-5"><h3 class="font-extrabold text-ribacom-navy mb-3">Income by Category</h3><table class="w-full text-sm">'+lines+'</table></div><div class="bg-white border rounded-3xl p-5"><h3 class="font-extrabold text-ribacom-navy mb-3">Income by Payment Method</h3><table class="w-full text-sm">'+methods+'</table></div></div><div class="bg-white border rounded-3xl p-5"><h3 class="font-extrabold text-ribacom-navy mb-3">Key Fund Movements</h3><div class="grid sm:grid-cols-3 gap-3 text-sm"><div class="bg-gray-50 rounded-xl p-3">Monthly dues collected<br><b>'+M(dues)+'</b></div><div class="bg-gray-50 rounded-xl p-3">Welfare levy collected<br><b>'+M(welfare)+'</b></div><div class="bg-gray-50 rounded-xl p-3">Welfare payments<br><b>'+M(welfarePaid)+'</b></div></div></div></div>';
+  };
+  const oldRenderFinance=RibacomApp.prototype.renderFinanceView;
+  RibacomApp.prototype.renderFinanceView=async function(){
+    const h=await oldRenderFinance.call(this);
+    if(!A(this)) return h;
+    return h.replace('<div class="space-y-5">','<div class="space-y-5"><div class="print:hidden"><button onclick="app.navigate(\\'finance-reports\\')" class="w-full bg-ribacom-navy text-white rounded-2xl p-3 font-extrabold text-sm">📊 Open Treasurer Reports</button></div>');
+  };
+  const oldNav2=RibacomApp.prototype.navigate;
+  RibacomApp.prototype.navigate=function(v,p=null){
+    if(v==='finance-reports'){this.currentView=v;const c=document.getElementById('appViewport');this.renderFinanceReports().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI()});return}
+    return oldNav2.call(this,v,p);
+  };
+
 })();
