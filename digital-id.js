@@ -79,8 +79,9 @@
   };
 
   RibacomApp.prototype.renderDigitalIdView = function() {
-    const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === this.currentUser?.memberId);
-    const member=mine ? (this.db.members||[]).find(m => m.id === (mine.memberId || mine.member_id)) : null;
+    const currentMember=(this.db.members||[]).find(m => m.id===this.currentUser?.memberId || m.user_id===this.currentUser?.id);
+    const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === (currentMember?.id || this.currentUser?.memberId));
+    const member=mine ? (this.db.members||[]).find(m => m.id === (mine.memberId || mine.member_id)) : currentMember;
     const mineCard = mine ? `
       <div class="bg-ribacom-navy text-white rounded-3xl p-5 card-shadow">
         <div class="flex items-start justify-between gap-4"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-full bg-white p-1 object-cover shrink-0">
