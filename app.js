@@ -302,7 +302,20 @@
                     if (profileSyncError) console.warn('Post-verification profile sync:', profileSyncError.message);
                     else resolvedProfile = createdProfile;
                 }
-                const role = resolvedProfile?.role || 'member';
+                let role = resolvedProfile?.role || 'member';
+                // Official leadership email match can provide the executive dashboard automatically.
+                // The database profile role remains authoritative for privileged Supabase writes.
+                if ((role === 'member' || role === 'visitor') && leadershipRecord?.position) {
+                    const p = String(leadershipRecord.position).toLowerCase();
+                    const leadershipRole = p.includes('president') && !p.includes('vice') ? 'president'
+                      : p.includes('vice president') ? 'vice_president'
+                      : p.includes('secretary general') && p.includes('assistant') ? 'assistant_secretary_general'
+                      : p.includes('secretary general') ? 'secretary_general'
+                      : p.includes('treasurer') ? 'treasurer'
+                      : p.includes('welfare') || p.includes('provost') ? 'welfare_officer'
+                      : p.includes('public relations') || p === 'pro' ? 'pro' : null;
+                    if (leadershipRole) role = leadershipRole;
+                }
                 this.currentUser = {
                     id: user.id,
                     userId: user.id,
