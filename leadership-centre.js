@@ -4,7 +4,7 @@
  const e=v=>typeof esc==='function'?esc(v??''):String(v??'');
  RibacomApp.prototype.loadLeadershipCentre=async function(){
   const [l,a]=await Promise.all([
-   this.supabaseClient.from('leadership').select('*').eq('is_active',true).order('category').order('created_at'),
+   this.supabaseClient.from('leadership').select('*').eq('is_active',true).order('display_order').order('created_at'),
    this.supabaseClient.from('advisers').select('*').eq('is_active',true).order('display_order').order('created_at')
   ]);
   if(l.error||a.error){this.toast(l.error?.message||a.error?.message,'error');return{leadership:[],advisers:[]}}
@@ -12,6 +12,9 @@
  };
  RibacomApp.prototype.renderLeadershipCentre=async function(){
   const d=await this.loadLeadershipCentre();
+  if((!d.leadership||!d.leadership.length) && Array.isArray(this.db?.leadership) && this.db.leadership.length){
+    d.leadership=this.db.leadership.filter(x=>x.is_active!==false);
+  }
   const required=['President','Vice President','Secretary General','Assistant Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
   const existing=new Set(d.leadership.map(x=>String(x.position||'').trim().toLowerCase()));
   const vacancies=required.filter(x=>!existing.has(x.toLowerCase())).map(position=>({name:'Position Vacant',position,biography:'This constitutional executive position is currently vacant.',is_vacant:true}));
