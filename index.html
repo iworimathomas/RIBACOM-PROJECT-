@@ -530,7 +530,7 @@
                 this.supabaseClient = null;
                 
                 this.initSupabase();
-                if (this.supabaseClient && this.currentUser) this.hydrateCurrentUser();
+                this.refreshCurrentCloudSession();
             }
 
             loadInitialDB() {
@@ -2413,24 +2413,14 @@
             }
 
             saveSupabaseConfig() {
-                const url = document.getElementById('supabaseUrlInput').value.trim();
-                const key = document.getElementById('supabaseKeyInput').value.trim();
-
-                if (url && key) {
-                    localStorage.setItem('supabase_url', url);
-                    localStorage.setItem('supabase_key', key);
-                    this.initSupabase();
-                    this.toast('Supabase Connection Saved!', 'success');
-                }
+                this.initSupabase();
+                this.toast(this.supabaseClient ? 'RIBACOM Cloud connection is active.' : 'RIBACOM Cloud connection is unavailable.', this.supabaseClient ? 'success' : 'error');
                 this.closeSupabaseModal();
             }
 
             resetSupabaseConfig() {
-                localStorage.removeItem('supabase_url');
-                localStorage.removeItem('supabase_key');
-                document.getElementById('backendStatusBadge').innerText = "Local DB (Demo)";
-                document.getElementById('backendStatusBadge').className = "hidden sm:inline";
-                this.toast('Reverted to Offline Engine', 'info');
+                this.initSupabase();
+                this.toast('RIBACOM uses the protected application configuration. Browser credentials are not stored locally.', 'info');
                 this.closeSupabaseModal();
             }
 
