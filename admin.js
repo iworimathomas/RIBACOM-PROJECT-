@@ -1,6 +1,6 @@
 /* RIBACOM D4 — Administration and CRUD module */
 (function () {
-  const isAdmin = a => !!a?.currentUser && ['admin','super_admin'].includes(a.currentUser.roleKey);
+  const isAdmin = a => !!a?.currentUser && ['admin','super_admin','treasurer'].includes(a.currentUser.roleKey);
   const esc = v => String(v ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   const val = id => document.getElementById(id)?.value?.trim() || '';
 
