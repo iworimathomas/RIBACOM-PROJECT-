@@ -37,8 +37,10 @@
     if(!String(title||'').trim()||!String(message||'').trim()) return this.toast('Title and message are required.','warning');
     const {data:members,error}=await this.supabaseClient.from('members').select('user_id').not('user_id','is',null);
     if(error) return this.toast(error.message,'error');
-    const rows=(members||[]).filter(m=>m.user_id).map(m=>({
-      user_id:m.user_id,title:String(title).trim(),message:String(message).trim(),type:String(type||'announcement').trim(),
+    const uniqueUserIds=[...new Set((members||[]).map(m=>m.user_id).filter(Boolean))];
+    const rows=uniqueUserIds.map(userId=>({
+      user_id:userId,
+      title:String(title).trim(),message:String(message).trim(),type:String(type||'announcement').trim(),
       link_route:linkRoute||null,is_read:false
     }));
     if(!rows.length) return this.toast('No linked member accounts were found.','warning');
