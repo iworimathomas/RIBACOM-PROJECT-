@@ -299,6 +299,15 @@
       status:'rejected',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),admin_notes:reason.trim()
     }).eq('id',applicationId).in('status',['pending','under_review']);
     if(error) return this.toast(error.message,'error');
+    const {error:notificationError}=await this.supabaseClient.from('notifications').insert({
+      user_id:applicationId && (this.db.membershipApplications||[]).find(a=>a.id===applicationId)?.user_id || null,
+      title:'Membership application update',
+      message:'Your RIBACOM membership application was not approved. Reason: '+reason.trim(),
+      type:'membership',
+      link_route:'member-dashboard',
+      is_read:false
+    });
+    if(notificationError) console.warn('Rejection notification:',notificationError.message);
     this.toast('Membership application rejected.','success');
     this.navigate('admin-members');
   };
