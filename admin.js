@@ -250,4 +250,38 @@
     this.toast('Membership application rejected and member records synchronized.','warning');
     await this.openMembershipApplications();
   };
+  const isFinance=a=>!!a?.currentUser&&['admin','super_admin','treasurer'].includes(String(a.currentUser.roleKey||'').toLowerCase());
+  const oldAdminNav=RibacomApp.prototype.navigate;
+  RibacomApp.prototype.navigate=function(viewId,params=null){
+    if(viewId==='finance'){
+      if(!isFinance(this)) return this.toast('Treasurer, Admin or Super Admin access required.','error');
+      this.currentView=viewId;
+      const vp=document.getElementById('appViewport');
+      if(vp) vp.innerHTML=this.renderFinanceCentre();
+      this.updateAuthHeaderUI();
+      return;
+    }
+    return oldAdminNav.call(this,viewId,params);
+  };
+  RibacomApp.prototype.renderFinanceCentre=function(){
+    if(!isFinance(this)) return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">Finance access required.</div>';
+    const rows=this.db.financeTransactions||[];
+    const income=rows.filter(x=>String(x.direction).toLowerCase()==='income').reduce((s,x)=>s+Number(x.amount||0),0);
+    const expense=rows.filter(x=>String(x.direction).toLowerCase()==='expense').reduce((s,x)=>s+Number(x.amount||0),0);
+    const role=String(this.currentUser?.roleKey||'').toLowerCase();
+    const canWrite=['admin','super_admin','treasurer'].includes(role);
+    const list=rows.slice(0,100).map(x=>'<tr class="border-b"><td class="p-2">'+esc(x.created_at?.slice(0,10)||'—')+'</td><td class="p-2 font-semibold">'+esc(x.category)+'</td><td class="p-2">'+esc(x.direction)+'</td><td class="p-2">D'+Number(x.amount||0).toLocaleString()+'</td><td class="p-2">'+esc(x.payment_method||'—')+'</td><td class="p-2">'+esc(x.reference_number||x.receipt_number||'—')+'</td><td class="p-2">'+esc(x.status||'—')+'</td></tr>').join('')||'<tr><td colspan="7" class="p-6 text-center text-gray-500">No finance transactions recorded.</td></tr>';
+    return '<div class="max-w-7xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase text-ribacom-gold">RIBACOM Finance Centre</span><h2 class="text-2xl font-extrabold mt-1">'+esc(role==='treasurer'?'Treasurer Dashboard':'Finance Administration')+'</h2><p class="text-xs text-gray-300 mt-1">Membership dues, welfare levy and official financial records.</p></div><div class="grid sm:grid-cols-3 gap-4"><div class="bg-white rounded-2xl border p-5"><p class="text-xs text-gray-500">Income</p><p class="text-2xl font-black text-ribacom-green mt-1">D'+income.toLocaleString()+'</p></div><div class="bg-white rounded-2xl border p-5"><p class="text-xs text-gray-500">Expenses</p><p class="text-2xl font-black text-red-600 mt-1">D'+expense.toLocaleString()+'</p></div><div class="bg-white rounded-2xl border p-5"><p class="text-xs text-gray-500">Balance</p><p class="text-2xl font-black text-ribacom-navy mt-1">D'+(income-expense).toLocaleString()+'</p></div></div>'+(canWrite?'<div class="bg-white rounded-3xl border p-6"><h3 class="font-extrabold text-ribacom-navy">Record Transaction</h3><form onsubmit="app.recordFinanceTransaction(event)" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"><select id="fin_direction" class="border rounded-xl p-3" required><option value="income">Income</option><option value="expense">Expense</option></select><select id="fin_category" class="border rounded-xl p-3" required><option value="registration">Registration Fee</option><option value="monthly_dues">Monthly Dues</option><option value="welfare_levy">Welfare Levy</option><option value="welfare_payment">Welfare Payment</option><option value="donation">Donation</option><option value="venue">Venue</option><option value="refreshment">Refreshment</option><option value="other">Other</option></select><input id="fin_amount" type="number" min="0" step="0.01" placeholder="Amount (D)" class="border rounded-xl p-3" required><input id="fin_method" placeholder="Payment method" class="border rounded-xl p-3"><input id="fin_reference" placeholder="Reference / receipt" class="border rounded-xl p-3"><input id="fin_description" placeholder="Description" class="border rounded-xl p-3"><button class="bg-ribacom-green text-white rounded-xl p-3 font-bold sm:col-span-2">Record Transaction</button></form></div>':'')+'<div class="bg-white rounded-3xl border p-4 overflow-x-auto"><h3 class="font-extrabold text-ribacom-navy p-2">Financial Records</h3><table class="w-full text-xs"><thead><tr class="bg-gray-50"><th class="p-2 text-left">Date</th><th class="p-2 text-left">Category</th><th class="p-2 text-left">Direction</th><th class="p-2 text-left">Amount</th><th class="p-2 text-left">Method</th><th class="p-2 text-left">Reference</th><th class="p-2 text-left">Status</th></tr></thead><tbody>'+list+'</tbody></table></div><button onclick="app.navigate(\'executive-work\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl text-xs font-bold">Back to Executive Portal</button></div>';
+  };
+  RibacomApp.prototype.recordFinanceTransaction=async function(e){
+    e.preventDefault();
+    if(!isFinance(this)) return this.toast('Treasurer, Admin or Super Admin access required.','error');
+    const amount=Number(document.getElementById('fin_amount')?.value||0);
+    if(!(amount>0)) return this.toast('Enter a valid transaction amount.','warning');
+    const payload={direction:document.getElementById('fin_direction')?.value,category:document.getElementById('fin_category')?.value,amount,payment_method:document.getElementById('fin_method')?.value?.trim()||null,reference_number:document.getElementById('fin_reference')?.value?.trim()||null,description:document.getElementById('fin_description')?.value?.trim()||null,status:'recorded',recorded_by:this.currentUser.id};
+    const {error}=await this.supabaseClient.from('finance_transactions').insert(payload);
+    if(error) return this.toast(error.message,'error');
+    await this.loadCloudData(); this.toast('Financial transaction recorded.','success'); this.navigate('finance');
+  };
+
 })();
