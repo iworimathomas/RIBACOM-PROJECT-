@@ -1,6 +1,6 @@
 /* RIBACOM Media Gallery Centre */
 (function(){
- const admin=a=>['admin','super_admin'].includes(a?.currentUser?.roleKey);
+ const admin=a=>['admin','super_admin'].includes(String(a?.currentUser?.roleKey||'').toLowerCase()); const approver=a=>['super_admin'].includes(String(a?.currentUser?.roleKey||'').toLowerCase());
  const e=v=>typeof esc==='function'?esc(v??''):String(v??'');
  RibacomApp.prototype.loadGallery=async function(all=false){
   let q=this.supabaseClient.from('gallery').select('*').order('created_at',{ascending:false});
@@ -15,12 +15,12 @@
   if(error)return this.toast(error.message,'error');this.toast('Gallery item submitted for approval.','success');this.navigate('gallery-admin');
  };
  RibacomApp.prototype.publishGalleryItem=async function(id){
-  if(!admin(this))return this.toast('Administrator access required.','error');
+  if(!approver(this))return this.toast('President / Super Admin approval required.','error');
   const {error}=await this.supabaseClient.from('gallery').update({is_published:true,approval_status:'approved',approved_by:this.currentUser.id,approved_at:new Date().toISOString()}).eq('id',id);
   if(error)return this.toast(error.message,'error');this.toast('Gallery item published.','success');this.navigate('gallery-admin');
  };
  RibacomApp.prototype.unpublishGalleryItem=async function(id){
-  if(!admin(this))return this.toast('Administrator access required.','error');
+  if(!approver(this))return this.toast('President / Super Admin approval required.','error');
   const {error}=await this.supabaseClient.from('gallery').update({is_published:false}).eq('id',id);
   if(error)return this.toast(error.message,'error');this.navigate('gallery-admin');
  };
