@@ -65,7 +65,8 @@
                     paymentSettings: 'payment_settings',
                     welfareRequests: 'welfare_requests',
                     financeTransactions: 'finance_transactions',
-                    membershipApplications: 'membership_applications'
+                    membershipApplications: 'membership_applications',
+                    notifications: 'notifications'
                 } : {};
                 const sources = {...publicSources, ...privateSources};
                 const results = await Promise.all(Object.entries(sources).map(async ([key, table]) => {
