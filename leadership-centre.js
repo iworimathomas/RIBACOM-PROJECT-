@@ -15,7 +15,7 @@
   if((!d.leadership||!d.leadership.length) && Array.isArray(this.db?.leadership) && this.db.leadership.length){
     d.leadership=this.db.leadership.filter(x=>x.is_active!==false);
   }
-  const required=['President','Vice President','Secretary General','Assistant Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
+  const required=['Chairman','Vice-Chair','Secretary General','Assistant Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
   const existing=new Set(d.leadership.map(x=>String(x.position||'').trim().toLowerCase()));
   const vacancies=required.filter(x=>!existing.has(x.toLowerCase())).map(position=>({name:'Position Vacant',position,biography:'This constitutional executive position is currently vacant.',is_vacant:true}));
   const roster=[...d.leadership,...vacancies].sort((a,b)=>{const ai=required.indexOf(a.position),bi=required.indexOf(b.position);return (ai<0?999:ai)-(bi<0?999:bi) || Number(a.display_order||0)-Number(b.display_order||0);});
