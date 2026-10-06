@@ -243,15 +243,17 @@
                 const [profileResult, memberResult, applicationResult] = await Promise.all([
                     this.supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
                     this.supabaseClient.from('members').select('*').eq('user_id', user.id).maybeSingle(),
-                    this.supabaseClient.from('membership_applications').select('*').eq('user_id', user.id).order('created_at',{ascending:false}).limit(1).maybeSingle()
+                    this.supabaseClient.from('membership_applications').select('*').eq('user_id', user.id).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+                    this.supabaseClient.from('leadership').select('*').eq('is_active',true).ilike('email', user.email).limit(1).maybeSingle()
                 ]);
                 if (profileResult.error) console.warn('Profile hydration:', profileResult.error.message);
                 if (memberResult.error) console.warn('Member hydration:', memberResult.error.message);
                 if (applicationResult.error) console.warn('Application hydration:', applicationResult.error.message);
                 const profile = profileResult.data;
                 const member = memberResult.data;
+                const leadershipRecord = (await this.supabaseClient.from('leadership').select('*').eq('is_active',true).ilike('email', user.email).limit(1).maybeSingle()).data;
                 const latestApplication = applicationResult.data;
-
+                
                 // Email verification can leave a newly registered applicant without a
                 // members row because the initial anonymous signup cannot satisfy the
                 // protected members INSERT policy. Once the user is authenticated, safely
