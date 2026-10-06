@@ -1160,12 +1160,47 @@
                 `;
             }
 
+            async prepareCloudDigitalId() {
+                if (!this.supabaseClient || !this.currentUser?.id) return null;
+                const { data: member } = await this.supabaseClient.from('members')
+                    .select('id,membership_number,full_name,status,category,photo_url,state_of_origin,lga')
+                    .eq('user_id', this.currentUser.id).maybeSingle();
+                if (!member || member.status !== 'approved') return null;
+                const { data: digitalId } = await this.supabaseClient.from('digital_ids')
+                    .select('*').eq('member_id', member.id).maybeSingle();
+                if (!digitalId) return null;
+                this.currentUser.membershipNo = member.membership_number || '';
+                this.currentUser.fullName = member.full_name;
+                this.currentUser.status = member.status;
+                this.currentUser.category = member.category;
+                this.currentUser.photo = member.photo_url || '';
+                this.currentUser.stateOfOrigin = member.state_of_origin || '';
+                this.currentUser.lga = member.lga || '';
+                this.currentUser.digitalId = digitalId;
+                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                return digitalId;
+            }
+
+            async refreshCurrentCloudSession() {
+                if (!this.supabaseClient) return null;
+                const { data: { user } } = await this.supabaseClient.auth.getUser();
+                if (!user) {
+                    this.currentUser = null;
+                    localStorage.removeItem('ribacom_user');
+                    return null;
+                }
+                await this.hydrateCurrentUser();
+                if (this.currentUser?.status === 'approved') await this.prepareCloudDigitalId();
+                return this.currentUser;
+            }
+
             generateQRCode() {
                 const qrContainer = document.getElementById("qrcode");
                 if (!qrContainer) return;
                 qrContainer.innerHTML = "";
                 const user = this.currentUser || this.db.members[0];
-                const qrData = `RIBACOM-GAMBIA|ID:${user.membershipNo || '001'}|NAME:${user.fullName}|STATUS:${user.status}`;
+                const idCard = user.digitalId?.id_card_number || user.membershipNo;
+                const qrData = user.digitalId?.qr_code_data || (idCard ? `RIBACOM-GAMBIA|ID:${idCard}|NAME:${user.fullName}|STATUS:${user.status}` : 'RIBACOM-GAMBIA|PENDING-APPROVAL');
                 new QRCode(qrContainer, {
                     text: qrData,
                     width: 50,
@@ -2279,7 +2314,10 @@
                     </div>`).join('');
             }
 
-            logout() {
+            async logout() {
+                if (this.supabaseClient) {
+                    try { await this.supabaseClient.auth.signOut(); } catch (e) { console.warn(e); }
+                }
                 this.currentUser = null;
                 localStorage.removeItem('ribacom_user');
                 this.toast('Logged out successfully', 'info');
