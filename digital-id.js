@@ -15,7 +15,7 @@
   function qr(member, number) { return `RIBACOM-GAMBIA|ID:${number}|MEMBER:${member.id}|NAME:${member.full_name || member.fullName}`; }
 
   RibacomApp.prototype.createDigitalId = async function(memberId) {
-    if (!admin(this)) return this.toast('Administrator access required.','error');
+    if (!['president','admin','super_admin'].includes(String(this.currentUser?.roleKey||'').toLowerCase())) return this.toast('President or Admin access required.','error');
     const {data:member,error:memberError}=await this.supabaseClient.from('members').select('*').eq('id',memberId).maybeSingle();
     if(memberError) return this.toast(memberError.message,'error');
     if(!member) return this.toast('Member not found.','error');
