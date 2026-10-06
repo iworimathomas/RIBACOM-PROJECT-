@@ -1,6 +1,6 @@
 /* RIBACOM Secretariat Management Centre */
 (function(){
-  const ROLES=['super_admin','admin','secretary_general','assistant_secretary_general','welfare_officer','treasurer'];
+  const ROLES=['super_admin','admin','secretary_general','assistant_secretary_general','welfare_officer','treasurer','vice_president','pro'];
   const canUse=app=>ROLES.includes(app?.currentUser?.roleKey);
   const escv=v=>typeof esc==='function'?esc(v??''):String(v??'');
   const fmt=d=>d?new Date(d).toLocaleString(): '—';
@@ -57,6 +57,28 @@
     this.navigate('secretariat');
   };
 
+  RibacomApp.prototype.secretariatExecutives=async function(){
+    if(!canUse(this)||!this.supabaseClient) return [];
+    const roles=['super_admin','secretary_general','assistant_secretary_general','welfare_officer','treasurer','vice_president','pro'];
+    const {data,error}=await this.supabaseClient.from('profiles').select('id,full_name,role').in('role',roles).order('full_name');
+    if(error) return [];
+    return data||[];
+  };
+
+  RibacomApp.prototype.assignSecretariatCase=async function(id,assigneeId){
+    if(!canUse(this)) return this.toast('Secretariat access required.','error');
+    const {data:target,error:targetError}=await this.supabaseClient.from('profiles').select('id,full_name,role').eq('id',assigneeId).maybeSingle();
+    if(targetError||!target) return this.toast('Selected executive could not be verified.','error');
+    const {data:row,error:getErr}=await this.supabaseClient.from('secretariat_cases').select('assigned_to').eq('id',id).maybeSingle();
+    if(getErr||!row) return this.toast(getErr?.message||'Case not found.','error');
+    const {error}=await this.supabaseClient.from('secretariat_cases').update({assigned_to:assigneeId,updated_at:new Date().toISOString()}).eq('id',id);
+    if(error) return this.toast(error.message,'error');
+    await this.supabaseClient.from('secretariat_case_actions').insert({case_id:id,action_type:'assignment',note:'Case assigned to '+(target.full_name||'executive member')+'.',actor_id:this.currentUser.id});
+    if(typeof sendMemberNotification==='function') await sendMemberNotification(assigneeId,'Secretariat Case Assigned','A RIBACOM Secretariat case has been assigned to you.','secretariat','secretariat');
+    this.toast('Case assigned successfully.','success');
+    this.navigate('secretariat');
+  };
+
   RibacomApp.prototype.addSecretariatNote=async function(id){
     if(!canUse(this)) return;
     const note=prompt('Add Secretariat note:','');
@@ -72,13 +94,13 @@
   RibacomApp.prototype.renderSecretariat=async function(){
     if(!this.currentUser) return '<div class="bg-white rounded-3xl border p-8 text-center">Please sign in.</div>';
     if(!canUse(this)) return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">Secretariat access required.</div>';
-    const rows=await this.secretariatCases();
+    const [rows,executives]=await Promise.all([this.secretariatCases(),this.secretariatExecutives()]);
     const counts={new:0,under_review:0,awaiting_information:0,completed:0};
     rows.forEach(r=>{if(counts[r.status]!==undefined)counts[r.status]++});
     const cards=rows.length?rows.map(r=>{
       const badge=r.status==='new'?'bg-blue-100 text-blue-700':r.status==='under_review'?'bg-amber-100 text-amber-700':r.status==='completed'?'bg-emerald-100 text-emerald-700':'bg-gray-100 text-gray-700';
       const pri=r.priority==='urgent'?'text-red-600':r.priority==='high'?'text-orange-600':'text-gray-500';
-      return '<div class="bg-white border rounded-2xl p-4 shadow-sm"><div class="flex flex-wrap justify-between gap-2"><div><span class="text-[10px] font-black uppercase text-ribacom-green">'+escv(label(r.case_type))+'</span><h3 class="font-extrabold text-ribacom-navy">'+escv(r.title)+'</h3></div><span class="px-2 py-1 rounded-full text-[10px] font-bold '+badge+'">'+escv(label(r.status))+'</span></div><p class="text-xs text-gray-500 mt-2">'+escv(r.description||'')+'</p><div class="flex flex-wrap items-center gap-2 mt-3 text-[11px]"><span class="'+pri+' font-bold">Priority: '+escv(label(r.priority))+'</span><span class="text-gray-400">Updated: '+escv(fmt(r.updated_at))+'</span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3"><select onchange="app.updateSecretariatCase('+JSON.stringify(r.id)+',this.value,'+JSON.stringify(r.priority)+')" class="border rounded-xl p-2 text-xs"><option value="new" '+(r.status==='new'?'selected':'')+'>New</option><option value="under_review" '+(r.status==='under_review'?'selected':'')+'>Under Review</option><option value="awaiting_information" '+(r.status==='awaiting_information'?'selected':'')+'>Awaiting Information</option><option value="completed" '+(r.status==='completed'?'selected':'')+'>Completed</option><option value="closed" '+(r.status==='closed'?'selected':'')+'>Closed</option></select><select onchange="app.updateSecretariatCase('+JSON.stringify(r.id)+','+JSON.stringify(r.status)+',this.value)" class="border rounded-xl p-2 text-xs"><option value="low" '+(r.priority==='low'?'selected':'')+'>Low</option><option value="normal" '+(r.priority==='normal'?'selected':'')+'>Normal</option><option value="high" '+(r.priority==='high'?'selected':'')+'>High</option><option value="urgent" '+(r.priority==='urgent'?'selected':'')+'>Urgent</option></select><button onclick="app.addSecretariatNote('+JSON.stringify(r.id)+')" class="bg-ribacom-navy text-white rounded-xl p-2 text-xs font-bold">Add Note</button></div></div>';
+      return '<div class="bg-white border rounded-2xl p-4 shadow-sm"><div class="flex flex-wrap justify-between gap-2"><div><span class="text-[10px] font-black uppercase text-ribacom-green">'+escv(label(r.case_type))+'</span><h3 class="font-extrabold text-ribacom-navy">'+escv(r.title)+'</h3></div><span class="px-2 py-1 rounded-full text-[10px] font-bold '+badge+'">'+escv(label(r.status))+'</span></div><p class="text-xs text-gray-500 mt-2">'+escv(r.description||'')+'</p><div class="flex flex-wrap items-center gap-2 mt-3 text-[11px]"><span class="'+pri+' font-bold">Priority: '+escv(label(r.priority))+'</span><span class="text-gray-400">Updated: '+escv(fmt(r.updated_at))+'</span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3"><select onchange="app.updateSecretariatCase('+JSON.stringify(r.id)+',this.value,'+JSON.stringify(r.priority)+')" class="border rounded-xl p-2 text-xs"><option value="new" '+(r.status==='new'?'selected':'')+'>New</option><option value="under_review" '+(r.status==='under_review'?'selected':'')+'>Under Review</option><option value="awaiting_information" '+(r.status==='awaiting_information'?'selected':'')+'>Awaiting Information</option><option value="completed" '+(r.status==='completed'?'selected':'')+'>Completed</option><option value="closed" '+(r.status==='closed'?'selected':'')+'>Closed</option></select><select onchange="app.assignSecretariatCase('+JSON.stringify(r.id)+',this.value)" class="border rounded-xl p-2 text-xs"><option value="">Assign to...</option>'+executives.map(e=>'<option value="'+escv(e.id)+'" '+(r.assigned_to===e.id?'selected':'')+'>'+escv((e.full_name||'Executive')+' — '+label(e.role))+'</option>').join('')+'</select><select onchange="app.updateSecretariatCase('+JSON.stringify(r.id)+','+JSON.stringify(r.status)+',this.value)" class="border rounded-xl p-2 text-xs"><option value="low" '+(r.priority==='low'?'selected':'')+'>Low</option><option value="normal" '+(r.priority==='normal'?'selected':'')+'>Normal</option><option value="high" '+(r.priority==='high'?'selected':'')+'>High</option><option value="urgent" '+(r.priority==='urgent'?'selected':'')+'>Urgent</option></select><button onclick="app.addSecretariatNote('+JSON.stringify(r.id)+')" class="bg-ribacom-navy text-white rounded-xl p-2 text-xs font-bold">Add Note</button></div></div>';
     }).join(''):'<div class="bg-white border rounded-2xl p-8 text-center text-sm text-gray-500">No active Secretariat cases.</div>';
     return '<div class="max-w-6xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase text-ribacom-gold">RIBACOM Administration</span><h2 class="text-2xl font-extrabold mt-1">Secretariat Management Centre</h2><p class="text-xs text-gray-300 mt-1">Central inbox for membership and welfare matters, with status tracking and an administrative action trail.</p></div><div class="grid grid-cols-2 md:grid-cols-4 gap-3"><div class="bg-white border rounded-2xl p-4"><small>NEW</small><div class="text-2xl font-extrabold text-blue-600">'+counts.new+'</div></div><div class="bg-white border rounded-2xl p-4"><small>UNDER REVIEW</small><div class="text-2xl font-extrabold text-amber-600">'+counts.under_review+'</div></div><div class="bg-white border rounded-2xl p-4"><small>AWAITING INFO</small><div class="text-2xl font-extrabold">'+counts.awaiting_information+'</div></div><div class="bg-white border rounded-2xl p-4"><small>COMPLETED</small><div class="text-2xl font-extrabold text-emerald-600">'+counts.completed+'</div></div></div><div class="space-y-3">'+cards+'</div></div>';
   };
