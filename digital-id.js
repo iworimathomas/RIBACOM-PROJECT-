@@ -1,6 +1,6 @@
 /* RIBACOM D4 — Digital ID administration module */
 (function () {
-  function admin(app) { return !!app?.currentUser && ['admin','super_admin'].includes(app.currentUser.roleKey); }
+  function admin(app) { return !!app?.currentUser && app.currentUser.roleKey === 'super_admin'; }
   function esc(v) { return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
   function idNumber() { return `RBC-ID-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`; }
   async function nextUniqueIdNumber(app) {
@@ -15,7 +15,7 @@
   function qr(member, number) { return `RIBACOM-GAMBIA|ID:${number}|MEMBER:${member.id}|NAME:${member.full_name || member.fullName}`; }
 
   RibacomApp.prototype.createDigitalId = async function(memberId) {
-    if (!['admin','super_admin'].includes(String(this.currentUser?.roleKey||'').toLowerCase())) return this.toast('President / Super Admin or Admin access required.','error');
+    if (String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('President / Super Admin access required.','error');
     const {data:member,error:memberError}=await this.supabaseClient.from('members').select('*').eq('id',memberId).maybeSingle();
     if(memberError) return this.toast(memberError.message,'error');
     if(!member) return this.toast('Member not found.','error');
@@ -126,7 +126,7 @@
   RibacomApp.prototype.renderDigitalIdQr = function() {
     const box=document.getElementById('ribacomDigitalIdQr');
     if(!box || typeof QRCode==='undefined') return;
-    const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === this.currentUser?.memberId);
+    const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === (currentMember?.id || this.currentUser?.memberId));
     if(!mine) return;
     const data=mine.qrCodeData || mine.qr_code_data || ('RIBACOM-GAMBIA|ID:'+(mine.idCardNumber || mine.id_card_number));
     box.innerHTML='';
