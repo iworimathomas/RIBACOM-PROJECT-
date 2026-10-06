@@ -537,16 +537,11 @@
             }
 
             loadInitialDB() {
-                const stored = localStorage.getItem('ribacom_db');
-                if (stored) {
-                    try { return JSON.parse(stored); } catch(e) { console.error(e); }
-                }
-                localStorage.setItem('ribacom_db', JSON.stringify(DEFAULT_DB));
-                return DEFAULT_DB;
+                return JSON.parse(JSON.stringify(DEFAULT_DB));
             }
 
             saveDB() {
-                localStorage.setItem('ribacom_db', JSON.stringify(this.db));
+                return true;
             }
 
             isMasterAdmin() {
@@ -555,7 +550,8 @@
             }
 
             isAdmin() {
-                return this.isMasterAdmin() || !!this.currentUser?.role?.includes('Admin');
+                const role = String(this.currentUser?.role || '').toLowerCase();
+                return this.isMasterAdmin() || ['super_admin','admin','president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'].includes(role);
             }
 
             initSupabase() {
@@ -606,8 +602,9 @@
                         container.innerHTML = this.renderMembershipView();
                         break;
                     case 'digital-id':
-                        container.innerHTML = this.renderDigitalIdView();
-                        setTimeout(() => this.generateQRCode(), 100);
+                        if (!this.currentUser) { container.innerHTML = this.renderDigitalIdView(); break; }
+                        container.innerHTML = '<div class="p-10 text-center text-sm text-gray-500">Loading your official Digital ID from RIBACOM Cloud…</div>';
+                        this.prepareCloudDigitalId().then(() => { if (this.currentView === 'digital-id') { container.innerHTML = this.renderDigitalIdView(); this.generateQRCode(); } });
                         break;
                     case 'welfare':
                         container.innerHTML = this.renderWelfareView();
@@ -617,6 +614,7 @@
                         break;
                     case 'announcements':
                         container.innerHTML = this.renderAnnouncementsView();
+                        if (this.supabaseClient) this.refreshCloudAnnouncements();
                         break;
                     case 'publications':
                         container.innerHTML = this.renderPublicationsView();
@@ -655,7 +653,7 @@
                             return;
                         }
                         container.innerHTML = this.renderAdminDashboardView();
-                        setTimeout(() => { this.loadYouthEditor(); this.refreshMembershipReview(); this.refreshAdminCloudStats(); this.refreshCloudMemberDirectory(); }, 0);
+                        setTimeout(() => { this.loadYouthEditor(); this.refreshMembershipReview(); this.refreshAdminCloudStats(); this.refreshCloudMemberDirectory(); this.refreshCloudWelfareRequests(); }, 0);
                         break;
                     default:
                         container.innerHTML = this.renderHomeView();
@@ -1100,7 +1098,7 @@
             }
 
             renderDigitalIdView() {
-                const user = this.currentUser || this.db.members[0];
+                const user = this.currentUser;
 
                 return `
                     <div class="max-w-md mx-auto space-y-6 animate-fadeIn">
@@ -1115,9 +1113,7 @@
                             <!-- Header -->
                             <div class="flex items-center justify-between border-b border-white/20 pb-3">
                                 <div class="flex items-center space-x-2">
-                                    <div class="w-8 h-8 rounded-full bg-ribacom-gold text-ribacom-navy font-black flex items-center justify-center text-sm shadow">
-                                        R
-                                    </div>
+                                    <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-10 h-10 rounded-full bg-white p-1 object-cover border border-ribacom-gold shadow">
                                     <div>
                                         <h3 class="font-extrabold text-xs tracking-wider">RIBACOM GAMBIA</h3>
                                         <p class="text-[9px] text-ribacom-gold tracking-widest font-semibold">TRUTH • UNITY • SERVICE</p>
@@ -1198,7 +1194,7 @@
                 const qrContainer = document.getElementById("qrcode");
                 if (!qrContainer) return;
                 qrContainer.innerHTML = "";
-                const user = this.currentUser || this.db.members[0];
+                const user = this.currentUser;
                 const idCard = user.digitalId?.id_card_number || user.membershipNo;
                 const qrData = user.digitalId?.qr_code_data || (idCard ? `RIBACOM-GAMBIA|ID:${idCard}|NAME:${user.fullName}|STATUS:${user.status}` : 'RIBACOM-GAMBIA|PENDING-APPROVAL');
                 new QRCode(qrContainer, {
@@ -2193,44 +2189,64 @@
                 if(url) window.open(url,'_blank','noopener'); else this.toast('This publication has no document/media link yet.','info');
             }
 
-            handleWelfareSubmit(e) {
+            async handleWelfareSubmit(e) {
                 e.preventDefault();
-                const type = document.getElementById('w_type').value;
-                let amt = 500;
-                if (type === 'Wedding') amt = 1000;
-                if (type === 'Bereavement') amt = 1500;
-
-                const req = {
-                    id: "wel_" + Date.now(),
-                    memberName: document.getElementById('w_memberName').value,
-                    type: type,
-                    description: document.getElementById('w_desc').value,
-                    amount: amt,
-                    status: "Pending Review",
-                    date: new Date().toISOString().split('T')[0]
-                };
-
-                this.db.welfareRequests.unshift(req);
-                this.saveDB();
-                this.toast('Welfare Claim submitted to Executive Council.', 'success');
-                this.navigate('home');
+                if (!this.supabaseClient) return this.toast('RIBACOM Cloud is unavailable. Please try again.', 'error');
+                if (!this.currentUser) return this.toast('Please sign in before submitting a welfare request.', 'warning');
+                try {
+                    const { data: member, error: memberError } = await this.supabaseClient.from('members').select('id,status').eq('user_id', this.currentUser.id).maybeSingle();
+                    if (memberError) throw memberError;
+                    if (!member || member.status !== 'approved') return this.toast('Only approved members can submit welfare requests.', 'warning');
+                    const type = document.getElementById('w_type').value;
+                    const amount = type === 'Wedding' ? 1000 : type === 'Birth' ? 500 : type === 'Bereavement' ? 1500 : 0;
+                    const category = type === 'Wedding' ? 'wedding' : type === 'Birth' ? 'birth' : type === 'Bereavement' ? 'loss_parent' : 'other';
+                    const description = document.getElementById('w_desc').value.trim();
+                    const { error } = await this.supabaseClient.from('welfare_requests').insert({ member_id: member.id, category, amount_requested: amount, description, status: 'pending' });
+                    if (error) throw error;
+                    this.toast('Welfare request submitted to the Executive Council.', 'success');
+                    this.navigate('member-dashboard');
+                } catch (err) { console.error(err); this.toast(err?.message || 'Welfare submission failed.', 'error'); }
             }
 
-            handleAdminPostAnnouncement(e) {
-                e.preventDefault();
-                const ann = {
-                    id: "ann_" + Date.now(),
-                    title: document.getElementById('admin_ann_title').value,
-                    category: document.getElementById('admin_ann_cat').value,
-                    content: document.getElementById('admin_ann_content').value,
-                    date: new Date().toISOString().split('T')[0],
-                    author: "Secretariat Admin"
-                };
+            async loadCloudWelfareRequests() {
+                if (!this.supabaseClient || !this.isAdmin()) return [];
+                const { data, error } = await this.supabaseClient.from('welfare_requests').select('id,member_id,category,amount_requested,approved_amount,description,status,created_at,members(full_name,membership_number)').order('created_at',{ascending:false});
+                if (error) { console.error(error); return []; }
+                return data || [];
+            }
 
-                this.db.announcements.unshift(ann);
-                this.saveDB();
-                this.toast('Announcement published live!', 'success');
-                this.navigate('admin-dashboard');
+            async refreshCloudWelfareRequests() {
+                const rows = await this.loadCloudWelfareRequests();
+                this.db.welfareRequests = rows.map(w => ({ id:w.id, memberId:w.member_id, memberName:w.members?.full_name || 'Member', type:w.category, amount:w.amount_requested || 0, status:w.status || 'pending', description:w.description || '', date:(w.created_at || '').slice(0,10) }));
+                const box = document.getElementById('cloudWelfareRequests');
+                if (box) box.innerHTML = this.db.welfareRequests.length ? this.db.welfareRequests.map(w => '<tr><td class="p-2 font-bold">'+w.memberName+'</td><td class="p-2">'+w.type+'</td><td class="p-2 font-bold text-ribacom-green">D'+w.amount+'</td><td class="p-2"><span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-[10px] font-bold">'+w.status+'</span></td><td class="p-2 text-right">'+(String(w.status).toLowerCase()==='pending' ? '<button onclick="app.approveWelfare(\\''+w.id+'\\')" class="bg-ribacom-green text-white px-2 py-1 rounded text-[10px] font-bold">Approve</button>' : '')+'</td></tr>').join('') : '<tr><td colspan="5" class="p-5 text-center text-gray-500">No cloud welfare requests.</td></tr>';
+            }
+
+            async handleAdminPostAnnouncement(e) {
+                e.preventDefault();
+                if (!this.isAdmin()) return this.toast('Administrator privileges required.', 'error');
+                if (!this.supabaseClient) return this.toast('RIBACOM Cloud is unavailable.', 'error');
+                try {
+                    const { data: { user } } = await this.supabaseClient.auth.getUser();
+                    if (!user) throw new Error('Active authenticated session required.');
+                    const { error } = await this.supabaseClient.from('announcements').insert({ title: document.getElementById('admin_ann_title').value.trim(), content: document.getElementById('admin_ann_content').value.trim(), author_id: user.id, submitted_by: user.id, is_published: false, approval_status: 'pending' });
+                    if (error) throw error;
+                    this.toast('Announcement submitted to the RIBACOM approval queue.', 'success');
+                    this.navigate('admin-dashboard');
+                } catch (err) { console.error(err); this.toast(err?.message || 'Announcement submission failed.', 'error'); }
+            }
+
+            async loadCloudAnnouncements() {
+                if (!this.supabaseClient) return [];
+                const { data, error } = await this.supabaseClient.from('announcements').select('id,title,content,created_at,author_id').eq('is_published',true).eq('approval_status','approved').order('created_at',{ascending:false});
+                if (error) { console.error(error); return []; }
+                return data || [];
+            }
+
+            async refreshCloudAnnouncements() {
+                const rows = await this.loadCloudAnnouncements();
+                this.db.announcements = rows.map(a => ({ id:a.id, title:a.title, content:a.content, category:'Official Notice', date:(a.created_at || '').slice(0,10), author:'RIBACOM Executive Council' }));
+                if (this.currentView === 'announcements') { const container=document.getElementById('appViewport'); if(container) container.innerHTML=this.renderAnnouncementsView(); }
             }
 
             deleteMember(id) {
@@ -2240,14 +2256,15 @@
                 this.navigate('admin-dashboard');
             }
 
-            approveWelfare(id) {
-                const req = this.db.welfareRequests.find(w => w.id === id);
-                if (req) {
-                    req.status = "Approved & Paid";
-                    this.saveDB();
-                    this.toast('Welfare disbursement approved!', 'success');
-                    this.navigate('admin-dashboard');
-                }
+            async approveWelfare(id) {
+                if (!this.isAdmin() || !this.supabaseClient) return this.toast('Administrator privileges required.', 'error');
+                try {
+                    const { error } = await this.supabaseClient.from('welfare_requests').update({ status:'approved', updated_at:new Date().toISOString() }).eq('id', id);
+                    if (error) throw error;
+                    this.toast('Welfare request approved in RIBACOM Cloud.', 'success');
+                    await this.refreshCloudWelfareRequests();
+                    await this.refreshAdminCloudStats();
+                } catch (err) { console.error(err); this.toast(err?.message || 'Welfare approval failed.', 'error'); }
             }
 
             async handleLogin(e) {
