@@ -775,4 +775,6 @@
             // RibacomApp now owns startup sequencing so authentication and cloud data
             // are restored before the initial route renders. This prevents a double
             // navigation race that could overwrite the authenticated dashboard.
+            // Expose the same instance globally for modular bridges and inline handlers.
+            window.app = app;
         });
