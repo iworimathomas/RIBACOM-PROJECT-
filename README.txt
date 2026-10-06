@@ -42,7 +42,7 @@ IMPORTANT
 - The small in-memory object in app.js is only a UI cache/default shape; cloud data is loaded from Supabase.
 - Do not publish unverified constitution text over the authoritative 13-Chapter/97-Article source.
 - Do not add a fixed registered office address unless the community formally supplies one.
-- The official crest asset was not included because no crest image file was available in the D8 source package. Add the approved crest as an asset when available.
+- The approved official RIBACOM crest is stored as `ribacom-official-logo.jpg` and is used by the main application branding.
 
 DEPLOYMENT
 1. Upload the contents of this package to the RIBACOM GitHub repository.
