@@ -624,7 +624,7 @@
             async rejectMember(id) { return this.setMemberStatus(id,'rejected'); }
             async suspendMember(id) { return this.setMemberStatus(id,'suspended'); }
             async setMemberStatus(id,status) {
-                if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+                if (this.currentUser?.roleKey !== 'super_admin') return;
                 const member=this.db.members.find(m=>m.id===id);
                 if(!member){this.toast('Member record not found.','error');return;}
                 // Route approval through the full application workflow when an application exists.
