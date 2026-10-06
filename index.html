@@ -649,7 +649,7 @@
                             return;
                         }
                         container.innerHTML = this.renderAdminDashboardView();
-                        setTimeout(() => { this.loadYouthEditor(); this.refreshMembershipReview(); }, 0);
+                        setTimeout(() => { this.loadYouthEditor(); this.refreshMembershipReview(); this.refreshAdminCloudStats(); this.refreshCloudMemberDirectory(); }, 0);
                         break;
                     default:
                         container.innerHTML = this.renderHomeView();
@@ -1030,6 +1030,54 @@
                         </div>
                     </div>
                 `;
+            }
+
+            async loadCloudAdminStats() {
+                if (!this.supabaseClient || !this.isAdmin()) return null;
+                const results = await Promise.all([
+                    this.supabaseClient.from('members').select('id', { count: 'exact', head: true }),
+                    this.supabaseClient.from('membership_applications').select('id', { count: 'exact', head: true }).in('status', ['pending','under_review']),
+                    this.supabaseClient.from('digital_ids').select('id', { count: 'exact', head: true }),
+                    this.supabaseClient.from('welfare_requests').select('id', { count: 'exact', head: true }).catch(() => ({count:null}))
+                ]);
+                const [members, applications, digitalIds, welfare] = results;
+                return {
+                    members: members.count ?? 0,
+                    applications: applications.count ?? 0,
+                    digitalIds: digitalIds.count ?? 0,
+                    welfare: welfare?.count ?? this.db.welfareRequests.length
+                };
+            }
+
+            async refreshAdminCloudStats() {
+                const stats = await this.loadCloudAdminStats();
+                if (!stats) return;
+                const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=String(value)};
+                set('cloudStatMembers',stats.members);
+                set('cloudStatApplications',stats.applications);
+                set('cloudStatDigitalIds',stats.digitalIds);
+                set('cloudStatWelfare',stats.welfare);
+            }
+
+            async loadCloudApprovedMembers() {
+                if (!this.supabaseClient || !this.isAdmin()) return [];
+                const { data, error } = await this.supabaseClient.from('members')
+                    .select('id,full_name,email,membership_number,category,status,created_at')
+                    .order('created_at',{ascending:false});
+                if(error){console.error(error);return [];}
+                return data || [];
+            }
+
+            async refreshCloudMemberDirectory() {
+                const box=document.getElementById('cloudMemberDirectory');
+                if(!box)return;
+                const members=await this.loadCloudApprovedMembers();
+                if(!members.length){box.innerHTML='<div class="p-4 bg-gray-50 rounded-xl text-gray-500">No approved member records yet.</div>';return;}
+                box.innerHTML=members.map(m=>`
+                    <div class="border rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+                        <div><strong>${m.full_name}</strong><div class="text-[11px] text-gray-500">${m.email||'—'} · ${m.category||'—'}</div></div>
+                        <div class="text-right"><div class="font-bold text-ribacom-green">${m.membership_number||'—'}</div><span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">${m.status||'approved'}</span></div>
+                    </div>`).join('');
             }
 
             async loadCloudDigitalId() {
@@ -1512,6 +1560,14 @@
                             </form>
                         </div>
 
+                        <!-- Live Supabase Administration Statistics -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow"><p class="text-[10px] text-gray-400 font-bold uppercase">Cloud Members</p><h3 id="cloudStatMembers" class="text-2xl font-extrabold text-ribacom-navy">—</h3></div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow"><p class="text-[10px] text-gray-400 font-bold uppercase">Pending Applications</p><h3 id="cloudStatApplications" class="text-2xl font-extrabold text-amber-600">—</h3></div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow"><p class="text-[10px] text-gray-400 font-bold uppercase">Digital IDs</p><h3 id="cloudStatDigitalIds" class="text-2xl font-extrabold text-ribacom-green">—</h3></div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow"><p class="text-[10px] text-gray-400 font-bold uppercase">Welfare Records</p><h3 id="cloudStatWelfare" class="text-2xl font-extrabold text-purple-600">—</h3></div>
+                        </div>
+
                         <!-- Stat Cards Overview -->
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow space-y-1">
@@ -1544,6 +1600,12 @@
                                 <button onclick="app.refreshMembershipReview()" class="text-xs bg-gray-100 px-3 py-2 rounded-lg font-bold">Refresh</button>
                             </div>
                             <div id="cloudMembershipReview" class="text-xs text-gray-500">Loading cloud applications...</div>
+                        </div>
+
+                        <!-- Live Cloud Member Directory -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div class="flex items-center justify-between"><div><h3 class="font-bold text-base text-gray-800">Live Cloud Member Directory</h3><p class="text-xs text-gray-500">Approved members loaded directly from Supabase.</p></div><button onclick="app.refreshCloudMemberDirectory();app.refreshAdminCloudStats()" class="text-xs bg-gray-100 px-3 py-2 rounded-lg font-bold">Refresh</button></div>
+                            <div id="cloudMemberDirectory" class="space-y-2 text-xs">Loading cloud members...</div>
                         </div>
 
                         <!-- Members & Welfare Admin Panel -->
