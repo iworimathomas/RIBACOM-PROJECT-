@@ -280,7 +280,7 @@
     const reason=prompt('Reason for rejection:','')||'';
     if(!reason.trim()) return this.toast('A rejection reason is required.','warning');
     const {error}=await this.supabaseClient.from('membership_applications').update({
-      status:'rejected',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),reviewer_notes:reason.trim()
+      status:'rejected',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),admin_notes:reason.trim()
     }).eq('id',applicationId).in('status',['pending','under_review']);
     if(error) return this.toast(error.message,'error');
     this.toast('Membership application rejected.','success');
