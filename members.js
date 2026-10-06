@@ -183,6 +183,17 @@
     }).eq('id',applicationId);
     if(applicationUpdateError) return this.toast('Member was approved, but application synchronization failed: '+applicationUpdateError.message,'error');
 
+    // Notify the applicant through the protected notification centre.
+    const {error:notificationError}=await this.supabaseClient.from('notifications').insert({
+      user_id:application.user_id,
+      title:'Membership application approved',
+      message:'Congratulations. Your RIBACOM membership application has been approved by the Secretariat. Your membership record and Digital ID are now being finalized.',
+      type:'membership',
+      link_route:'member-dashboard',
+      is_read:false
+    });
+    if(notificationError) console.warn('Approval notification:',notificationError.message);
+
     await this.loadCloudData();
     const existingId=(this.db.digitalIds||[]).find(x=>x.memberId===member.id||x.member_id===member.id);
     if(!existingId && typeof this.createDigitalId==='function'){
