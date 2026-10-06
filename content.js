@@ -34,7 +34,7 @@
   RibacomApp.prototype.renderFinanceView=async function(){
     const h=await oldRenderFinance.call(this);
     if(!A(this)) return h;
-    return h.replace('<div class="space-y-5">','<div class="space-y-5"><div class="print:hidden"><button onclick="app.navigate(\\'finance-reports\\')" class="w-full bg-ribacom-navy text-white rounded-2xl p-3 font-extrabold text-sm">📊 Open Treasurer Reports</button></div>');
+    return h.replace('<div class="space-y-5">','<div class="space-y-5"><div class="print:hidden"><button onclick="app.navigate(\'finance-reports\')" class="w-full bg-ribacom-navy text-white rounded-2xl p-3 font-extrabold text-sm">📊 Open Treasurer Reports</button></div>');
   };
   const oldNav2=RibacomApp.prototype.navigate;
   RibacomApp.prototype.navigate=function(v,p=null){
