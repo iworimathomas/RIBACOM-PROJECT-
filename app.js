@@ -300,35 +300,38 @@
                     if (profileSyncError) console.warn('Post-verification profile sync:', profileSyncError.message);
                     else resolvedProfile = createdProfile;
                 }
-                // Reconcile an authenticated profile against the public official leadership roster.
-                // This does not let a user choose a role: the roster email/position is the source of truth.
-                // It also repairs existing executive accounts whose leadership record was added later.
-                if (user.email && resolvedProfile) {
+                // Reconcile existing executive accounts when the signed-in user is the President/Super Admin.
+                // This is a protected repair path: only an already-authorized Super Admin can update roles.
+                // Ordinary users never get a client-side role assignment path.
+                if (String(resolvedProfile?.role || '').toLowerCase() === 'super_admin') {
                     try {
-                        const { data: leadershipMatch, error: leadershipMatchError } = await this.supabaseClient
+                        const { data: roster, error: rosterError } = await this.supabaseClient
                             .from('leadership')
-                            .select('position,is_active,email')
+                            .select('position,email,is_active')
                             .eq('is_active', true)
-                            .ilike('email', user.email)
-                            .limit(1)
-                            .maybeSingle();
-                        if (leadershipMatchError) {
-                            console.warn('Executive roster reconciliation:', leadershipMatchError.message);
-                        } else if (leadershipMatch) {
-                            const position = String(leadershipMatch.position || '').toLowerCase();
-                            const executiveRole = position.includes('president') && !position.includes('vice') ? 'super_admin' :
-                                position.includes('vice president') ? 'vice_president' :
-                                position.includes('assistant') && position.includes('secretary general') ? 'assistant_secretary_general' :
-                                position.includes('secretary general') ? 'secretary_general' :
-                                position.includes('treasurer') ? 'treasurer' :
-                                (position.includes('welfare') || position.includes('provost')) ? 'welfare_officer' :
-                                (position.includes('public relations') || position.trim() === 'pro') ? 'pro' : null;
-                            if (executiveRole && resolvedProfile.role !== executiveRole) {
-                                console.info('Official executive roster match found; awaiting protected profile synchronization.', executiveRole);
+                            .not('email', 'is', null);
+                        if (rosterError) {
+                            console.warn('Executive roster synchronization:', rosterError.message);
+                        } else {
+                            for (const leader of (roster || [])) {
+                                const position = String(leader.position || '').toLowerCase();
+                                const executiveRole = position.includes('president') && !position.includes('vice') ? 'super_admin' :
+                                    position.includes('vice president') ? 'vice_president' :
+                                    position.includes('assistant') && position.includes('secretary general') ? 'assistant_secretary_general' :
+                                    position.includes('secretary general') ? 'secretary_general' :
+                                    position.includes('treasurer') ? 'treasurer' :
+                                    (position.includes('welfare') || position.includes('provost')) ? 'welfare_officer' :
+                                    (position.includes('public relations') || position.trim() === 'pro') ? 'pro' : null;
+                                if (!executiveRole || !String(leader.email || '').trim()) continue;
+                                const { error: syncError } = await this.supabaseClient
+                                    .from('profiles')
+                                    .update({ role: executiveRole })
+                                    .ilike('email', String(leader.email).trim());
+                                if (syncError) console.warn('Executive role sync failed:', syncError.message);
                             }
                         }
                     } catch (error) {
-                        console.warn('Executive roster reconciliation failed:', error);
+                        console.warn('Executive roster synchronization failed:', error);
                     }
                 }
                 const role = resolvedProfile?.role || 'member';
