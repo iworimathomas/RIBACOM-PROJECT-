@@ -31,8 +31,20 @@
     if(status==='paid' && !patch.approved_amount){
       const row=(this.db.welfareRequests||[]).find(x=>x.id===id); if(row) patch.approved_amount=row.amount_requested;
     }
-    const {error}=await this.supabaseClient.from('welfare_requests').update(patch).eq('id',id);
+    const {data:request,error}=await this.supabaseClient.from('welfare_requests').select('id,member_id,category,amount_requested,approved_amount').eq('id',id).maybeSingle();
     if(error) return this.toast(error.message,'error');
+    if(!request) return this.toast('Welfare request not found.','error');
+    const {error:updateError}=await this.supabaseClient.from('welfare_requests').update(patch).eq('id',id);
+    if(updateError) return this.toast(updateError.message,'error');
+    const {data:member}=await this.supabaseClient.from('members').select('user_id,full_name').eq('id',request.member_id).maybeSingle();
+    if(member?.user_id){
+      const label=labels[request.category]||request.category||'Welfare';
+      const amount=(approvedAmount!==null&&approvedAmount!=='')?Number(approvedAmount):Number(request.approved_amount||request.amount_requested||0);
+      const messages={approved:'Your '+label+' welfare request has been approved'+(amount?' for D'+amount.toLocaleString():'.'),paid:'Your '+label+' welfare request has been marked paid'+(amount?' for D'+amount.toLocaleString():'.'),rejected:'Your '+label+' welfare request has been rejected.',pending:'Your '+label+' welfare request is pending Executive review.',under_review:'Your '+label+' welfare request is under Executive review.'};
+      const notification={user_id:member.user_id,title:'Welfare Request Update',message:messages[status]||('Your '+label+' welfare request status is now '+status+'.'),type:'welfare',link_route:'welfare',is_read:false};
+      const {error:notificationError}=await this.supabaseClient.from('notifications').insert(notification);
+      if(notificationError) console.warn('Welfare notification could not be created:',notificationError.message);
+    }
     await this.loadCloudData(); this.toast(`Welfare request marked ${status}.`,'success'); this.navigate('admin-dashboard');
   };
 
