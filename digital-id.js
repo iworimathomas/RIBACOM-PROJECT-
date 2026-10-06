@@ -12,7 +12,7 @@
     }
     throw new Error('Unable to generate a unique Digital ID number. Please try again.');
   }
-  function qr(member, number) { return `RIBACOM-GAMBIA|ID:${number}|MEMBER:${member.id}|NAME:${member.full_name || member.fullName}`; }
+  function qr(member, number) { return `RIBACOM-GAMBIA|ID:${number}`; }
 
   RibacomApp.prototype.createDigitalId = async function(memberId) {
     if (String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('President / Super Admin access required.','error');
