@@ -125,7 +125,7 @@
   // This method is intentionally kept in the membership module so admin approval cannot
   // silently call a missing function and leave the application/member records out of sync.
   RibacomApp.prototype.approveMembershipApplication = async function(applicationId){
-    if(!['admin','super_admin'].includes(String(this.currentUser?.roleKey||'').toLowerCase())) return this.toast('President / Super Admin or Admin approval required.','error');
+    if(String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('President / Super Admin approval is required.','error');
     if(!this.supabaseClient) return this.toast('Supabase connection is unavailable.','error');
     const {data:application,error:applicationError}=await this.supabaseClient
       .from('membership_applications').select('*').eq('id',applicationId).maybeSingle();
@@ -273,8 +273,8 @@
   };
   RibacomApp.prototype.renderMembershipReviewD7 = async function(){
     const role=String(this.currentUser?.roleKey||'').toLowerCase();
-    if(!['super_admin','admin'].includes(role)){
-      return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">Super Admin access required.</div>';
+    if(role!=='super_admin'){
+      return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">President / Super Admin access required for membership approval.</div>';
     }
     if(!this.supabaseClient) return '<div class="bg-white rounded-3xl border p-8 text-center">Supabase connection unavailable.</div>';
     const {data:apps,error}=await this.supabaseClient.from('membership_applications').select('*').in('status',['pending','under_review']).order('created_at',{ascending:false});
@@ -289,6 +289,7 @@
 
   RibacomApp.prototype.reviewMembershipFromAdmin = function(application){
     if(!application?.id) return this.toast('Application not found.','error');
+    if(String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('Admin review is available, but only the President / Super Admin can approve membership.','warning');
     if(confirm('Approve this membership application?')) return this.approveMembershipApplication(application.id);
   };
 
