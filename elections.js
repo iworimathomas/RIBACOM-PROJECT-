@@ -1,7 +1,7 @@
 /* RIBACOM Elections & Voting System — integrated Digital Ecosystem module */
 (function(){
-  const managerRoles=['admin','super_admin','secretary_general','vice_president'];
-  const isManager=()=>managerRoles.includes(window.app?.currentUser?.roleKey);
+  const managerRoles=['super_admin','secretary_general','vice_president'];
+  const isManager=()=>managerRoles.includes(String(window.app?.currentUser?.roleKey||'').toLowerCase());
 
   RibacomApp.prototype.loadElections = async function(){
     if(!this.supabaseClient) return [];
@@ -31,6 +31,8 @@
 
   RibacomApp.prototype.openElectionVoting = async function(electionId){
     if(!this.currentUser?.memberId){this.toast('Please sign in as an approved member to vote.','warning');return;}
+    const {data:roll}=await this.supabaseClient.from('election_voter_roll').select('eligibility_status').eq('election_id',electionId).eq('member_id',this.currentUser.memberId).maybeSingle();
+    if(!roll || roll.eligibility_status!=='eligible'){this.toast('You are not on the locked voter roll for this election.','warning');return;}
     const {data:e,error}=await this.supabaseClient.from('elections').select('*').eq('id',electionId).single();
     if(error||!e){this.toast('Election could not be loaded.','error');return;}
     if(e.status!=='open'||!e.starts_at||!e.ends_at||Date.now()<new Date(e.starts_at).getTime()||Date.now()>new Date(e.ends_at).getTime()){this.toast('This election is not currently open.','warning');return;}
