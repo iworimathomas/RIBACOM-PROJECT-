@@ -243,8 +243,7 @@
                 const [profileResult, memberResult, applicationResult] = await Promise.all([
                     this.supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle(),
                     this.supabaseClient.from('members').select('*').eq('user_id', user.id).maybeSingle(),
-                    this.supabaseClient.from('membership_applications').select('*').eq('user_id', user.id).order('created_at',{ascending:false}).limit(1).maybeSingle(),
-                    this.supabaseClient.from('leadership').select('*').eq('is_active',true).ilike('email', user.email).limit(1).maybeSingle()
+                    this.supabaseClient.from('membership_applications').select('*').eq('user_id', user.id).order('created_at',{ascending:false}).limit(1).maybeSingle()
                 ]);
                 if (profileResult.error) console.warn('Profile hydration:', profileResult.error.message);
                 if (memberResult.error) console.warn('Member hydration:', memberResult.error.message);
