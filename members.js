@@ -125,7 +125,7 @@
   // This method is intentionally kept in the membership module so admin approval cannot
   // silently call a missing function and leave the application/member records out of sync.
   RibacomApp.prototype.approveMembershipApplication = async function(applicationId){
-    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return this.toast('Admin approval required.','error');
+    if(!['president','admin','super_admin'].includes(String(this.currentUser?.roleKey||'').toLowerCase())) return this.toast('President or Admin approval required.','error');
     if(!this.supabaseClient) return this.toast('Supabase connection is unavailable.','error');
     const {data:application,error:applicationError}=await this.supabaseClient
       .from('membership_applications').select('*').eq('id',applicationId).maybeSingle();
