@@ -392,7 +392,7 @@
                 let body='';
                 if(view==='home') {
                     const cfg=window.RIBACOM_CONFIG||{}, leaders=this.db.leadership||[], events=(this.db.events||[]).filter(x=>x.is_published!==false).slice(0,3);
-                    const required=['President','Vice President','Secretary General','Assistant Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
+                    const required=['Chairman','Vice-Chair','Secretary General','Assistant Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
                     const roster=required.map(role=>leaders.find(x=>String(x.position||'').toLowerCase()===role.toLowerCase())||{position:role,name:'Position Vacant',is_vacant:true});
                     const leadershipCards=roster.map(x=>'<div class="bg-white/95 text-ribacom-navy rounded-2xl p-4 border"><div class="text-[10px] uppercase font-black '+(x.is_vacant?'text-amber-600':'text-ribacom-green')+'">'+esc(x.position)+(x.is_vacant?' • VACANT':'')+'</div><div class="font-extrabold mt-1">'+esc(x.name)+'</div></div>').join('');
                     const eventCards=events.length?events.map(x=>'<div class="bg-white rounded-2xl border p-4"><div class="text-[10px] uppercase font-black text-ribacom-green">'+esc(String(x.start_date||x.event_date||'').slice(0,10))+'</div><h4 class="font-extrabold text-ribacom-navy mt-1">'+esc(x.title||'RIBACOM Event')+'</h4><p class="text-xs text-gray-500 mt-1">'+esc(x.location||'The Gambia')+'</p></div>').join(''):'<div class="bg-white rounded-2xl border p-5 text-sm text-gray-500">No upcoming published events currently available.</div>';
