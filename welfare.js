@@ -39,7 +39,7 @@
   RibacomApp.prototype.renderWelfareView = function(){
     const u=this.currentUser||{};
     if(!u.id) return '<div class="bg-white rounded-3xl border p-8 text-center"><h2 class="font-extrabold text-ribacom-navy">Welfare Centre</h2><p class="mt-2 text-gray-600">Please sign in to access welfare services.</p><button onclick="app.openLoginModal()" class="mt-4 bg-ribacom-green text-white px-5 py-2 rounded-xl font-bold">Sign In</button></div>';
-    const member=(this.db.members||[]).find(m=>m.id===u.memberId)||{};
+    const member=(this.db.members||[]).find(m=>m.id===u.memberId||m.user_id===u.id)||{};
     const approved=String(member.status||u.status||'').toLowerCase()==='approved';
     const rows=(this.db.welfareRequests||[]).filter(r=>r.member_id===member.id||r.memberId===member.id);
     const benefitCards=Object.entries(labels).filter(([k])=>k!=='other').map(([k,v])=>'<div class="bg-gray-50 rounded-xl p-3"><b>'+v+'</b><div class="text-ribacom-green font-extrabold mt-1">D'+Number(amounts[k]||0).toLocaleString()+'</div></div>').join('');
