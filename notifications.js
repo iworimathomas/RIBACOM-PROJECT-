@@ -44,9 +44,20 @@
       link_route:linkRoute||null,is_read:false
     }));
     if(!rows.length) return this.toast('No linked member accounts were found.','warning');
-    const {error:insertError}=await this.supabaseClient.from('notifications').insert(rows);
+    const {data:existing,error:existingError}=await this.supabaseClient
+      .from('notifications')
+      .select('user_id')
+      .in('user_id',uniqueUserIds)
+      .eq('title',String(title).trim())
+      .eq('message',String(message).trim())
+      .eq('type',String(type||'announcement').trim());
+    if(existingError) return this.toast(existingError.message,'error');
+    const alreadySent=new Set((existing||[]).map(x=>x.user_id));
+    const freshRows=rows.filter(x=>!alreadySent.has(x.user_id));
+    if(!freshRows.length) return this.toast('This notification has already been sent to all linked member accounts.','warning');
+    const {error:insertError}=await this.supabaseClient.from('notifications').insert(freshRows);
     if(insertError) return this.toast(insertError.message,'error');
-    this.toast('Notification broadcast to '+rows.length+' member account(s).','success');
+    this.toast('Notification sent to '+freshRows.length+' new member account(s).','success');
   };
 
   RibacomApp.prototype.renderNotificationsView=async function(){ return this.renderNotifications(); };
