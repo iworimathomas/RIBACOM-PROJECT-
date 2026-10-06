@@ -190,7 +190,7 @@
     document.body.appendChild(modal);
   };
   RibacomApp.prototype.approveMembershipApplication = async function(id){
-    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+    if(String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('President / Super Admin approval is required.','error');
     const {data:a,error:ae}=await this.supabaseClient.from('membership_applications').select('*').eq('id',id).maybeSingle();
     if(ae||!a) return this.toast(ae?.message||'Application not found.','error');
     if(!['pending','under_review'].includes(a.status)) return this.toast('This application has already been reviewed.','warning');
