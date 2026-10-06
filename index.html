@@ -641,6 +641,12 @@
                             return;
                         }
                         container.innerHTML = this.renderMemberDashboardView();
+                        if (this.supabaseClient) {
+                            this.loadCloudMemberPortal().then(() => {
+                                container.innerHTML = this.renderMemberDashboardView();
+                                this.generateQRCode();
+                            });
+                        }
                         break;
                     case 'admin-dashboard':
                         if (!this.isAdmin()) {
@@ -1117,7 +1123,7 @@
                                         <p class="text-[9px] text-ribacom-gold tracking-widest font-semibold">TRUTH • UNITY • SERVICE</p>
                                     </div>
                                 </div>
-                                <span class="text-[9px] bg-emerald-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${user.status || 'Active'}</span>
+                                <span class="text-[9px] bg-emerald-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${user.status || 'Pending'}</span>
                             </div>
 
                             <!-- Photo & Details -->
@@ -1125,7 +1131,7 @@
                                 <img src="${user.photo || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop'}" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-ribacom-gold shadow-md flex-shrink-0">
                                 <div class="space-y-1 overflow-hidden">
                                     <h4 class="font-extrabold text-base truncate">${user.fullName}</h4>
-                                    <p class="text-xs text-ribacom-gold font-bold">${user.membershipNo || 'RBC-GM-2026-001'}</p>
+                                    <p class="text-xs text-ribacom-gold font-bold">${user.membershipNo || 'Pending Approval'}</p>
                                     <p class="text-[11px] text-gray-300">${user.category || 'Regular Member'}</p>
                                     <p class="text-[10px] text-gray-400"><i class="fa-solid fa-location-dot text-ribacom-gold mr-1"></i>${user.stateOfOrigin || 'Rivers State'}</p>
                                 </div>
@@ -1436,6 +1442,24 @@
                         </div>
                     </div>
                 `;
+            }
+
+            async loadCloudMemberPortal() {
+                if (!this.supabaseClient || !this.currentUser?.id) return null;
+                const { data: member, error } = await this.supabaseClient.from('members').select('*').eq('user_id', this.currentUser.id).maybeSingle();
+                if (error) { console.error(error); return null; }
+                if (!member) return null;
+                this.currentUser = {
+                    ...this.currentUser, ...member, id: this.currentUser.id,
+                    fullName: member.full_name, membershipNo: member.membership_number || '',
+                    photo: member.photo_url || '', status: member.status || 'pending',
+                    category: member.category || 'regular', stateOfOrigin: member.state_of_origin || '',
+                    lga: member.lga || ''
+                };
+                const { data: digitalId } = await this.supabaseClient.from('digital_ids').select('*').eq('member_id', member.id).maybeSingle();
+                this.currentUser.digitalId = digitalId || null;
+                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                return this.currentUser;
             }
 
             renderMemberDashboardView() {
