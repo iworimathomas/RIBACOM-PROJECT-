@@ -310,7 +310,7 @@
 
   RibacomApp.prototype.rejectMembershipApplication = async function(applicationId){
     const role=String(this.currentUser?.roleKey||'').toLowerCase();
-    if(!['super_admin','admin'].includes(role)) return this.toast('Super Admin approval required.','error');
+    if(role!=='super_admin') return this.toast('President / Super Admin approval required.','error');
     const reason=prompt('Reason for rejection:','')||'';
     if(!reason.trim()) return this.toast('A rejection reason is required.','warning');
     const {data:application,error:applicationLookupError}=await this.supabaseClient.from('membership_applications').select('id,user_id').eq('id',applicationId).maybeSingle();
