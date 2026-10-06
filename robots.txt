@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ribacomgambia.vercel.app/sitemap.xml
