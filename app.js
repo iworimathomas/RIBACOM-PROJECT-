@@ -703,7 +703,7 @@
                 }
             }
             async createDigitalId(memberId) {
-                if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+                if (this.currentUser?.roleKey !== 'super_admin') return;
                 const member=this.db.members.find(m=>m.id===memberId); if(!member){this.toast('Member not found.','error');return;}
                 if(member.status!=='approved'){this.toast('Only approved members can receive a Digital ID.','warning');return;}
                 const existing=this.db.digitalIds.find(x=>x.memberId===memberId || x.member_id===memberId); if(existing){this.toast('This member already has a Digital ID. Use edit/renew instead.','warning');return;}
