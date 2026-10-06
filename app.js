@@ -3,7 +3,6 @@
             constructor() {
                 this.db = {members:[],digitalIds:[],membershipApplications:[],financeTransactions:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
                 this.currentUser = null;
-                this.loginMode = 'member';
                 this.currentView = 'home';
                 this.pendingElectionResultsId = new URLSearchParams(window.location.search).get('election_results');
                 if (this.pendingElectionResultsId) this.currentView = 'election-results';
@@ -512,24 +511,48 @@
             }
 
             openLoginModal() {
-                this.loginMode = 'member';
-                document.getElementById('authModalTitle').innerText = 'Member Login';
+                document.getElementById('authModalTitle').innerText = 'RIBACOM Login / Member Portal';
                 document.getElementById('registerPrompt').classList.remove('hidden');
                 document.getElementById('authModal').classList.remove('hidden');
                 this.switchAuthTab('login');
             }
 
-            openTreasurerLoginModal() {
-                this.loginMode = 'treasurer';
-                document.getElementById('authModalTitle').innerText = 'Treasurer Login';
-                document.getElementById('registerPrompt').classList.add('hidden');
-                document.getElementById('authModal').classList.remove('hidden');
-                this.switchAuthTab('login');
+            async handleLogin(event) {
+                event?.preventDefault();
+                if (!this.supabaseClient?.auth) {
+                    this.toast('RIBACOM authentication is currently unavailable.','error');
+                    return;
+                }
+                const email = String(document.getElementById('loginEmail')?.value || '').trim();
+                const password = String(document.getElementById('loginPassword')?.value || '');
+                if (!email || !password) {
+                    this.toast('Enter your email address and password.','warning');
+                    return;
+                }
+                const submit = document.querySelector('#loginForm button[type="submit"]');
+                if (submit) { submit.disabled = true; submit.dataset.originalText = submit.textContent; submit.textContent = 'Signing in…'; }
+                try {
+                    const { data, error } = await this.supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    if (!data?.user) throw new Error('Authentication succeeded but no user session was returned.');
+                    await this.hydrateCurrentUser(data.user);
+                    const role = String(this.currentUser?.roleKey || 'member').toLowerCase();
+                    document.getElementById('authModal').classList.add('hidden');
+                    if (role === 'super_admin') this.navigate('admin-dashboard');
+                    else if (['admin'].includes(role)) this.navigate('admin-dashboard');
+                    else if (['president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro'].includes(role)) this.navigate('executive-work');
+                    else this.navigate('member-dashboard');
+                    this.toast('Welcome back to RIBACOM.','success');
+                } catch (error) {
+                    console.error('RIBACOM login error:', error);
+                    this.toast(error?.message || 'Login failed. Please check your credentials.','error');
+                } finally {
+                    if (submit) { submit.disabled = false; submit.textContent = submit.dataset.originalText || 'Login'; }
+                }
             }
 
             closeAuthModal() {
                 document.getElementById('authModal').classList.add('hidden');
-                this.loginMode = 'member';
             }
 
             switchAuthTab(tab) {
