@@ -318,4 +318,75 @@
     this.navigate('admin-members');
   };
 
+
+  // Public membership application form — separate from login.
+  RibacomApp.prototype.renderMembershipApplicationView = function(){
+    return `
+      <div class="max-w-5xl mx-auto space-y-5 animate-fadeIn">
+        <div class="bg-ribacom-navy text-white rounded-3xl p-6 sm:p-8 border-b-4 border-ribacom-gold">
+          <div class="flex items-center gap-4"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-2xl bg-white p-1 object-cover"><div><span class="text-[10px] uppercase font-black text-ribacom-gold">RIBACOM Membership</span><h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Membership Application Form</h2><p class="text-xs text-white/70 mt-1">Create your secure account and submit your application for Secretariat review.</p></div></div>
+        </div>
+        <form onsubmit="app.handleMembershipSubmit(event)" class="bg-white rounded-3xl border shadow-sm p-5 sm:p-7 space-y-7">
+          <section><h3 class="font-extrabold text-ribacom-navy text-lg">1. Personal Information</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
+            <label class="text-xs font-bold">Full Name *<input id="m_fullName" required class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Email Address *<input id="m_email" type="email" required class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Phone / WhatsApp *<input id="m_phone" required class="mt-1 w-full border rounded-xl px-3 py-2.5" placeholder="+220..."></label>
+            <label class="text-xs font-bold">Membership Category *<select id="m_category" required class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="regular">Regular Member</option><option value="associate">Associate Member</option></select></label>
+            <label class="text-xs font-bold">Date of Birth<input id="m_dob" type="date" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Gender<select id="m_gender" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select</option><option>Male</option><option>Female</option></select></label>
+            <label class="text-xs font-bold">Nationality<input id="m_nationality" value="Nigerian" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Other / Previous Name<input id="m_otherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+          </div></section>
+          <section><h3 class="font-extrabold text-ribacom-navy text-lg">2. Rivers / Bayelsa Connection</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
+            <label class="text-xs font-bold">State of Origin *<select id="m_state" required class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select State</option><option value="Rivers State">Rivers State</option><option value="Bayelsa State">Bayelsa State</option><option value="Other State">Other State</option></select></label>
+            <label class="text-xs font-bold">LGA *<input id="m_lga" required class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Town / Village<input id="m_townVillage" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Community / Clan<input id="m_originCommunity" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Clan / Ward<input id="m_clanWard" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Father's Name<input id="m_fatherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Mother's Name<input id="m_motherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Passport / National ID No.<input id="m_idNumber" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+          </div></section>
+          <section><h3 class="font-extrabold text-ribacom-navy text-lg">3. Residence & Contact</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
+            <label class="text-xs font-bold sm:col-span-2">Current Address in The Gambia *<textarea id="m_address" required rows="2" class="mt-1 w-full border rounded-xl px-3 py-2.5"></textarea></label>
+            <label class="text-xs font-bold">Area / Location<input id="m_areaLocation" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Date of Arrival in The Gambia<input id="m_arrivalGambia" type="date" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Preferred Contact Method<select id="m_contactMethod" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option>WhatsApp</option><option>Phone</option><option>Email</option></select></label>
+            <label class="text-xs font-bold">Photo (optional)<input id="m_photo_file" type="file" accept="image/*" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><input id="m_photo" type="hidden">
+          </div></section>
+          <section><h3 class="font-extrabold text-ribacom-navy text-lg">4. Family, Emergency & Work</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
+            <label class="text-xs font-bold">Spouse Name<input id="m_spouse" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><label class="text-xs font-bold">Number of Children<input id="m_children" type="number" min="0" value="0" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Next of Kin<input id="m_nextOfKin" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><label class="text-xs font-bold">Next of Kin Relationship<input id="m_nextOfKinRelationship" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Next of Kin Phone<input id="m_nextOfKinPhone" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><label class="text-xs font-bold">Emergency Contact Name<input id="m_emergencyName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Emergency Contact Phone<input id="m_emergencyPhone" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><label class="text-xs font-bold">Occupation<input id="m_occupation" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Employer / Business<input id="m_employer" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><label class="text-xs font-bold">Work Address<input id="m_workAddress" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold sm:col-span-2">Skills / Profession<input id="m_skills" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold sm:col-span-2">Previous Association<input id="m_previousAssociation" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold sm:col-span-2">Medical Emergency Information (optional)<textarea id="m_medicalEmergency" rows="2" class="mt-1 w-full border rounded-xl px-3 py-2.5"></textarea></label>
+            <label class="text-xs font-bold sm:col-span-2">Proof of Nigerian Origin URL (optional)<input id="m_proofOfOrigin" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+          </div></section>
+          <section><h3 class="font-extrabold text-ribacom-navy text-lg">5. Community Interests</h3><div class="grid sm:grid-cols-2 gap-3 mt-4 text-sm">
+            <label><input id="m_welfareInterest" type="checkbox" class="mr-2">Welfare activities</label><label><input id="m_youthInterest" type="checkbox" class="mr-2">Youth activities</label><label><input id="m_culturalInterest" type="checkbox" class="mr-2">Cultural activities</label><label><input id="m_volunteer" type="checkbox" class="mr-2">Community volunteering</label>
+          </div></section>
+          <section><h3 class="font-extrabold text-ribacom-navy text-lg">6. Secure Account</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
+            <label class="text-xs font-bold">Password *<input id="m_password" type="password" minlength="8" required class="mt-1 w-full border rounded-xl px-3 py-2.5"></label><label class="text-xs font-bold">Confirm Password *<input id="m_passwordConfirm" type="password" minlength="8" required class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+          </div><p class="text-xs text-gray-500 mt-2">Use an email address you can access. Email verification may be required before login.</p></section>
+          <section class="border rounded-2xl p-4 bg-gray-50 space-y-3 text-xs"><label class="flex gap-2 items-start"><input id="m_constitutionConsent" type="checkbox" required class="mt-0.5"><span>I confirm that I have read and agree to abide by the RIBACOM Constitution.</span></label><label class="flex gap-2 items-start"><input id="m_declaration" type="checkbox" required class="mt-0.5"><span>I declare that the information provided is true and complete and consent to its use for legitimate RIBACOM membership administration.</span></label></section>
+          <div class="flex flex-wrap gap-3 pt-2"><button type="submit" class="bg-ribacom-green text-white px-6 py-3 rounded-xl font-extrabold">Submit Membership Application</button><button type="button" onclick="app.openLoginModal()" class="bg-ribacom-navy text-white px-6 py-3 rounded-xl font-bold">Existing Member / Login</button><button type="button" onclick="app.navigate('home')" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold">Cancel</button></div>
+        </form>
+      </div>`;
+  };
+
+  const previousMembershipNav = RibacomApp.prototype.navigate;
+  RibacomApp.prototype.navigate = function(view, params=null){
+    if(view==='membership'){
+      this.currentView='membership';
+      try { localStorage.setItem('ribacom_last_view','membership'); } catch (_) {}
+      const target=document.getElementById('appViewport');
+      if(target){ target.innerHTML=this.renderMembershipApplicationView(); this.updateAuthHeaderUI(); window.scrollTo({top:0,behavior:'smooth'}); }
+      return;
+    }
+    return previousMembershipNav.call(this,view,params);
+  };
+
 })();
