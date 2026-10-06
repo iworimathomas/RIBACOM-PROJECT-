@@ -525,11 +525,7 @@
 
             constructor() {
                 this.db = this.loadInitialDB();
-                this.currentUser = JSON.parse(localStorage.getItem('ribacom_user')) || null;
-                if (this.currentUser && (this.currentUser.email || '').toLowerCase() === RibacomApp.MASTER_ADMIN_EMAIL) {
-                    this.currentUser.role = 'Master Admin';
-                    this.currentUser.isMasterAdmin = true;
-                }
+                this.currentUser = null;
                 this.currentView = 'home';
                 this.supabaseClient = null;
                 
@@ -1093,69 +1089,22 @@
                 if (digitalId) {
                     this.currentUser.membershipNo = member.membership_number || this.currentUser.membershipNo;
                     this.currentUser.digitalId = digitalId;
-                    localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                    
                 }
                 return digitalId || null;
             }
 
             renderDigitalIdView() {
                 const user = this.currentUser;
-
-                return `
-                    <div class="max-w-md mx-auto space-y-6 animate-fadeIn">
-                        <div class="text-center space-y-1">
-                            <span class="bg-ribacom-gold/20 text-ribacom-navy font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">Official Identity</span>
-                            <h2 class="text-xl font-extrabold text-ribacom-navy">Digital Membership ID Card</h2>
-                            <p class="text-xs text-gray-500">Official digital identification card for RIBACOM The Gambia.</p>
-                        </div>
-
-                        <!-- DIGITAL ID CARD CONTAINER -->
-                        <div id="digitalIdCard" class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-ribacom-gold/60 text-white bg-gradient-to-br from-ribacom-navy via-slate-900 to-ribacom-green p-6 space-y-4">
-                            <!-- Header -->
-                            <div class="flex items-center justify-between border-b border-white/20 pb-3">
-                                <div class="flex items-center space-x-2">
-                                    <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-10 h-10 rounded-full bg-white p-1 object-cover border border-ribacom-gold shadow">
-                                    <div>
-                                        <h3 class="font-extrabold text-xs tracking-wider">RIBACOM GAMBIA</h3>
-                                        <p class="text-[9px] text-ribacom-gold tracking-widest font-semibold">TRUTH • UNITY • SERVICE</p>
-                                    </div>
-                                </div>
-                                <span class="text-[9px] bg-emerald-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${user.status || 'Pending'}</span>
-                            </div>
-
-                            <!-- Photo & Details -->
-                            <div class="flex items-center space-x-4 py-2">
-                                <img src="${user.photo || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop'}" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-ribacom-gold shadow-md flex-shrink-0">
-                                <div class="space-y-1 overflow-hidden">
-                                    <h4 class="font-extrabold text-base truncate">${user.fullName}</h4>
-                                    <p class="text-xs text-ribacom-gold font-bold">${user.membershipNo || 'Pending Approval'}</p>
-                                    <p class="text-[11px] text-gray-300">${user.category || 'Regular Member'}</p>
-                                    <p class="text-[10px] text-gray-400"><i class="fa-solid fa-location-dot text-ribacom-gold mr-1"></i>${user.stateOfOrigin || 'Rivers State'}</p>
-                                </div>
-                            </div>
-
-                            <!-- Footer & QR -->
-                            <div class="pt-3 border-t border-white/20 flex items-center justify-between">
-                                <div class="space-y-0.5">
-                                    <p class="text-[9px] text-gray-400">ISSUED DATE: <span class="text-white font-medium">${user.issueDate || '2026-01-10'}</span></p>
-                                    <p class="text-[9px] text-gray-400">EXPIRES: <span class="text-ribacom-gold font-medium">PERPETUAL</span></p>
-                                </div>
-                                <div id="qrcode" class="p-1.5 bg-white rounded-lg shadow-md"></div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex gap-3">
-                            <button onclick="window.print()" class="flex-1 bg-ribacom-navy hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-print"></i> Print ID Card
-                            </button>
-                            <button onclick="app.toast('ID Card stored to local wallet device cache', 'success')" class="flex-1 bg-ribacom-green hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-download"></i> Save Digital ID
-                            </button>
-                        </div>
-                    </div>
-                `;
+                if (!user) return `<div class="max-w-md mx-auto bg-white rounded-3xl border p-8 text-center space-y-4"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-24 h-24 mx-auto rounded-2xl object-cover border border-ribacom-gold shadow"><h2 class="text-xl font-extrabold text-ribacom-navy">Digital Membership ID</h2><p class="text-sm text-gray-600">Sign in with your RIBACOM account to view your official Digital ID.</p><button onclick="app.openLoginModal()" class="bg-ribacom-green text-white px-5 py-2.5 rounded-xl font-bold">Member Login</button></div>`;
+                const digitalId = user.digitalId;
+                if (user.status !== 'approved' || !digitalId) return `<div class="max-w-md mx-auto bg-white rounded-3xl border p-8 text-center space-y-4"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-24 h-24 mx-auto rounded-2xl object-cover border border-ribacom-gold shadow"><h2 class="text-xl font-extrabold text-ribacom-navy">Digital ID Not Yet Available</h2><p class="text-sm text-gray-600">Your membership must be approved before an official Digital ID can be issued.</p><span class="inline-flex bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold">${user.status || 'Pending'}</span></div>`;
+                const issued = digitalId.issued_at ? new Date(digitalId.issued_at).toLocaleDateString() : '—';
+                const expires = digitalId.expires_at ? new Date(digitalId.expires_at).toLocaleDateString() : 'No expiry';
+                const photo = user.photo_url || user.photo || '';
+                return `<div class="max-w-md mx-auto space-y-6 animate-fadeIn"><div class="text-center space-y-1"><span class="bg-ribacom-gold/20 text-ribacom-navy font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">Official Identity</span><h2 class="text-xl font-extrabold text-ribacom-navy">Digital Membership ID Card</h2><p class="text-xs text-gray-500">Issued from the RIBACOM membership database.</p></div><div id="digitalIdCard" class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-ribacom-gold/60 text-white bg-gradient-to-br from-ribacom-navy via-slate-900 to-ribacom-green p-6 space-y-4"><div class="flex items-center justify-between border-b border-white/20 pb-3"><div class="flex items-center space-x-2"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-10 h-10 rounded-full bg-white p-1 object-cover border border-ribacom-gold shadow"><div><h3 class="font-extrabold text-xs tracking-wider">RIBACOM GAMBIA</h3><p class="text-[9px] text-ribacom-gold tracking-widest font-semibold">TRUTH • UNITY • SERVICE</p></div></div><span class="text-[9px] bg-emerald-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${digitalId.status || 'active'}</span></div><div class="flex items-center space-x-4 py-2">${photo ? `<img src="${photo}" alt="Member photograph" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-ribacom-gold shadow-md flex-shrink-0">` : `<div class="w-20 h-20 rounded-2xl bg-white/10 ring-2 ring-ribacom-gold flex items-center justify-center text-ribacom-gold"><i class="fa-solid fa-user text-2xl"></i></div>`}<div class="space-y-1 overflow-hidden"><h4 class="font-extrabold text-base truncate">${user.fullName || user.email}</h4><p class="text-xs text-ribacom-gold font-bold">${digitalId.id_card_number}</p><p class="text-[11px] text-gray-300">${user.category || 'Regular Member'}</p><p class="text-[10px] text-gray-400">${user.stateOfOrigin || 'Rivers/Bayelsa'}</p></div></div><div class="pt-3 border-t border-white/20 flex items-center justify-between"><div class="space-y-0.5"><p class="text-[9px] text-gray-400">ISSUED: <span class="text-white font-medium">${issued}</span></p><p class="text-[9px] text-gray-400">EXPIRES: <span class="text-ribacom-gold font-medium">${expires}</span></p></div><div id="qrcode" class="p-1.5 bg-white rounded-lg shadow-md"></div></div></div><div class="flex gap-3"><button onclick="window.print()" class="flex-1 bg-ribacom-navy text-white font-bold py-2.5 rounded-xl text-xs shadow flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> Print ID Card</button></div></div>`;
             }
+
 
             async prepareCloudDigitalId() {
                 if (!this.supabaseClient || !this.currentUser?.id) return null;
@@ -1174,7 +1123,7 @@
                 this.currentUser.stateOfOrigin = member.state_of_origin || '';
                 this.currentUser.lga = member.lga || '';
                 this.currentUser.digitalId = digitalId;
-                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                
                 return digitalId;
             }
 
@@ -1183,7 +1132,7 @@
                 const { data: { user } } = await this.supabaseClient.auth.getUser();
                 if (!user) {
                     this.currentUser = null;
-                    localStorage.removeItem('ribacom_user');
+                    
                     return null;
                 }
                 await this.hydrateCurrentUser();
@@ -1490,7 +1439,7 @@
                 };
                 const { data: digitalId } = await this.supabaseClient.from('digital_ids').select('*').eq('member_id', member.id).maybeSingle();
                 this.currentUser.digitalId = digitalId || null;
-                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                
                 return this.currentUser;
             }
 
@@ -1982,7 +1931,7 @@
                 else if (photoUrl) member.photo = photoUrl;
 
                 this.currentUser = { ...member };
-                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                
                 this.saveDB();
                 this.updateAuthHeaderUI();
                 this.toast('Administrator profile and picture updated successfully.', 'success');
@@ -2034,7 +1983,7 @@
                         status: 'pending',
                         membershipNo: ''
                     };
-                    localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                    
                     this.toast(authData.session
                         ? 'Application submitted successfully. Your membership is now Pending Secretariat Review.'
                         : 'Application submitted successfully. Check your email to verify your account, then sign in.', 'success');
@@ -2156,15 +2105,28 @@
                 set('admin_id_category',m.category); set('admin_id_state',m.stateOfOrigin); set('admin_id_lga',m.lga); set('admin_id_issue',m.issueDate); set('admin_id_expiry',m.expiryDate); set('admin_id_photo',m.photo); set('admin_id_phone',m.phone);
             }
 
-            saveMemberIdDetails() {
-                if (!this.currentUser?.role?.includes('Admin')) return this.toast('Administrator privileges required.','error');
-                const id=document.getElementById('admin_id_member')?.value; const m=this.db.members.find(x=>x.id===id);
-                if(!m) return this.toast('Select a member first.','error');
-                const get=id=>document.getElementById(id)?.value.trim()||'';
-                m.membershipNo=get('admin_id_number'); m.status=get('admin_id_status')==='Active'?'Approved':get('admin_id_status'); m.fullName=get('admin_id_name'); m.category=get('admin_id_category'); m.stateOfOrigin=get('admin_id_state'); m.lga=get('admin_id_lga'); m.issueDate=get('admin_id_issue'); m.expiryDate=get('admin_id_expiry'); m.photo=get('admin_id_photo'); m.phone=get('admin_id_phone');
-                if(this.currentUser.id===m.id){this.currentUser={...m}; localStorage.setItem('ribacom_user',JSON.stringify(this.currentUser));}
-                this.saveDB(); this.toast('Digital ID details updated successfully.','success'); this.navigate('admin-dashboard');
+            async saveMemberIdDetails() {
+                if (!this.isMasterAdmin() || !this.supabaseClient) return this.toast('Super Admin privileges required.','error');
+                const id=document.getElementById('admin_id_member')?.value;
+                if(!id) return this.toast('Select a member first.','error');
+                const get=x=>document.getElementById(x)?.value.trim()||'';
+                try {
+                    const {data: member,error: memberError}=await this.supabaseClient.from('members').select('id').eq('id',id).maybeSingle();
+                    if(memberError||!member) throw memberError||new Error('Member record not found.');
+                    const idNumber=get('admin_id_number');
+                    if(!idNumber) throw new Error('Digital ID number is required.');
+                    const payload={id_card_number:idNumber,status:get('admin_id_status')==='Active'?'active':'inactive',qr_code_data:'RIBACOM-GAMBIA|ID:'+idNumber+'|NAME:'+get('admin_id_name')};
+                    if(get('admin_id_issue')) payload.issued_at=new Date(get('admin_id_issue')).toISOString();
+                    payload.expires_at=get('admin_id_expiry')?new Date(get('admin_id_expiry')).toISOString():null;
+                    const {error:updateError}=await this.supabaseClient.from('digital_ids').update(payload).eq('member_id',member.id);
+                    if(updateError) throw updateError;
+                    const {error:memberUpdateError}=await this.supabaseClient.from('members').update({full_name:get('admin_id_name'),category:get('admin_id_category'),state_of_origin:get('admin_id_state'),lga:get('admin_id_lga'),phone:get('admin_id_phone'),photo_url:get('admin_id_photo')||null}).eq('id',member.id);
+                    if(memberUpdateError) throw memberUpdateError;
+                    this.toast('Digital ID updated in RIBACOM Cloud.','success');
+                    this.navigate('admin-dashboard');
+                } catch(err) { console.error(err); this.toast(err?.message||'Digital ID update failed.','error'); }
             }
+
 
             loadPublicationForEdit(id) {
                 if(id==='new'){['admin_pub_title','admin_pub_category','admin_pub_date','admin_pub_media','admin_pub_description'].forEach(x=>{const e=document.getElementById(x);if(e)e.value=''});return;}
@@ -2173,7 +2135,7 @@
             }
 
             savePublication(e) {
-                e.preventDefault(); if(!this.currentUser?.role?.includes('Admin'))return this.toast('Administrator privileges required.','error');
+                e.preventDefault(); if(!this.isAdmin())return this.toast('Administrator privileges required.','error');
                 const get=id=>document.getElementById(id)?.value.trim()||''; const id=get('admin_pub_id');
                 const data={title:get('admin_pub_title'),category:get('admin_pub_category')||'Document',date:get('admin_pub_date')||new Date().toISOString().slice(0,10),media_url:get('admin_pub_media'),description:get('admin_pub_description')};
                 if(id==='new'){data.id='pub_'+Date.now();this.db.publications.unshift(data);this.toast('Publication added successfully.','success');}else{const p=this.db.publications.find(x=>x.id===id);if(!p)return this.toast('Publication not found.','error');Object.assign(p,data);this.toast('Publication updated successfully.','success');}
@@ -2181,7 +2143,7 @@
             }
 
             deletePublication(){
-                if(!this.currentUser?.role?.includes('Admin'))return this.toast('Administrator privileges required.','error'); const id=document.getElementById('admin_pub_id')?.value;
+                if(!this.isAdmin())return this.toast('Administrator privileges required.','error'); const id=document.getElementById('admin_pub_id')?.value;
                 if(id==='new')return this.toast('Select a publication to delete.','error'); this.db.publications=this.db.publications.filter(p=>p.id!==id);this.saveDB();this.toast('Publication deleted.','success');this.navigate('admin-dashboard');
             }
 
@@ -2279,7 +2241,7 @@
                     const { data: profile } = await this.supabaseClient.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
                     const { data: member } = await this.supabaseClient.from('members').select('*').eq('user_id', data.user.id).maybeSingle();
                     this.currentUser = { ...(member || {}), ...(profile || {}), id: data.user.id, email: data.user.email, fullName: member?.full_name || profile?.full_name || data.user.email, role: profile?.role || 'member', status: member?.status || 'pending', membershipNo: member?.membership_number || '' };
-                    localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                    
                     this.closeAuthModal();
                     await this.hydrateCurrentUser();
                     this.toast(`Welcome back, ${this.currentUser.fullName}`, 'success');
@@ -2303,7 +2265,7 @@
                     status: member?.status || 'pending',
                     membershipNo: member?.membership_number || ''
                 };
-                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                
                 this.updateAuthHeaderUI();
             }
 
@@ -2337,14 +2299,14 @@
                     try { await this.supabaseClient.auth.signOut(); } catch (e) { console.warn(e); }
                 }
                 this.currentUser = null;
-                localStorage.removeItem('ribacom_user');
+                
                 this.toast('Logged out successfully', 'info');
                 this.navigate('home');
             }
 
             handleAuthAction() {
                 if (this.currentUser) {
-                    if (this.currentUser.role.includes('Admin')) {
+                    if (this.isAdmin()) {
                         this.navigate('admin-dashboard');
                     } else {
                         this.navigate('member-dashboard');
@@ -2442,8 +2404,8 @@
 
             openSupabaseModal() {
                 document.getElementById('supabaseModal').classList.remove('hidden');
-                document.getElementById('supabaseUrlInput').value = localStorage.getItem('supabase_url') || '';
-                document.getElementById('supabaseKeyInput').value = localStorage.getItem('supabase_key') || '';
+                document.getElementById('supabaseUrlInput').value = window.RIBACOM_CONFIG?.supabaseUrl || '';
+                document.getElementById('supabaseKeyInput').value = window.RIBACOM_CONFIG?.supabaseKey || '';
             }
 
             closeSupabaseModal() {
