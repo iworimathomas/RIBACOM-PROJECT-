@@ -19,6 +19,34 @@
     if(error)return this.toast(error.message,'error');
     this.navigate('notifications');
   };
+  RibacomApp.prototype.sendMemberNotification = async function(userId,title,message,type='general',linkRoute=null){
+    const role=String(this.currentUser?.roleKey||'').toLowerCase();
+    if(!['admin','super_admin'].includes(role)) return this.toast('Super Admin or Admin access required.','error');
+    if(!userId||!String(title||'').trim()||!String(message||'').trim()) return this.toast('Recipient, title and message are required.','warning');
+    const {error}=await this.supabaseClient.from('notifications').insert({
+      user_id:userId,title:String(title).trim(),message:String(message).trim(),type:String(type||'general').trim(),
+      link_route:linkRoute||null,is_read:false
+    });
+    if(error) return this.toast(error.message,'error');
+    this.toast('Notification sent.','success');
+  };
+
+  RibacomApp.prototype.broadcastMemberNotification = async function(title,message,type='announcement',linkRoute=null){
+    const role=String(this.currentUser?.roleKey||'').toLowerCase();
+    if(!['admin','super_admin'].includes(role)) return this.toast('Super Admin or Admin access required.','error');
+    if(!String(title||'').trim()||!String(message||'').trim()) return this.toast('Title and message are required.','warning');
+    const {data:members,error}=await this.supabaseClient.from('members').select('user_id').not('user_id','is',null);
+    if(error) return this.toast(error.message,'error');
+    const rows=(members||[]).filter(m=>m.user_id).map(m=>({
+      user_id:m.user_id,title:String(title).trim(),message:String(message).trim(),type:String(type||'announcement').trim(),
+      link_route:linkRoute||null,is_read:false
+    }));
+    if(!rows.length) return this.toast('No linked member accounts were found.','warning');
+    const {error:insertError}=await this.supabaseClient.from('notifications').insert(rows);
+    if(insertError) return this.toast(insertError.message,'error');
+    this.toast('Notification broadcast to '+rows.length+' member account(s).','success');
+  };
+
   RibacomApp.prototype.renderNotificationsView=async function(){ return this.renderNotifications(); };
   RibacomApp.prototype.renderNotifications=async function(){
     if(!this.currentUser)return '<div class="bg-white rounded-3xl p-8 text-center">Please sign in to view notifications.</div>';
