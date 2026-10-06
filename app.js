@@ -307,7 +307,7 @@
                     email: user.email,
                     fullName: resolvedProfile?.full_name || activeMember?.full_name || latestApplication?.full_name || user.email,
                     phone: resolvedProfile?.phone || activeMember?.phone || '',
-                    role: ({super_admin:'Super Admin',admin:'Admin',president:'President / Chairman',vice_president:'Vice President',secretary_general:'Secretary General',assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',visitor:'Visitor'}[role] || 'Member'),
+                    role: ({super_admin:'President / Super Admin',admin:'Admin',president:'President / Chairman',vice_president:'Vice President',secretary_general:'Secretary General',assistant_secretary_general:'Assistant Secretary General',treasurer:'Treasurer',welfare_officer:'Welfare Officer / Provost',pro:'Public Relations Officer',visitor:'Visitor'}[role] || 'Member'),
                     roleKey: role,
                     membershipNumber: activeMember?.membership_number || '',
                     memberId: activeMember?.id || null,
