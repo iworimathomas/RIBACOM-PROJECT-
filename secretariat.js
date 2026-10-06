@@ -74,7 +74,7 @@
     const {error}=await this.supabaseClient.from('secretariat_cases').update({assigned_to:assigneeId,updated_at:new Date().toISOString()}).eq('id',id);
     if(error) return this.toast(error.message,'error');
     await this.supabaseClient.from('secretariat_case_actions').insert({case_id:id,action_type:'assignment',note:'Case assigned to '+(target.full_name||'executive member')+'.',actor_id:this.currentUser.id});
-    if(typeof sendMemberNotification==='function') await sendMemberNotification(assigneeId,'Secretariat Case Assigned','A RIBACOM Secretariat case has been assigned to you.','secretariat','secretariat');
+    if(typeof this.sendMemberNotification==='function') await this.sendMemberNotification(assigneeId,'Secretariat Case Assigned','A RIBACOM Secretariat case has been assigned to you.','secretariat','secretariat');
     this.toast('Case assigned successfully.','success');
     this.navigate('secretariat');
   };
