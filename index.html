@@ -1032,6 +1032,19 @@
                 `;
             }
 
+            async loadCloudDigitalId() {
+                if (!this.supabaseClient || !this.currentUser?.id) return null;
+                const { data: member } = await this.supabaseClient.from('members').select('id,membership_number').eq('user_id', this.currentUser.id).maybeSingle();
+                if (!member) return null;
+                const { data: digitalId } = await this.supabaseClient.from('digital_ids').select('*').eq('member_id', member.id).maybeSingle();
+                if (digitalId) {
+                    this.currentUser.membershipNo = member.membership_number || this.currentUser.membershipNo;
+                    this.currentUser.digitalId = digitalId;
+                    localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                }
+                return digitalId || null;
+            }
+
             renderDigitalIdView() {
                 const user = this.currentUser || this.db.members[0];
 
@@ -1971,6 +1984,20 @@
                         .update({ status: 'approved', reviewed_by: this.currentUser.id, reviewed_at: new Date().toISOString() })
                         .eq('id', id);
                     if (updateError) throw updateError;
+
+                    // Issue the member's official Digital ID only after approval.
+                    const { data: existingId } = await this.supabaseClient
+                        .from('digital_ids').select('id,id_card_number').eq('member_id', member.id).maybeSingle();
+                    if (!existingId) {
+                        const idCardNumber = 'RBC-ID-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
+                        const { error: idError } = await this.supabaseClient.from('digital_ids').insert({
+                            member_id: member.id,
+                            id_card_number: idCardNumber,
+                            qr_code_data: 'RIBACOM-GAMBIA|ID:' + idCardNumber + '|NAME:' + app.full_name,
+                            status: 'active'
+                        });
+                        if (idError) throw idError;
+                    }
 
                     const { data: profile, error: profileError } = await this.supabaseClient
                         .from('profiles').select('id,full_name,email,role').eq('id', app.user_id).maybeSingle();
