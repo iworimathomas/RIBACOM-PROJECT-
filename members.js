@@ -295,12 +295,15 @@
     if(!['super_admin','admin'].includes(role)) return this.toast('Super Admin approval required.','error');
     const reason=prompt('Reason for rejection:','')||'';
     if(!reason.trim()) return this.toast('A rejection reason is required.','warning');
+    const {data:application,error:applicationLookupError}=await this.supabaseClient.from('membership_applications').select('id,user_id').eq('id',applicationId).maybeSingle();
+    if(applicationLookupError) return this.toast(applicationLookupError.message,'error');
+    if(!application) return this.toast('Membership application not found.','error');
     const {error}=await this.supabaseClient.from('membership_applications').update({
       status:'rejected',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),admin_notes:reason.trim()
     }).eq('id',applicationId).in('status',['pending','under_review']);
     if(error) return this.toast(error.message,'error');
     const {error:notificationError}=await this.supabaseClient.from('notifications').insert({
-      user_id:applicationId && (this.db.membershipApplications||[]).find(a=>a.id===applicationId)?.user_id || null,
+      user_id:application.user_id,
       title:'Membership application update',
       message:'Your RIBACOM membership application was not approved. Reason: '+reason.trim(),
       type:'membership',
