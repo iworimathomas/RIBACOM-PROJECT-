@@ -519,16 +519,11 @@
         };
 
         class RibacomApp {
-            // RIBACOM Master Administrator identity
-            static MASTER_ADMIN_EMAIL = "iworimathomas@ymail.com";
-
             constructor() {
                 this.db = this.loadInitialDB();
+                // Local storage may restore display state, but never grants authorization.
+                // Supabase session/profile hydration is the source of truth for roles.
                 this.currentUser = JSON.parse(localStorage.getItem('ribacom_user')) || null;
-                if (this.currentUser && (this.currentUser.email || '').toLowerCase() === RibacomApp.MASTER_ADMIN_EMAIL) {
-                    this.currentUser.role = 'Master Admin';
-                    this.currentUser.isMasterAdmin = true;
-                }
                 this.currentView = 'home';
                 this.supabaseClient = null;
                 
