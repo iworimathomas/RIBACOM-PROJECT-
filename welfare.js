@@ -25,7 +25,7 @@
   };
 
   RibacomApp.prototype.updateWelfareStatus = async function(id,status,approvedAmount=null,notes=''){
-    if(!['admin','super_admin'].includes(this.currentUser?.roleKey)) return this.toast('Administrator access required.','error');
+    if(!['admin','super_admin','welfare_officer'].includes(String(this.currentUser?.roleKey||'').toLowerCase())) return this.toast('Welfare Officer, Admin or Super Admin access required.','error');
     const patch={status,admin_notes:notes||null};
     if(approvedAmount!==null && approvedAmount!=='') patch.approved_amount=Number(approvedAmount);
     if(status==='paid' && !patch.approved_amount){
@@ -45,7 +45,7 @@
       const {error:notificationError}=await this.supabaseClient.from('notifications').insert(notification);
       if(notificationError) console.warn('Welfare notification could not be created:',notificationError.message);
     }
-    await this.loadCloudData(); this.toast(`Welfare request marked ${status}.`,'success'); this.navigate('admin-dashboard');
+    await this.loadCloudData(); this.toast(`Welfare request marked ${status}.`,'success'); this.navigate('welfare');
   };
 
   RibacomApp.prototype.renderWelfareView = function(){
