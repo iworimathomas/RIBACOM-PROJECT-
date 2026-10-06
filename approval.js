@@ -55,7 +55,7 @@
       }
     }
     if(row.submitted_by){
-      const notice={user_id:row.submitted_by,title:decision==='approved'?'Content approved and published':'Content submission rejected',message:decision==='approved'?'Your '+(typeLabel[row.content_type]||'content')+' submission has been approved and published.':'Your '+(typeLabel[row.content_type]||'content')+' submission was rejected. Reason: '+comment.trim(),type:'content',link_route:'approval-center',is_read:false};
+      const notice={user_id:row.submitted_by,title:decision==='approved'?'Content approved and published':'Content submission rejected',message:decision==='approved'?'Your '+(typeLabel[row.content_type]||'content')+' submission has been approved and published.':'Your '+(typeLabel[row.content_type]||'content')+' submission was rejected. Reason: '+comment.trim(),type:'content',link_route:(row.content_type==='announcement'?'news':row.content_type==='event'?'events':row.content_type==='publication'?'publications':row.content_type==='gallery'?'gallery':'approval-center'),is_read:false};
       const {error:noticeError}=await this.supabaseClient.from('notifications').insert(notice);
       if(noticeError) console.warn('Content decision notification failed:',noticeError.message);
     }
