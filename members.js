@@ -253,4 +253,38 @@
     this.toast('Membership profile updated.','success');
     this.navigate('member-dashboard');
   };
+  RibacomApp.prototype.renderMembershipReviewD7 = async function(){
+    const role=String(this.currentUser?.roleKey||'').toLowerCase();
+    if(!['super_admin','admin'].includes(role)){
+      return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">Super Admin access required.</div>';
+    }
+    if(!this.supabaseClient) return '<div class="bg-white rounded-3xl border p-8 text-center">Supabase connection unavailable.</div>';
+    const {data:apps,error}=await this.supabaseClient.from('membership_applications').select('*').in('status',['pending','under_review']).order('created_at',{ascending:false});
+    if(error) return '<div class="bg-white rounded-3xl border p-8 text-red-600">'+esc(error.message)+'</div>';
+    const rows=apps||[];
+    const cards=rows.length?rows.map(a=>{
+      const safe=JSON.stringify(a).replace(/"/g,'&quot;');
+      return '<div class="bg-white rounded-2xl border p-5"><div class="flex flex-wrap justify-between gap-3"><div><span class="text-[10px] font-black uppercase text-ribacom-green">Membership Application</span><h3 class="font-extrabold text-ribacom-navy mt-1">'+esc(a.full_name||'Applicant')+'</h3></div><span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">'+esc(displayStatus(a.status))+'</span></div><div class="grid sm:grid-cols-2 gap-3 mt-4 text-xs"><div><span class="text-gray-400">Email</span><p class="font-semibold">'+esc(a.email||'—')+'</p></div><div><span class="text-gray-400">Phone</span><p class="font-semibold">'+esc(a.phone||'—')+'</p></div><div><span class="text-gray-400">Category</span><p class="font-semibold">'+esc(displayCategory(a.membership_category))+'</p></div><div><span class="text-gray-400">Submitted</span><p class="font-semibold">'+esc(String(a.created_at||'').slice(0,10))+'</p></div></div><div class="mt-4 flex flex-wrap gap-2"><button onclick="app.reviewMembershipFromAdmin('+safe+')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-extrabold">Review / Approve</button><button onclick="app.rejectMembershipApplication('+JSON.stringify(a.id).replace(/"/g,'&quot;')+')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-extrabold">Reject</button></div></div>';
+    }).join(''):'<div class="bg-white rounded-2xl border p-8 text-center text-sm text-gray-500">No pending membership applications.</div>';
+    return '<div class="max-w-6xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase text-ribacom-gold">Membership Administration</span><h2 class="text-2xl font-extrabold mt-1">Application Review</h2><p class="text-xs text-gray-300 mt-1">'+rows.length+' application(s) awaiting action.</p></div><div class="space-y-3">'+cards+'</div></div>';
+  };
+
+  RibacomApp.prototype.reviewMembershipFromAdmin = function(application){
+    if(!application?.id) return this.toast('Application not found.','error');
+    if(confirm('Approve this membership application?')) return this.approveMembershipApplication(application.id);
+  };
+
+  RibacomApp.prototype.rejectMembershipApplication = async function(applicationId){
+    const role=String(this.currentUser?.roleKey||'').toLowerCase();
+    if(!['super_admin','admin'].includes(role)) return this.toast('Super Admin approval required.','error');
+    const reason=prompt('Reason for rejection:','')||'';
+    if(!reason.trim()) return this.toast('A rejection reason is required.','warning');
+    const {error}=await this.supabaseClient.from('membership_applications').update({
+      status:'rejected',reviewed_by:this.currentUser.id,reviewed_at:new Date().toISOString(),reviewer_notes:reason.trim()
+    }).eq('id',applicationId).in('status',['pending','under_review']);
+    if(error) return this.toast(error.message,'error');
+    this.toast('Membership application rejected.','success');
+    this.navigate('admin-members');
+  };
+
 })();
