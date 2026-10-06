@@ -24,102 +24,117 @@
 
   RibacomApp.prototype.handleMembershipSubmit = async function(e){
     e.preventDefault();
-    if(!this.supabaseClient) return this.toast('Supabase is not connected.','error');
-    const val=id=>document.getElementById(id)?.value?.trim()||'';
-    const checked=id=>!!document.getElementById(id)?.checked;
-    const fullName=val('m_fullName'), phone=val('m_phone'), email=val('m_email').toLowerCase();
-    const password=val('m_password'), confirm=val('m_passwordConfirm');
-    const stateRaw=val('m_state'), lga=val('m_lga'), address=val('m_address'), photo=val('m_photo');
-    const photoFile=document.getElementById('m_photo_file')?.files?.[0];
-    if(photoFile){
-      if(!photoFile.type.startsWith('image/')) return this.toast('Please select an image file.','warning');
-      if(photoFile.size>5*1024*1024) return this.toast('Photo must be 5 MB or smaller.','warning');
-    }
-    if(!fullName||!phone||!email||!address||password.length<8) return this.toast('Please complete all required fields.','warning');
-    if(password!==confirm) return this.toast('Passwords do not match.','warning');
-    if(!checked('m_constitutionConsent') || !checked('m_declaration')) return this.toast('Please accept the Constitution consent and declaration before submitting.','warning');
+    const form=e.currentTarget;
+    const submitButton=form?.querySelector('button[type="submit"]');
+    const originalText=submitButton?.textContent||'Submit Membership Application';
+    const fail=(message,type='error')=>{ console.error('[RIBACOM membership]',message); this.toast(String(message),type); };
+    try{
+      if(!this.supabaseClient) return fail('Supabase is not connected. Please refresh the page and try again.');
+      const val=id=>String(document.getElementById(id)?.value??'').trim();
+      const checked=id=>!!document.getElementById(id)?.checked;
+      const fullName=val('m_fullName'), phone=val('m_phone'), email=val('m_email').toLowerCase();
+      const password=val('m_password'), confirm=val('m_passwordConfirm');
+      const stateRaw=val('m_state'), lga=val('m_lga'), address=val('m_address'), photo=val('m_photo');
+      const photoFile=document.getElementById('m_photo_file')?.files?.[0];
+      if(!fullName||!phone||!email||!address||password.length<8) return fail('Please complete all required fields.','warning');
+      if(password!==confirm) return fail('Passwords do not match.','warning');
+      if(!checked('m_constitutionConsent')||!checked('m_declaration')) return fail('Please accept the Constitution consent and declaration before submitting.','warning');
+      if(photoFile){
+        if(!photoFile.type.startsWith('image/')) return fail('Please select a valid image file.','warning');
+        if(photoFile.size>5*1024*1024) return fail('Photo must be 5 MB or smaller.','warning');
+      }
+      if(submitButton){ submitButton.disabled=true; submitButton.textContent='Submitting…'; }
 
-    const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
-    const category=normalizeCategory(val('m_category'));
-    const details={
-      previous_name:val('m_otherName'),date_of_birth:val('m_dob'),gender:val('m_gender'),
-      nationality:val('m_nationality')||'Nigerian',passport_or_id:val('m_idNumber'),
-      origin_community:val('m_originCommunity'),clan_ward:val('m_clanWard'),
-      previous_association:val('m_previousAssociation'),emergency_contact_name:val('m_emergencyName'),
-      emergency_contact_phone:val('m_emergencyPhone'),spouse_name:val('m_spouse'),
-      children_count:Number(val('m_children')||0),next_of_kin:val('m_nextOfKin'),
-      next_of_kin_phone:val('m_nextOfKinPhone'),occupation:val('m_occupation'),
-      employer_business:val('m_employer'),work_address:val('m_workAddress'),skills:val('m_skills'),
-      interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
-      constitution_consent:checked('m_constitutionConsent'),information_declaration:checked('m_declaration'),
-      application_status:'pending',monthly_dues:'D50'
-    };
+      const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
+      const category=normalizeCategory(val('m_category'));
+      const details={
+        previous_name:val('m_otherName'),date_of_birth:val('m_dob'),gender:val('m_gender'),
+        nationality:val('m_nationality')||'Nigerian',passport_or_id:val('m_idNumber'),
+        origin_community:val('m_originCommunity'),clan_ward:val('m_clanWard'),
+        previous_association:val('m_previousAssociation'),emergency_contact_name:val('m_emergencyName'),
+        emergency_contact_phone:val('m_emergencyPhone'),spouse_name:val('m_spouse'),
+        children_count:Number(val('m_children')||0),next_of_kin:val('m_nextOfKin'),
+        next_of_kin_phone:val('m_nextOfKinPhone'),occupation:val('m_occupation'),
+        employer_business:val('m_employer'),work_address:val('m_workAddress'),skills:val('m_skills'),
+        interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
+        constitution_consent:true,information_declaration:true,application_status:'pending',monthly_dues:'D50'
+      };
 
-    let uploadedPhotoUrl=photo||null;
-    if(photoFile){
-      const ext=(photoFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-      const path=`memberships/${crypto.randomUUID()}-${Date.now()}.${ext}`;
-      const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,photoFile,{contentType:photoFile.type,upsert:false,cacheControl:'3600'});
-      if(upError) return this.toast('Photo upload failed: '+upError.message,'error');
-      uploadedPhotoUrl=this.supabaseClient.storage.from('avatars').getPublicUrl(up.data.path).data.publicUrl;
-    }
-    this.toast('Creating your RIBACOM account…','info');
-    const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({
-      email,password,options:{data:{full_name:fullName,phone,application_details:details}}
-    });
-    if(authError) return this.toast(authError.message,'error');
-    const user=authData?.user;
-    if(!user) return this.toast('Account creation did not return a user.','error');
+      let uploadedPhotoUrl=photo||null;
+      if(photoFile){
+        const ext=(photoFile.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+        const path='memberships/'+crypto.randomUUID()+'-'+Date.now()+'.'+ext;
+        const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,photoFile,{contentType:photoFile.type,upsert:false,cacheControl:'3600'});
+        if(upError){
+          console.warn('[RIBACOM membership] optional photo upload failed:',upError.message);
+          fail('Photo upload failed, but the application will continue without the photo.','warning');
+        } else {
+          uploadedPhotoUrl=this.supabaseClient.storage.from('avatars').getPublicUrl(up.path).data.publicUrl;
+        }
+      }
 
-    const {error:profileError}=await this.supabaseClient.from('profiles').upsert({id:user.id,email,full_name:fullName,phone},{onConflict:'id'});
-    if(profileError) console.warn('Profile upsert:',profileError.message);
+      this.toast('Creating your RIBACOM account…','info');
+      const redirectTo=window.location.origin+window.location.pathname;
+      const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({
+        email,password,options:{emailRedirectTo:redirectTo,data:{full_name:fullName,phone,application_details:details}}
+      });
+      if(authError){
+        const msg=String(authError.message||'Account creation failed.');
+        if(/already registered|already exists|user already/i.test(msg)) return fail('This email already has a RIBACOM account. Please use Member Login instead, then submit/update your membership application.');
+        return fail(msg);
+      }
+      const user=authData?.user;
+      if(!user?.id) return fail('Account creation did not return a valid user.');
 
-    // Save the complete application first. This is the authoritative application record.
-    // RLS permits this insert for anon/authenticated users only when the declaration is accepted.
-    const applicationPayload={
-      user_id:user.id,full_name:fullName,date_of_birth:details.date_of_birth,gender:details.gender,
-      nationality:details.nationality,place_of_birth:val('m_placeOfBirth'),state_of_origin:state,lga,
-      town_village:val('m_townVillage'),community_clan:details.origin_community,phone,whatsapp:phone,email,
-      current_address:address,area_location:val('m_areaLocation'),occupation:details.occupation,
-      employer_business:details.employer_business,nigerian_passport_number:details.passport_or_id,
-      membership_category:category,
-      rivers_bayelsa_connection:state, father_name:val('m_fatherName'),mother_name:val('m_motherName'),
-      spouse_name:details.spouse_name,date_of_arrival_gambia:val('m_arrivalGambia'),
-      next_of_kin_name:details.next_of_kin,next_of_kin_relationship:val('m_nextOfKinRelationship'),
-      next_of_kin_phone:details.next_of_kin_phone,emergency_contact_name:details.emergency_contact_name,
-      emergency_contact_phone:details.emergency_contact_phone,preferred_contact_method:val('m_contactMethod')||'WhatsApp',
-      photo_url:uploadedPhotoUrl,declaration_accepted:true,digital_signature:fullName,status:'pending',
-      medical_emergency_information:val('m_medicalEmergency'),national_id_number:details.passport_or_id,
-      proof_of_nigerian_origin_url:val('m_proofOfOrigin')
-    };
-    const {error:applicationError}=await this.supabaseClient.from('membership_applications').insert(applicationPayload);
-    if(applicationError){
-      this.toast('Application could not be saved: '+applicationError.message,'error');
-      return;
-    }
+      // Public applicants are allowed to submit the application while the Auth account
+      // is awaiting email verification. Do not require a profile/session at this point.
+      const applicationPayload={
+        user_id:user.id,full_name:fullName,date_of_birth:details.date_of_birth||null,gender:details.gender||null,
+        nationality:details.nationality,place_of_birth:val('m_placeOfBirth')||null,state_of_origin:state,lga:lga||null,
+        town_village:val('m_townVillage')||null,community_clan:details.origin_community||null,phone,whatsapp:phone,email,
+        current_address:address,area_location:val('m_areaLocation')||null,occupation:details.occupation||null,
+        employer_business:details.employer_business||null,nigerian_passport_number:details.passport_or_id||null,
+        membership_category:category,rivers_bayelsa_connection:state,father_name:val('m_fatherName')||null,mother_name:val('m_motherName')||null,
+        spouse_name:details.spouse_name||null,date_of_arrival_gambia:val('m_arrivalGambia')||null,
+        next_of_kin_name:details.next_of_kin||null,next_of_kin_relationship:val('m_nextOfKinRelationship')||null,
+        next_of_kin_phone:details.next_of_kin_phone||null,emergency_contact_name:details.emergency_contact_name||null,
+        emergency_contact_phone:details.emergency_contact_phone||null,preferred_contact_method:val('m_contactMethod')||'WhatsApp',
+        photo_url:uploadedPhotoUrl,declaration_accepted:true,digital_signature:fullName,status:'pending',
+        medical_emergency_information:val('m_medicalEmergency')||null,national_id_number:details.passport_or_id||null,
+        proof_of_nigerian_origin_url:val('m_proofOfOrigin')||null
+      };
+      const {error:applicationError}=await this.supabaseClient.from('membership_applications').insert(applicationPayload);
+      if(applicationError) return fail('Application could not be saved: '+applicationError.message);
 
-    // A membership row is created only after authentication is established.
-    // The public/anon application path must not attempt the protected members INSERT policy.
-    if(!authData.session){
-      this.toast('Application saved successfully. Verify your email, then sign in. Your application remains pending Secretariat approval.','success');
+      // Only create the protected member/profile records when a real authenticated
+      // session is already available. Email verification may leave session null.
+      if(authData.session){
+        const {error:profileError}=await this.supabaseClient.from('profiles').upsert(
+          {id:user.id,email,full_name:fullName,phone},{onConflict:'id'}
+        );
+        if(profileError) console.warn('[RIBACOM membership] profile sync:',profileError.message);
+
+        const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
+        const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
+        if(memberError) console.warn('[RIBACOM membership] pending member sync:',memberError.message);
+
+        await this.hydrateCurrentUser(user);
+        await this.loadCloudData();
+        this.toast('Membership application submitted for Secretariat approval.','success');
+        this.navigate('member-dashboard');
+        return;
+      }
+
+      this.toast('Application submitted successfully. Check your email, verify your RIBACOM account, then use Member Login. Your application is pending Secretariat approval.','success');
       this.openLoginModal();
-      return;
+    }catch(error){
+      console.error('[RIBACOM membership] unexpected submission error:',error);
+      fail(error?.message||'The application could not be submitted. Please try again.');
+    }finally{
+      if(submitButton){ submitButton.disabled=false; submitButton.textContent=originalText; }
     }
-
-    // Create the pending member row only when the authenticated session is available.
-    // The membership application remains the authoritative record until Secretariat approval.
-    const memberPayload={user_id:user.id,full_name:fullName,email,phone,state_of_origin:state,lga,address,photo_url:uploadedPhotoUrl,nationality:details.nationality,category,status:'pending'};
-    const {error:memberError}=await this.supabaseClient.from('members').upsert(memberPayload,{onConflict:'user_id'});
-    if(memberError){
-      // Do not fail the application after the authoritative application row was saved.
-      console.warn('Pending member sync:',memberError.message);
-      this.toast('Application saved. Your member profile will be synchronized after verification.','success');
-    }
-
-    await this.hydrateCurrentUser(user); await this.loadCloudData();
-    this.toast('Membership application submitted for Secretariat approval.','success');
-    this.navigate('member-dashboard');
   };
+
 
   // Complete the Secretariat approval chain: application -> member -> membership number -> Digital ID.
   // This method is intentionally kept in the membership module so admin approval cannot
