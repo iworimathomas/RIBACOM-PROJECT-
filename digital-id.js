@@ -26,6 +26,17 @@
     const number = await nextUniqueIdNumber(this), issued = new Date(), expiry = new Date(issued); expiry.setFullYear(expiry.getFullYear()+1);
     const {error} = await this.supabaseClient.from('digital_ids').insert({member_id:memberId,id_card_number:number,qr_code_data:qr(member,number),status:'active',issued_at:issued.toISOString(),expires_at:expiry.toISOString()});
     if (error) return this.toast(error.message,'error');
+
+    const {error:notificationError}=await this.supabaseClient.from('notifications').insert({
+      user_id:member.user_id,
+      title:'Digital ID issued',
+      message:'Your official RIBACOM Digital ID has been issued. Open your Member Dashboard to view your membership and Digital ID.',
+      type:'digital_id',
+      link_route:'digital-id',
+      is_read:false
+    });
+    if(notificationError) console.warn('Digital ID notification:',notificationError.message);
+
     await this.loadCloudData(); this.toast('Digital ID issued successfully.','success'); this.navigate('admin-digital-ids');
   };
 
