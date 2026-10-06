@@ -54,6 +54,11 @@
         });
       }
     }
+    if(row.submitted_by){
+      const notice={user_id:row.submitted_by,title:decision==='approved'?'Content approved and published':'Content submission rejected',message:decision==='approved'?'Your '+(typeLabel[row.content_type]||'content')+' submission has been approved and published.':'Your '+(typeLabel[row.content_type]||'content')+' submission was rejected. Reason: '+comment.trim(),type:'content',link_route:'approval-center',is_read:false};
+      const {error:noticeError}=await this.supabaseClient.from('notifications').insert(notice);
+      if(noticeError) console.warn('Content decision notification failed:',noticeError.message);
+    }
     this.toast(decision==='approved'?'Approved and published.':'Rejected and returned to the executive.','success');
     this.navigate('approval-center');
   };
