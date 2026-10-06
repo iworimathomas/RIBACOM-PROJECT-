@@ -69,7 +69,6 @@
     </style>
 </head>
 <body class="h-full text-gray-800 flex flex-col antialiased selection:bg-ribacom-green selection:text-white">
-<script>window.RIBACOM_CONFIG={supabaseUrl:'https://pvgdcqzglafkhqvzxxbi.supabase.co',supabaseKey:'sb_publishable_z3fMAHBZyR4zKT1oBVMJZQ_NeIGzD1m'};</script>
 
     <!-- Global Loading Overlay -->
     <div id="globalLoader" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 hidden">
@@ -314,7 +313,7 @@
             </div>
             <div class="p-6 space-y-4 text-sm">
                 <p class="text-xs text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200 leading-relaxed">
-                    <strong>Demo Mode Enabled:</strong> All operations currently run instantly using LocalStorage. You can connect your live Supabase project below anytime to sync real database and bucket storage.
+                    <strong>RIBACOM Cloud Backend:</strong> This Web 4 release is configured to use the official RIBACOM Supabase project. Connection credentials are managed by the application and are not entered by members.
                 </p>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Supabase Project URL</label>
@@ -367,10 +366,8 @@
                         <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
                     </div>
                     
-                    <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-800 space-y-1">
-                        <p class="font-bold">Quick Demo Portals:</p>
-                        <p>• Admin: <code>admin@ribacom.org</code> / <code>admin123</code></p>
-                        <p>• Member: <code>member@ribacom.org</code> / <code>member123</code></p>
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs text-blue-800">
+                        Sign in uses the official RIBACOM Supabase account system. New members must first submit the membership application.
                     </div>
 
                     <button type="submit" class="w-full bg-ribacom-navy hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-sm transition shadow-md">
@@ -527,55 +524,51 @@
 
             constructor() {
                 this.db = this.loadInitialDB();
-                this.currentUser = null;
+                this.currentUser = JSON.parse(localStorage.getItem('ribacom_user')) || null;
+                if (this.currentUser && (this.currentUser.email || '').toLowerCase() === RibacomApp.MASTER_ADMIN_EMAIL) {
+                    this.currentUser.role = 'Master Admin';
+                    this.currentUser.isMasterAdmin = true;
+                }
                 this.currentView = 'home';
                 this.supabaseClient = null;
+                
                 this.initSupabase();
-                this.restoreSession();
             }
 
             loadInitialDB() {
                 const stored = localStorage.getItem('ribacom_db');
-                if (stored) { try { return JSON.parse(stored); } catch(e) {} }
-                return JSON.parse(JSON.stringify(DEFAULT_DB));
+                if (stored) {
+                    try { return JSON.parse(stored); } catch(e) { console.error(e); }
+                }
+                localStorage.setItem('ribacom_db', JSON.stringify(DEFAULT_DB));
+                return DEFAULT_DB;
             }
 
-            saveDB() { localStorage.setItem('ribacom_db', JSON.stringify(this.db)); }
+            saveDB() {
+                localStorage.setItem('ribacom_db', JSON.stringify(this.db));
+            }
 
-            isMasterAdmin() { return (this.currentUser?.email || '').toLowerCase() === RibacomApp.MASTER_ADMIN_EMAIL || this.currentUser?.role === 'super_admin'; }
-            isAdmin() { return ['super_admin','admin'].includes(this.currentUser?.role); }
+            isMasterAdmin() {
+                return !!this.currentUser && (this.currentUser.isMasterAdmin === true ||
+                    (this.currentUser.email || '').toLowerCase() === RibacomApp.MASTER_ADMIN_EMAIL);
+            }
+
+            isAdmin() {
+                return this.isMasterAdmin() || !!this.currentUser?.role?.includes('Admin');
+            }
 
             initSupabase() {
-                const cfg=window.RIBACOM_CONFIG||{};
-                if(cfg.supabaseUrl && cfg.supabaseKey && window.supabase) {
-                    try {
-                        this.supabaseClient=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseKey);
-                        const b=document.getElementById('backendStatusBadge');
-                        if(b){b.textContent='Supabase Cloud';b.className='text-emerald-400 font-bold hidden sm:inline';}
-                    } catch(e){ console.error(e); }
-                }
-            }
-
-            async restoreSession(){
-                if(this.supabaseClient){
-                    try{const {data}=await this.supabaseClient.from('leadership').select('name,position,photo_url,biography,phone,display_order').eq('is_active',true).order('display_order'); if(data?.length)this.db.leadership=data.map((x,i)=>({id:'cloud_'+i,name:x.name,position:x.position,photo:x.photo_url||'https://placehold.co/300x300?text=RIBACOM',bio:x.biography||'',phone:x.phone||'',order:x.display_order||i+1}));}catch(e){console.warn('Public leadership sync failed',e);}
-                } else return;
+                const url = window.RIBACOM_CONFIG?.supabaseUrl;
+                const key = window.RIBACOM_CONFIG?.supabaseKey;
+                if (!url || !key || !window.supabase) return;
                 try {
-                    const {data}=await this.supabaseClient.auth.getSession();
-                    if(data?.session?.user) await this.hydrateUser(data.session.user);
-                } catch(e){console.warn('Session restore failed',e);}
-                this.updateAuthHeaderUI();
-            }
-
-            async hydrateUser(user){
-                if(!user)return;
-                let role='member', fullName=user.user_metadata?.full_name||user.email;
-                const {data:profile}=await this.supabaseClient.from('profiles').select('id,full_name,email,phone,avatar_url,role').eq('id',user.id).maybeSingle();
-                if(profile){role=profile.role;fullName=profile.full_name||fullName;}
-                const {data:member}=await this.supabaseClient.from('members').select('*').eq('user_id',user.id).maybeSingle();
-                this.currentUser={...(member||{}),id:user.id,email:user.email,fullName:member?.full_name||fullName,role};
-                localStorage.setItem('ribacom_user',JSON.stringify(this.currentUser));
-                this.updateAuthHeaderUI();
+                    this.supabaseClient = window.supabase.createClient(url, key);
+                    const badge = document.getElementById('backendStatusBadge');
+                    if (badge) { badge.innerText = "Supabase Cloud"; badge.className = "text-emerald-400 font-bold hidden sm:inline"; }
+                } catch(e) {
+                    this.supabaseClient = null;
+                    console.warn("Supabase init error:", e);
+                }
             }
 
             navigate(viewId, params = null) {
@@ -872,7 +865,6 @@
             }
 
             renderLeadershipView() {
-                const leaders=(this.db.leadership||[]).map(l=>({name:l.name,position:l.position,photo:l.photo,bio:l.bio,phone:l.phone,order:l.order}));
                 return `
                     <div class="space-y-6 animate-fadeIn">
                         <div class="text-center max-w-2xl mx-auto space-y-2">
@@ -998,3 +990,1184 @@
                                         <div><label class="block text-xs font-bold text-gray-700 uppercase mb-1">Date of Birth</label><input type="date" id="m_dob" class="w-full px-3 py-2 border rounded-xl text-sm outline-none"></div>
                                         <div><label class="block text-xs font-bold text-gray-700 uppercase mb-1">Gender</label><select id="m_gender" class="w-full px-3 py-2 border rounded-xl text-sm outline-none"><option value="">Select</option><option>Male</option><option>Female</option></select></div>
                                         <div><label class="block text-xs font-bold text-gray-700 uppercase mb-1">Marital Status</label><select id="m_marital" class="w-full px-3 py-2 border rounded-xl text-sm outline-none"><option value="">Select</option><option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option></select></div>
+                                        <div><label class="block text-xs font-bold text-gray-700 uppercase mb-1">Occupation / Profession</label><input type="text" id="m_occupation" placeholder="Occupation or profession" class="w-full px-3 py-2 border rounded-xl text-sm outline-none"></div>
+                                        <div><label class="block text-xs font-bold text-gray-700 uppercase mb-1">Town / Village of Origin</label><input type="text" id="m_originTown" placeholder="Town, village or community" class="w-full px-3 py-2 border rounded-xl text-sm outline-none"></div>
+                                        <div><label class="block text-xs font-bold text-gray-700 uppercase mb-1">Date Arrived in The Gambia</label><input type="date" id="m_arrivalDate" class="w-full px-3 py-2 border rounded-xl text-sm outline-none"></div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t pt-4">
+                                    <h3 class="font-extrabold text-sm text-ribacom-navy mb-3">Emergency / Next-of-Kin Contact</h3>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <input type="text" id="m_nextOfKin" placeholder="Next-of-kin full name" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
+                                        <input type="tel" id="m_nextOfKinPhone" placeholder="Next-of-kin phone" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
+                                        <input type="text" id="m_relationship" placeholder="Relationship" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
+                                        <input type="text" id="m_emergencyAddress" placeholder="Emergency contact address" class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Passport Photograph URL</label>
+                                    <input type="url" id="m_photo" placeholder="https://..." class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                    <p class="text-[10px] text-gray-400 mt-1">Optional. Standard placeholder photo applied if left blank.</p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Account Password *</label>
+                                    <input type="password" required minlength="8" id="m_password" placeholder="Minimum 8 characters" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+
+                                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 space-y-1">
+                                    <p class="font-bold"><i class="fa-solid fa-coins mr-1"></i> Membership Fees & Dues Notice:</p>
+                                    <p>Standard monthly dues are <strong>D50 / month</strong>. Submitting this form creates an application with <strong>Pending</strong> status for Secretariat approval.</p>
+                                </div>
+
+                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-extrabold py-3 rounded-xl text-sm shadow-lg transition">
+                                    Submit Membership Application
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderDigitalIdView() {
+                const user = this.currentUser || this.db.members[0];
+
+                return `
+                    <div class="max-w-md mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1">
+                            <span class="bg-ribacom-gold/20 text-ribacom-navy font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase">Official Identity</span>
+                            <h2 class="text-xl font-extrabold text-ribacom-navy">Digital Membership ID Card</h2>
+                            <p class="text-xs text-gray-500">Official digital identification card for RIBACOM The Gambia.</p>
+                        </div>
+
+                        <!-- DIGITAL ID CARD CONTAINER -->
+                        <div id="digitalIdCard" class="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-ribacom-gold/60 text-white bg-gradient-to-br from-ribacom-navy via-slate-900 to-ribacom-green p-6 space-y-4">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between border-b border-white/20 pb-3">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-8 h-8 rounded-full bg-ribacom-gold text-ribacom-navy font-black flex items-center justify-center text-sm shadow">
+                                        R
+                                    </div>
+                                    <div>
+                                        <h3 class="font-extrabold text-xs tracking-wider">RIBACOM GAMBIA</h3>
+                                        <p class="text-[9px] text-ribacom-gold tracking-widest font-semibold">TRUTH • UNITY • SERVICE</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] bg-emerald-500 text-white font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${user.status || 'Active'}</span>
+                            </div>
+
+                            <!-- Photo & Details -->
+                            <div class="flex items-center space-x-4 py-2">
+                                <img src="${user.photo || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop'}" class="w-20 h-20 rounded-2xl object-cover ring-2 ring-ribacom-gold shadow-md flex-shrink-0">
+                                <div class="space-y-1 overflow-hidden">
+                                    <h4 class="font-extrabold text-base truncate">${user.fullName}</h4>
+                                    <p class="text-xs text-ribacom-gold font-bold">${user.membershipNo || 'RBC-GM-2026-001'}</p>
+                                    <p class="text-[11px] text-gray-300">${user.category || 'Regular Member'}</p>
+                                    <p class="text-[10px] text-gray-400"><i class="fa-solid fa-location-dot text-ribacom-gold mr-1"></i>${user.stateOfOrigin || 'Rivers State'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Footer & QR -->
+                            <div class="pt-3 border-t border-white/20 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <p class="text-[9px] text-gray-400">ISSUED DATE: <span class="text-white font-medium">${user.issueDate || '2026-01-10'}</span></p>
+                                    <p class="text-[9px] text-gray-400">EXPIRES: <span class="text-ribacom-gold font-medium">PERPETUAL</span></p>
+                                </div>
+                                <div id="qrcode" class="p-1.5 bg-white rounded-lg shadow-md"></div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-3">
+                            <button onclick="window.print()" class="flex-1 bg-ribacom-navy hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-print"></i> Print ID Card
+                            </button>
+                            <button onclick="app.toast('ID Card stored to local wallet device cache', 'success')" class="flex-1 bg-ribacom-green hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-download"></i> Save Digital ID
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            generateQRCode() {
+                const qrContainer = document.getElementById("qrcode");
+                if (!qrContainer) return;
+                qrContainer.innerHTML = "";
+                const user = this.currentUser || this.db.members[0];
+                const qrData = `RIBACOM-GAMBIA|ID:${user.membershipNo || '001'}|NAME:${user.fullName}|STATUS:${user.status}`;
+                new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 50,
+                    height: 50,
+                    colorDark : "#0A2540",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+
+            renderWelfareView() {
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Welfare Scheme & Benefits</h2>
+                            <p class="text-xs text-gray-600">Official assistance framework for members during key life events.</p>
+                        </div>
+
+                        <!-- Approved Benefits Tier Banner -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
+                                <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="fa-solid fa-rings-wedding"></i>
+                                </div>
+                                <h4 class="font-bold text-xs text-gray-800">Wedding Benefit</h4>
+                                <p class="text-lg font-extrabold text-ribacom-green">D1,000</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="fa-solid fa-baby"></i>
+                                </div>
+                                <h4 class="font-bold text-xs text-gray-800">Child Birth</h4>
+                                <p class="text-lg font-extrabold text-ribacom-green">D500</p>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow text-center space-y-1">
+                                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto text-base">
+                                    <i class="fa-solid fa-ribbon"></i>
+                                </div>
+                                <h4 class="font-bold text-xs text-gray-800">Bereavement</h4>
+                                <p class="text-lg font-extrabold text-ribacom-green">D1,500</p>
+                                <p class="text-[9px] text-gray-400">Parent / Spouse / Child</p>
+                            </div>
+                        </div>
+
+                        <!-- Application Form -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <h3 class="font-bold text-base text-ribacom-navy flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane text-ribacom-green"></i> Submit Welfare Claim / Application
+                            </h3>
+                            <form onsubmit="app.handleWelfareSubmit(event)" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Category *</label>
+                                        <select required id="w_type" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                            <option value="Wedding">Wedding Celebration (D1,000)</option>
+                                            <option value="Birth">Child Birth (D500)</option>
+                                            <option value="Bereavement">Bereavement (D1,500)</option>
+                                            <option value="Emergency">Other Special Welfare</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Your Full Name / ID</label>
+                                        <input type="text" required id="w_memberName" placeholder="Name or Membership No" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Description / Claim Details *</label>
+                                    <textarea required id="w_desc" rows="3" placeholder="Provide background information, dates, and documentation references..." class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none"></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full bg-ribacom-navy hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm transition shadow">
+                                    Submit Claim to Welfare Officer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderEventsView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn">
+                        <div class="text-center max-w-2xl mx-auto space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Community Events & Meetings</h2>
+                            <p class="text-xs text-gray-600">Stay informed on general congress meetings, galas, and community outreach.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            ${this.db.events.map(evt => `
+                                <div class="bg-white rounded-3xl border border-gray-100 card-shadow overflow-hidden flex flex-col justify-between">
+                                    <div>
+                                        <img src="${evt.image}" class="w-full h-44 object-cover">
+                                        <div class="p-5 space-y-2">
+                                            <div class="flex items-center justify-between">
+                                                <span class="bg-amber-100 text-amber-800 font-bold text-[10px] px-2.5 py-0.5 rounded-full">${evt.status}</span>
+                                                <span class="text-xs text-gray-400 font-semibold"><i class="fa-regular fa-clock text-ribacom-green mr-1"></i>${evt.date} @ ${evt.time}</span>
+                                            </div>
+                                            <h3 class="font-extrabold text-base text-gray-800">${evt.title}</h3>
+                                            <p class="text-xs text-gray-600 leading-relaxed">${evt.description}</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 p-4 border-t border-gray-100 text-xs text-gray-600 flex items-center justify-between">
+                                        <span><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> ${evt.location}</span>
+                                        <button onclick="app.toast('Event added to device calendar!', 'success')" class="text-ribacom-green font-bold hover:underline">Add to Calendar</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderAnnouncementsView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-3xl mx-auto">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Official Bulletins & Notices</h2>
+                            <p class="text-xs text-gray-600">Official circulars released by the Executive Council.</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            ${this.db.announcements.map(a => `
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="bg-ribacom-green/10 text-ribacom-green font-bold text-xs px-3 py-1 rounded-full">${a.category}</span>
+                                        <span class="text-xs text-gray-400">${a.date}</span>
+                                    </div>
+                                    <h3 class="font-bold text-base text-gray-800">${a.title}</h3>
+                                    <p class="text-xs sm:text-sm text-gray-600 leading-relaxed">${a.content}</p>
+                                    <div class="pt-3 border-t border-gray-100 text-xs text-gray-400 flex items-center justify-between">
+                                        <span>Issued by: <strong>${a.author}</strong></span>
+                                        <button onclick="app.toast('Notice copied to clipboard', 'info')" class="hover:text-ribacom-green"><i class="fa-regular fa-copy"></i> Copy</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderPublicationsView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-3xl mx-auto">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Official Publications & Documents</h2>
+                            <p class="text-xs text-gray-600">Access approved policy documents, election guidelines, and official reports.</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            ${this.db.publications.map(p => `
+                                <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex items-center justify-between gap-4">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg flex-shrink-0">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-sm text-gray-800">${p.title}</h4>
+                                            <p class="text-xs text-gray-500">${p.description}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="app.openPublication('${p.id}')" class="bg-gray-100 hover:bg-ribacom-green hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex-shrink-0">
+                                        View
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderGalleryView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn">
+                        <div class="text-center max-w-2xl mx-auto space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Community Photo Gallery</h2>
+                            <p class="text-xs text-gray-600">Highlights from congresses, cultural dances, and community gatherings.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            ${this.db.gallery.map(g => `
+                                <div class="bg-white rounded-2xl overflow-hidden border border-gray-100 card-shadow space-y-2">
+                                    <img src="${g.image_url}" class="w-full h-48 object-cover hover:scale-105 transition duration-300">
+                                    <div class="p-3">
+                                        <h4 class="font-bold text-xs text-gray-800">${g.title}</h4>
+                                        <p class="text-[11px] text-gray-500">${g.caption}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderYouthView() {
+                const y = this.db.youth;
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="bg-gradient-to-r from-ribacom-navy to-ribacom-green text-white p-8 rounded-3xl shadow-xl space-y-3">
+                            <span class="bg-ribacom-gold text-ribacom-navy font-black text-[10px] px-2.5 py-1 rounded-full uppercase">Youth Wing</span>
+                            <h2 class="text-2xl font-extrabold">${y.title}</h2>
+                            <p class="text-xs text-gray-200 leading-relaxed">${y.content}</p>
+                            <div class="pt-2">
+                                <span class="text-xs text-ribacom-gold font-bold"><i class="fa-solid fa-user-shield mr-1"></i> Leadership: ${y.leader}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-3">
+                            <h3 class="font-bold text-base text-gray-800">Youth Initiatives & Projects</h3>
+                            <ul class="space-y-2">
+                                ${y.activities.map(act => `
+                                    <li class="p-3 bg-gray-50 rounded-xl text-xs font-semibold text-gray-700 flex items-center gap-2">
+                                        <i class="fa-solid fa-check text-ribacom-green"></i> ${act}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderAdvisersView() {
+                return `
+                    <div class="space-y-6 animate-fadeIn max-w-3xl mx-auto">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Council of Advisers</h2>
+                            <p class="text-xs text-gray-600">Elders and patrons providing legal, cultural, and strategic counsel.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            ${this.db.advisers.map(adv => `
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow flex items-center space-x-4">
+                                    <img src="${adv.photo}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-ribacom-gold">
+                                    <div>
+                                        <span class="bg-amber-100 text-amber-800 font-bold text-[10px] px-2 py-0.5 rounded">${adv.category}</span>
+                                        <h4 class="font-bold text-sm text-gray-800 mt-1">${adv.name}</h4>
+                                        <p class="text-xs text-gray-500">${adv.bio}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderContactView() {
+                const a = this.db.about;
+                return `
+                    <div class="max-w-2xl mx-auto space-y-6 animate-fadeIn">
+                        <div class="text-center space-y-1">
+                            <h2 class="text-2xl font-extrabold text-ribacom-navy">Contact Secretariat</h2>
+                            <p class="text-xs text-gray-600">Reach out to the executive council for inquiries or assistance.</p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div class="space-y-3 text-xs">
+                                <p class="flex items-center gap-3"><i class="fa-solid fa-location-dot text-ribacom-green text-lg"></i> <span><strong>Secretariat Address:</strong> ${a.address}</span></p>
+                                <p class="flex items-center gap-3"><i class="fa-solid fa-phone text-ribacom-green text-lg"></i> <span><strong>Helpline:</strong> ${a.contactPhone}</span></p>
+                                <p class="flex items-center gap-3"><i class="fa-solid fa-envelope text-ribacom-green text-lg"></i> <span><strong>Email:</strong> ${a.contactEmail}</span></p>
+                            </div>
+
+                            <hr class="border-gray-100">
+
+                            <form onsubmit="app.toast('Message sent to Secretariat!', 'success'); event.preventDefault();" class="space-y-3">
+                                <input type="text" required placeholder="Your Name" class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <input type="email" required placeholder="Your Email" class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none">
+                                <textarea required rows="3" placeholder="Message content..." class="w-full px-3 py-2 border rounded-xl text-xs focus:ring-2 focus:ring-ribacom-green outline-none"></textarea>
+                                <button type="submit" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                                    Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderMemberDashboardView() {
+                const u = this.currentUser;
+                return `
+                    <div class="max-w-3xl mx-auto space-y-6 animate-fadeIn">
+                        <!-- Profile Header -->
+                        <div class="bg-ribacom-navy text-white p-6 rounded-3xl shadow-xl flex items-center space-x-4 border border-ribacom-gold/30">
+                            <img src="${u.photo || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop'}" class="w-16 h-16 rounded-2xl object-cover ring-2 ring-ribacom-gold">
+                            <div>
+                                <span class="bg-ribacom-gold text-ribacom-navy font-black text-[10px] px-2 py-0.5 rounded uppercase">${u.role || 'Member'}</span>
+                                <h2 class="text-xl font-extrabold mt-1">${u.fullName}</h2>
+                                <p class="text-xs text-ribacom-gold font-bold">${u.membershipNo || 'RBC-GM-2026-001'}</p>
+                            </div>
+                        </div>
+
+                        <!-- Payment & Dues Calculator Widget -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <h3 class="font-bold text-base text-ribacom-navy flex items-center gap-2">
+                                <i class="fa-solid fa-calculator text-ribacom-green"></i> Dues & Welfare Levy Calculator
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-2xl">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">Months to Pay Dues (D50/mo)</label>
+                                    <input type="number" id="calcMonths" value="1" min="1" max="12" oninput="app.calculateDuesTotal()" class="w-full px-3 py-1.5 border rounded-lg text-sm">
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-gray-600 mb-1">Total Payment Due</p>
+                                    <p id="calcTotal" class="text-2xl font-extrabold text-ribacom-green">D50</p>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-4 space-y-2">
+                                <h4 class="font-bold text-xs text-gray-700">Official Payment Gateways:</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                    ${this.db.paymentSettings.map(p => `
+                                        <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                                            <p class="font-bold text-ribacom-navy">${p.method}</p>
+                                            <p class="text-gray-600">${p.accountNo} (${p.accountName})</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateDuesTotal() {
+                const months = parseInt(document.getElementById('calcMonths')?.value || 1);
+                const total = months * 50;
+                const target = document.getElementById('calcTotal');
+                if (target) target.innerText = `D${total}`;
+            }
+
+            renderAdminDashboardView() {
+                return `
+                    <div class="space-y-8 animate-fadeIn">
+                        <!-- Admin Banner -->
+                        <div class="bg-ribacom-navy text-white p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 border-b-4 border-ribacom-gold">
+                            <div>
+                                <span class="bg-ribacom-gold text-ribacom-navy font-extrabold text-[10px] px-2.5 py-0.5 rounded uppercase">Secretariat Command Center</span>
+                                <h2 class="text-2xl font-extrabold mt-1">Management Portal</h2>
+                                <p class="text-xs text-gray-300">Full control over members, applications, welfare claims, publications, and organization content.</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="app.openSupabaseModal()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-2 rounded-xl text-xs border border-white/20">
+                                    <i class="fa-solid fa-database text-ribacom-gold"></i> Database Config
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Administrator Profile & Picture Editor -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+                                <div>
+                                    <h3 class="font-bold text-base text-gray-800">Administrator Profile</h3>
+                                    <p class="text-xs text-gray-500 mt-1">Edit your administrator details and profile picture. Changes are saved on this device.</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <img id="adminProfilePreview" src="${this.currentUser?.photo || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop'}" class="w-14 h-14 rounded-full object-cover ring-2 ring-ribacom-gold" onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop'">
+                                    <label class="cursor-pointer bg-ribacom-green text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 transition">
+                                        <i class="fa-solid fa-camera mr-1"></i> Change Picture
+                                        <input type="file" id="adminProfilePhotoFile" accept="image/*" class="hidden" onchange="app.previewAdminProfilePhoto(event)">
+                                    </label>
+                                </div>
+                            </div>
+                            <form onsubmit="app.saveAdminProfile(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
+                                    <input type="text" id="admin_profile_name" required value="${this.currentUser?.fullName || ''}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email</label>
+                                    <input type="email" id="admin_profile_email" value="${this.currentUser?.email || ''}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Phone</label>
+                                    <input type="text" id="admin_profile_phone" value="${this.currentUser?.phone || ''}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">State of Origin</label>
+                                    <input type="text" id="admin_profile_state" value="${this.currentUser?.stateOfOrigin || ''}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">LGA</label>
+                                    <input type="text" id="admin_profile_lga" value="${this.currentUser?.lga || ''}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Address</label>
+                                    <input type="text" id="admin_profile_address" value="${this.currentUser?.address || ''}" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Profile Picture URL (optional)</label>
+                                    <input type="url" id="admin_profile_photo_url" value="${this.currentUser?.photo && !this.currentUser.photo.startsWith('data:') ? this.currentUser.photo : ''}" placeholder="https://..." class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-ribacom-green outline-none" oninput="app.previewAdminProfileUrl(this.value)">
+                                </div>
+                                <div class="sm:col-span-2 flex justify-end">
+                                    <button type="submit" class="bg-ribacom-navy text-white font-bold px-5 py-2.5 rounded-xl text-xs hover:bg-slate-800 transition shadow">
+                                        <i class="fa-solid fa-floppy-disk mr-1"></i> Save Profile Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Stat Cards Overview -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow space-y-1">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Total Members</p>
+                                <h3 class="text-2xl font-extrabold text-ribacom-navy">${this.db.members.length}</h3>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow space-y-1">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Welfare Requests</p>
+                                <h3 class="text-2xl font-extrabold text-ribacom-green">${this.db.welfareRequests.length}</h3>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow space-y-1">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Announcements</p>
+                                <h3 class="text-2xl font-extrabold text-amber-600">${this.db.announcements.length}</h3>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow space-y-1">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase">Events Scheduled</p>
+                                <h3 class="text-2xl font-extrabold text-purple-600">${this.db.events.length}</h3>
+                            </div>
+                        </div>
+
+                        <!-- Admin Management Modules Grid -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Members & Welfare Admin Panel -->
+                            <div class="lg:col-span-2 space-y-6">
+                                <!-- Members Table -->
+                                <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="font-bold text-base text-gray-800">Member Directory & Approvals</h3>
+                                        <span class="text-xs bg-emerald-100 text-ribacom-green font-bold px-2.5 py-0.5 rounded-full">${this.db.members.length} Registered</span>
+                                    </div>
+
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs border-collapse">
+                                            <thead>
+                                                <tr class="bg-gray-50 text-gray-500 uppercase font-semibold">
+                                                    <th class="p-2">Member</th>
+                                                    <th class="p-2">Membership No</th>
+                                                    <th class="p-2">Category</th>
+                                                    <th class="p-2">Status</th>
+                                                    <th class="p-2 text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                ${this.db.members.map(m => `
+                                                    <tr>
+                                                        <td class="p-2 font-bold text-gray-800">${m.fullName}</td>
+                                                        <td class="p-2 text-ribacom-green font-semibold">${m.membershipNo}</td>
+                                                        <td class="p-2">${m.category}</td>
+                                                        <td class="p-2"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">${m.status}</span></td>
+                                                        <td class="p-2 text-right">
+                                                            <button onclick="app.deleteMember('${m.id}')" class="text-red-500 hover:text-red-700 font-bold text-[11px]">Delete</button>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Welfare Management Table -->
+                                <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                                    <h3 class="font-bold text-base text-gray-800">Welfare Requests Management</h3>
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs border-collapse">
+                                            <thead>
+                                                <tr class="bg-gray-50 text-gray-500 uppercase font-semibold">
+                                                    <th class="p-2">Claimant</th>
+                                                    <th class="p-2">Type</th>
+                                                    <th class="p-2">Amount</th>
+                                                    <th class="p-2">Status</th>
+                                                    <th class="p-2 text-right">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                ${this.db.welfareRequests.map(w => `
+                                                    <tr>
+                                                        <td class="p-2 font-bold">${w.memberName}</td>
+                                                        <td class="p-2">${w.type}</td>
+                                                        <td class="p-2 font-bold text-ribacom-green">D${w.amount}</td>
+                                                        <td class="p-2"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[10px] font-bold">${w.status}</span></td>
+                                                        <td class="p-2 text-right">
+                                                            <button onclick="app.approveWelfare('${w.id}')" class="bg-ribacom-green text-white px-2 py-1 rounded text-[10px] font-bold">Approve</button>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Member / Digital ID Editor -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div>
+                                <h3 class="font-bold text-base text-gray-800">Member & Digital ID Editor</h3>
+                                <p class="text-xs text-gray-500">Edit the information printed on a member's RIBACOM Digital ID. Changes are saved immediately to this application's database.</p>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <select id="admin_id_member" onchange="app.loadMemberForIdEdit(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                    <option value="">Select member</option>
+                                    ${this.db.members.map(m=>`<option value="${m.id}">${m.fullName} — ${m.membershipNo || 'No ID No.'}</option>`).join('')}
+                                </select>
+                                <input id="admin_id_number" placeholder="Membership / ID Number" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <select id="admin_id_status" class="w-full px-3 py-2 border rounded-xl text-xs outline-none"><option>Active</option><option>Pending</option><option>Suspended</option><option>Expired</option></select>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                                <input id="admin_id_name" placeholder="Full name" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_category" placeholder="Membership category" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_state" placeholder="State of origin" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_lga" placeholder="LGA" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_issue" type="date" title="Issue date" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_expiry" type="date" title="Expiry date" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_photo" placeholder="Photo URL" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_id_phone" placeholder="Phone" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                            </div>
+                            <button onclick="app.saveMemberIdDetails()" class="bg-ribacom-green text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-700">Save Digital ID Details</button>
+                        </div>
+
+                        <!-- Publication Media Editor -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div>
+                                <h3 class="font-bold text-base text-gray-800">Publication & Media Editor</h3>
+                                <p class="text-xs text-gray-500">Create or edit publication title, category, description, date and media/document URL.</p>
+                            </div>
+                            <form onsubmit="app.savePublication(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <select id="admin_pub_id" onchange="app.loadPublicationForEdit(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs outline-none"><option value="new">+ New Publication</option>${this.db.publications.map(p=>`<option value="${p.id}">${p.title}</option>`).join('')}</select>
+                                <input id="admin_pub_title" required placeholder="Publication title" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_pub_category" placeholder="Category" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_pub_date" type="date" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_pub_media" placeholder="PDF / document / media URL" class="w-full px-3 py-2 border rounded-xl text-xs outline-none sm:col-span-2">
+                                <textarea id="admin_pub_description" rows="3" placeholder="Description" class="w-full px-3 py-2 border rounded-xl text-xs outline-none sm:col-span-2"></textarea>
+                                <div class="sm:col-span-2 flex gap-2"><button type="submit" class="bg-ribacom-navy text-white px-5 py-2.5 rounded-xl text-xs font-bold">Save Publication</button><button type="button" onclick="app.deletePublication()" class="bg-red-50 text-red-600 px-5 py-2.5 rounded-xl text-xs font-bold">Delete Selected</button></div>
+                            </form>
+                        </div>
+
+                        <!-- Executive Leadership Editor -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div>
+                                <h3 class="font-bold text-base text-gray-800">Executive Leadership Editor</h3>
+                                <p class="text-xs text-gray-500">Master Admin can edit each executive leader's name, position, photograph and short biography without changing the existing RIBACOM leadership layout.</p>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <select id="admin_lead_id" onchange="app.loadLeadershipForEdit(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                    <option value="new">+ New Leadership Member</option>
+                                    ${this.db.leadership.map(x=>`<option value="${x.id}">${x.position} — ${x.name}</option>`).join('')}
+                                </select>
+                                <input id="admin_lead_position" placeholder="Position / office" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_lead_name" placeholder="Executive member name" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_lead_photo" placeholder="Executive photograph URL" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <textarea id="admin_lead_bio" rows="4" placeholder="Short biography / profile" class="w-full px-3 py-2 border rounded-xl text-xs outline-none sm:col-span-2"></textarea>
+                                <input id="admin_lead_phone" placeholder="Phone (optional)" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                                <input id="admin_lead_order" type="number" min="1" placeholder="Display order" class="w-full px-3 py-2 border rounded-xl text-xs outline-none">
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="app.saveLeadershipEditor()" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Save Leadership</button>
+                                <button onclick="app.deleteLeadershipEditor()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold">Delete Selected</button>
+                            </div>
+                        </div>
+
+                        <!-- RIBACOM Content Editors -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-6">
+                            <div>
+                                <h3 class="font-bold text-base text-gray-800">RIBACOM Community Content Management</h3>
+                                <p class="text-xs text-gray-500">Master Admin can edit the information displayed in the Youth Wing, Events & Meetings, Photo Gallery and Council of Advisers sections.</p>
+                            </div>
+
+                            <!-- Events Editor -->
+                            <div class="border rounded-2xl p-4 space-y-3">
+                                <h4 class="font-bold text-sm text-ribacom-navy">Community Events & Meetings</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <select id="admin_event_id" onchange="app.loadEventForEdit(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs"><option value="new">+ New Event</option>${this.db.events.map(x=>`<option value="${x.id}">${x.title}</option>`).join('')}</select>
+                                    <input id="admin_event_title" placeholder="Event / meeting title" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_event_date" type="date" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_event_time" type="time" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_event_location" placeholder="Location" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_event_image" placeholder="Event image URL" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <select id="admin_event_status" class="w-full px-3 py-2 border rounded-xl text-xs"><option>Upcoming</option><option>Completed</option><option>Cancelled</option></select>
+                                    <textarea id="admin_event_description" rows="2" placeholder="Event description" class="w-full px-3 py-2 border rounded-xl text-xs sm:col-span-2"></textarea>
+                                </div>
+                                <div class="flex gap-2"><button onclick="app.saveEventEditor()" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Save Event</button><button onclick="app.deleteEventEditor()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold">Delete</button></div>
+                            </div>
+
+                            <!-- Gallery Editor -->
+                            <div class="border rounded-2xl p-4 space-y-3">
+                                <h4 class="font-bold text-sm text-ribacom-navy">Community Photo Gallery</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <select id="admin_gallery_id" onchange="app.loadGalleryForEdit(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs"><option value="new">+ New Gallery Photo</option>${this.db.gallery.map(x=>`<option value="${x.id}">${x.title}</option>`).join('')}</select>
+                                    <input id="admin_gallery_title" placeholder="Photo title" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_gallery_image" placeholder="Photo image URL" class="w-full px-3 py-2 border rounded-xl text-xs sm:col-span-2">
+                                    <textarea id="admin_gallery_caption" rows="2" placeholder="Caption / description" class="w-full px-3 py-2 border rounded-xl text-xs sm:col-span-2"></textarea>
+                                </div>
+                                <div class="flex gap-2"><button onclick="app.saveGalleryEditor()" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Save Photo</button><button onclick="app.deleteGalleryEditor()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold">Delete</button></div>
+                            </div>
+
+                            <!-- Youth Wing Editor -->
+                            <div class="border rounded-2xl p-4 space-y-3">
+                                <h4 class="font-bold text-sm text-ribacom-navy">RIBACOM Youth Wing & Empowerment Hub</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <input id="admin_youth_title" placeholder="Youth Wing title" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_youth_leader" placeholder="Youth Wing leader / coordinator" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <textarea id="admin_youth_content" rows="4" placeholder="Youth Wing information" class="w-full px-3 py-2 border rounded-xl text-xs sm:col-span-2"></textarea>
+                                    <input id="admin_youth_activities" placeholder="Activities separated by commas" class="w-full px-3 py-2 border rounded-xl text-xs sm:col-span-2">
+                                </div>
+                                <button onclick="app.saveYouthEditor()" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Save Youth Wing Information</button>
+                            </div>
+
+                            <!-- Advisers Editor -->
+                            <div class="border rounded-2xl p-4 space-y-3">
+                                <h4 class="font-bold text-sm text-ribacom-navy">Council of Advisers</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <select id="admin_adviser_id" onchange="app.loadAdviserForEdit(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs"><option value="new">+ New Adviser</option>${this.db.advisers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
+                                    <input id="admin_adviser_name" placeholder="Adviser name" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_adviser_category" placeholder="Role / category" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <input id="admin_adviser_photo" placeholder="Photo URL" class="w-full px-3 py-2 border rounded-xl text-xs">
+                                    <textarea id="admin_adviser_bio" rows="3" placeholder="Adviser biography / profile" class="w-full px-3 py-2 border rounded-xl text-xs sm:col-span-2"></textarea>
+                                </div>
+                                <div class="flex gap-2"><button onclick="app.saveAdviserEditor()" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Save Adviser</button><button onclick="app.deleteAdviserEditor()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-xs font-bold">Delete</button></div>
+                            </div>
+                        </div>
+
+                        <!-- Content Creation Side Panel -->
+                            <div class="space-y-6">
+                                <!-- Quick Announcement Publisher -->
+                                <div class="bg-white p-5 rounded-3xl border border-gray-100 card-shadow space-y-3">
+                                    <h3 class="font-bold text-sm text-gray-800">Post New Announcement</h3>
+                                    <form onsubmit="app.handleAdminPostAnnouncement(event)" class="space-y-3">
+                                        <input type="text" required id="admin_ann_title" placeholder="Notice Title" class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none">
+                                        <select id="admin_ann_cat" class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none">
+                                            <option value="General">General Notice</option>
+                                            <option value="Meeting">Meeting Bulletin</option>
+                                            <option value="Urgent">Urgent Alert</option>
+                                        </select>
+                                        <textarea required id="admin_ann_content" rows="2" placeholder="Notice text..." class="w-full px-3 py-1.5 border rounded-lg text-xs outline-none"></textarea>
+                                        <button type="submit" class="w-full bg-ribacom-navy text-white font-bold py-2 rounded-lg text-xs hover:bg-slate-800 transition">
+                                            Publish Notice
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            loadLeadershipForEdit(id){
+                const l=this.db.leadership.find(x=>x.id===id);
+                const ids=['admin_lead_position','admin_lead_name','admin_lead_photo','admin_lead_bio','admin_lead_phone','admin_lead_order'];
+                if(id==='new'||!l){ids.forEach(x=>{const e=document.getElementById(x);if(e)e.value=''});return;}
+                const set=(x,v)=>{const e=document.getElementById(x);if(e)e.value=v??''};
+                set('admin_lead_position',l.position);set('admin_lead_name',l.name);set('admin_lead_photo',l.photo);set('admin_lead_bio',l.bio);set('admin_lead_phone',l.phone);set('admin_lead_order',l.order);
+            }
+            saveLeadershipEditor(){
+                if(!this.isAdmin())return this.toast('Administrator privileges required.','error');
+                const get=id=>document.getElementById(id)?.value.trim()||'';
+                const id=get('admin_lead_id');
+                const data={position:get('admin_lead_position'),name:get('admin_lead_name'),photo:get('admin_lead_photo'),bio:get('admin_lead_bio'),phone:get('admin_lead_phone'),order:Number(get('admin_lead_order'))||((this.db.leadership||[]).length+1)};
+                if(!data.position||!data.name)return this.toast('Enter the executive position and name.','error');
+                if(id==='new'){data.id='lead_'+Date.now();this.db.leadership.push(data)}else{const l=this.db.leadership.find(x=>x.id===id);if(!l)return this.toast('Leadership member not found.','error');Object.assign(l,data)}
+                this.db.leadership.sort((a,b)=>(Number(a.order)||999)-(Number(b.order)||999));
+                this.saveDB();this.toast('Executive leadership information saved successfully.','success');this.navigate('admin-dashboard');
+            }
+            deleteLeadershipEditor(){
+                if(!this.isAdmin())return this.toast('Administrator privileges required.','error');
+                const id=document.getElementById('admin_lead_id')?.value;if(!id||id==='new')return this.toast('Select a leadership member to delete.','error');
+                this.db.leadership=this.db.leadership.filter(x=>x.id!==id);this.saveDB();this.toast('Leadership member deleted.','success');this.navigate('admin-dashboard');
+            }
+
+            loadEventForEdit(id) {
+                const e = this.db.events.find(x=>x.id===id); if(id==='new' || !e){['admin_event_title','admin_event_date','admin_event_time','admin_event_location','admin_event_image','admin_event_description'].forEach(x=>{const el=document.getElementById(x);if(el)el.value=''}); const st=document.getElementById('admin_event_status');if(st)st.value='Upcoming';return;}
+                const set=(x,v)=>{const el=document.getElementById(x);if(el)el.value=v||''}; set('admin_event_title',e.title);set('admin_event_date',e.date);set('admin_event_time',e.time);set('admin_event_location',e.location);set('admin_event_image',e.image);set('admin_event_description',e.description);const st=document.getElementById('admin_event_status');if(st)st.value=e.status||'Upcoming';
+            }
+            saveEventEditor(){
+                if(!this.isAdmin())return this.toast('Administrator privileges required.','error'); const get=id=>document.getElementById(id)?.value.trim()||''; const id=get('admin_event_id'); const data={title:get('admin_event_title'),date:get('admin_event_date'),time:get('admin_event_time'),location:get('admin_event_location'),image:get('admin_event_image'),description:get('admin_event_description'),status:get('admin_event_status')||'Upcoming'}; if(!data.title)return this.toast('Enter an event title.','error'); if(id==='new'){data.id='evt_'+Date.now();this.db.events.unshift(data)}else{const e=this.db.events.find(x=>x.id===id);if(!e)return this.toast('Event not found.','error');Object.assign(e,data)} this.saveDB();this.toast('Event information saved successfully.','success');this.navigate('admin-dashboard');
+            }
+            deleteEventEditor(){if(!this.isAdmin())return this.toast('Administrator privileges required.','error');const id=document.getElementById('admin_event_id')?.value;if(!id||id==='new')return this.toast('Select an event to delete.','error');this.db.events=this.db.events.filter(x=>x.id!==id);this.saveDB();this.toast('Event deleted.','success');this.navigate('admin-dashboard')}
+
+            loadGalleryForEdit(id){const g=this.db.gallery.find(x=>x.id===id);if(id==='new'||!g){['admin_gallery_title','admin_gallery_image','admin_gallery_caption'].forEach(x=>{const e=document.getElementById(x);if(e)e.value=''});return}const set=(x,v)=>{const e=document.getElementById(x);if(e)e.value=v||''};set('admin_gallery_title',g.title);set('admin_gallery_image',g.image_url);set('admin_gallery_caption',g.caption)}
+            saveGalleryEditor(){if(!this.isAdmin())return this.toast('Administrator privileges required.','error');const get=id=>document.getElementById(id)?.value.trim()||'';const id=get('admin_gallery_id');const data={title:get('admin_gallery_title'),image_url:get('admin_gallery_image'),caption:get('admin_gallery_caption')};if(!data.title||!data.image_url)return this.toast('Enter a photo title and image URL.','error');if(id==='new'){data.id='gal_'+Date.now();this.db.gallery.unshift(data)}else{const g=this.db.gallery.find(x=>x.id===id);if(!g)return this.toast('Gallery item not found.','error');Object.assign(g,data)}this.saveDB();this.toast('Gallery photo saved successfully.','success');this.navigate('admin-dashboard')}
+            deleteGalleryEditor(){if(!this.isAdmin())return this.toast('Administrator privileges required.','error');const id=document.getElementById('admin_gallery_id')?.value;if(!id||id==='new')return this.toast('Select a gallery photo to delete.','error');this.db.gallery=this.db.gallery.filter(x=>x.id!==id);this.saveDB();this.toast('Gallery photo deleted.','success');this.navigate('admin-dashboard')}
+
+            loadYouthEditor(){const y=this.db.youth||{};const set=(x,v)=>{const e=document.getElementById(x);if(e)e.value=v||''};set('admin_youth_title',y.title);set('admin_youth_leader',y.leader);set('admin_youth_content',y.content);set('admin_youth_activities',(y.activities||[]).join(', '))}
+            saveYouthEditor(){if(!this.isAdmin())return this.toast('Administrator privileges required.','error');this.db.youth={title:document.getElementById('admin_youth_title')?.value.trim()||'RIBACOM Youth Wing & Empowerment Hub',leader:document.getElementById('admin_youth_leader')?.value.trim()||'',content:document.getElementById('admin_youth_content')?.value.trim()||'',activities:(document.getElementById('admin_youth_activities')?.value||'').split(',').map(x=>x.trim()).filter(Boolean)};this.saveDB();this.toast('Youth Wing information saved successfully.','success');this.navigate('admin-dashboard')}
+
+            loadAdviserForEdit(id){const a=this.db.advisers.find(x=>x.id===id);if(id==='new'||!a){['admin_adviser_name','admin_adviser_category','admin_adviser_photo','admin_adviser_bio'].forEach(x=>{const e=document.getElementById(x);if(e)e.value=''});return}const set=(x,v)=>{const e=document.getElementById(x);if(e)e.value=v||''};set('admin_adviser_name',a.name);set('admin_adviser_category',a.category);set('admin_adviser_photo',a.photo);set('admin_adviser_bio',a.bio)}
+            saveAdviserEditor(){if(!this.isAdmin())return this.toast('Administrator privileges required.','error');const get=id=>document.getElementById(id)?.value.trim()||'';const id=get('admin_adviser_id');const data={name:get('admin_adviser_name'),category:get('admin_adviser_category'),photo:get('admin_adviser_photo'),bio:get('admin_adviser_bio')};if(!data.name)return this.toast('Enter the adviser name.','error');if(id==='new'){data.id='adv_'+Date.now();this.db.advisers.unshift(data)}else{const a=this.db.advisers.find(x=>x.id===id);if(!a)return this.toast('Adviser not found.','error');Object.assign(a,data)}this.saveDB();this.toast('Council of Advisers information saved successfully.','success');this.navigate('admin-dashboard')}
+            deleteAdviserEditor(){if(!this.isAdmin())return this.toast('Administrator privileges required.','error');const id=document.getElementById('admin_adviser_id')?.value;if(!id||id==='new')return this.toast('Select an adviser to delete.','error');this.db.advisers=this.db.advisers.filter(x=>x.id!==id);this.saveDB();this.toast('Adviser deleted.','success');this.navigate('admin-dashboard')}
+
+            previewAdminProfileUrl(url) {
+                const preview = document.getElementById('adminProfilePreview');
+                if (preview && url) preview.src = url;
+            }
+
+            previewAdminProfilePhoto(e) {
+                const file = e.target.files?.[0];
+                const preview = document.getElementById('adminProfilePreview');
+                if (!file || !preview) return;
+                if (!file.type.startsWith('image/')) {
+                    this.toast('Please select an image file.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+                if (file.size > 3 * 1024 * 1024) {
+                    this.toast('Please choose a picture smaller than 3MB.', 'error');
+                    e.target.value = '';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    preview.src = reader.result;
+                    preview.dataset.imageData = reader.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            saveAdminProfile(e) {
+                e.preventDefault();
+                if (!this.isAdmin()) {
+                    this.toast('Administrator privileges required.', 'error');
+                    return;
+                }
+                const member = this.db.members.find(m => m.id === this.currentUser.id);
+                if (!member) {
+                    this.toast('Administrator profile record was not found.', 'error');
+                    return;
+                }
+
+                member.fullName = document.getElementById('admin_profile_name').value.trim();
+                member.email = document.getElementById('admin_profile_email').value.trim();
+                member.phone = document.getElementById('admin_profile_phone').value.trim();
+                member.stateOfOrigin = document.getElementById('admin_profile_state').value.trim();
+                member.lga = document.getElementById('admin_profile_lga').value.trim();
+                member.address = document.getElementById('admin_profile_address').value.trim();
+
+                const preview = document.getElementById('adminProfilePreview');
+                const uploadedImage = preview?.dataset?.imageData;
+                const photoUrl = document.getElementById('admin_profile_photo_url').value.trim();
+                if (uploadedImage) member.photo = uploadedImage;
+                else if (photoUrl) member.photo = photoUrl;
+
+                this.currentUser = { ...member };
+                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                this.saveDB();
+                this.updateAuthHeaderUI();
+                this.toast('Administrator profile and picture updated successfully.', 'success');
+                this.navigate('admin-dashboard');
+            }
+
+            async handleMembershipSubmit(e) {
+                e.preventDefault();
+                if (!this.supabaseClient) return this.toast('RIBACOM cloud connection is unavailable. Please try again later.', 'error');
+                const get = id => document.getElementById(id)?.value?.trim() || '';
+                const email = get('m_email').toLowerCase();
+                const password = get('m_password');
+                if (password.length < 8) return this.toast('Password must be at least 8 characters.', 'error');
+
+                const application = {
+                    full_name: get('m_fullName'), date_of_birth: get('m_dob') || null, gender: get('m_gender') || null,
+                    nationality: 'Nigerian', state_of_origin: get('m_state').startsWith('Rivers') ? 'Rivers' : get('m_state').startsWith('Bayelsa') ? 'Bayelsa' : 'Other',
+                    lga: get('m_lga') || null, town_village: get('m_originTown') || null, phone: get('m_phone'), whatsapp: get('m_phone'),
+                    email, current_address: get('m_address'), occupation: get('m_occupation') || null, date_of_arrival_gambia: get('m_arrivalDate') || null,
+                    membership_category: get('m_category').startsWith('Associate') ? 'associate' : 'regular',
+                    rivers_bayelsa_connection: get('m_state'), next_of_kin_name: get('m_nextOfKin') || null, next_of_kin_relationship: get('m_relationship') || null,
+                    next_of_kin_phone: get('m_nextOfKinPhone') || null, emergency_contact_name: get('m_nextOfKin') || null, emergency_contact_phone: get('m_nextOfKinPhone') || null,
+                    photo_url: get('m_photo') || null, declaration_accepted: true, status: 'pending'
+                };
+
+                try {
+                    this.toast('Submitting your membership application...', 'info');
+                    const { data: existing } = await this.supabaseClient.from('membership_applications').select('id,status').eq('email', email).in('status',['pending','under_review']).limit(1);
+                    if (existing?.length) return this.toast('A membership application already exists for this email.', 'error');
+
+                    const { data: created, error: appError } = await this.supabaseClient.from('membership_applications').insert(application).select('id').single();
+                    if (appError) throw appError;
+
+                    const { data: authData, error: authError } = await this.supabaseClient.auth.signUp({ email, password, options: { data: { full_name: application.full_name } } });
+                    if (authError) throw authError;
+                    if (authData?.user?.id) {
+                        await this.supabaseClient.from('membership_applications').update({ user_id: authData.user.id }).eq('id', created.id);
+                    }
+                    this.toast(authData?.session ? 'Application submitted. Your account is ready for Secretariat review.' : 'Application submitted. Check your email to verify your account, then sign in.', 'success');
+                    this.navigate('home');
+                } catch (err) {
+                    console.error(err);
+                    this.toast(err?.message || 'Membership application could not be submitted.', 'error');
+                }
+            }
+
+            loadMemberForIdEdit(id) {
+                const m = this.db.members.find(x => x.id === id);
+                if (!m) return;
+                const set=(id,v)=>{const el=document.getElementById(id); if(el) el.value=v||''};
+                set('admin_id_number',m.membershipNo); set('admin_id_status',m.status==='Approved'?'Active':m.status); set('admin_id_name',m.fullName);
+                set('admin_id_category',m.category); set('admin_id_state',m.stateOfOrigin); set('admin_id_lga',m.lga); set('admin_id_issue',m.issueDate); set('admin_id_expiry',m.expiryDate); set('admin_id_photo',m.photo); set('admin_id_phone',m.phone);
+            }
+
+            saveMemberIdDetails() {
+                if (!this.currentUser?.role?.includes('Admin')) return this.toast('Administrator privileges required.','error');
+                const id=document.getElementById('admin_id_member')?.value; const m=this.db.members.find(x=>x.id===id);
+                if(!m) return this.toast('Select a member first.','error');
+                const get=id=>document.getElementById(id)?.value.trim()||'';
+                m.membershipNo=get('admin_id_number'); m.status=get('admin_id_status')==='Active'?'Approved':get('admin_id_status'); m.fullName=get('admin_id_name'); m.category=get('admin_id_category'); m.stateOfOrigin=get('admin_id_state'); m.lga=get('admin_id_lga'); m.issueDate=get('admin_id_issue'); m.expiryDate=get('admin_id_expiry'); m.photo=get('admin_id_photo'); m.phone=get('admin_id_phone');
+                if(this.currentUser.id===m.id){this.currentUser={...m}; localStorage.setItem('ribacom_user',JSON.stringify(this.currentUser));}
+                this.saveDB(); this.toast('Digital ID details updated successfully.','success'); this.navigate('admin-dashboard');
+            }
+
+            loadPublicationForEdit(id) {
+                if(id==='new'){['admin_pub_title','admin_pub_category','admin_pub_date','admin_pub_media','admin_pub_description'].forEach(x=>{const e=document.getElementById(x);if(e)e.value=''});return;}
+                const p=this.db.publications.find(x=>x.id===id); if(!p)return;
+                const set=(x,v)=>{const e=document.getElementById(x);if(e)e.value=v||''}; set('admin_pub_title',p.title);set('admin_pub_category',p.category);set('admin_pub_date',p.date);set('admin_pub_media',p.media_url||p.url);set('admin_pub_description',p.description);
+            }
+
+            savePublication(e) {
+                e.preventDefault(); if(!this.currentUser?.role?.includes('Admin'))return this.toast('Administrator privileges required.','error');
+                const get=id=>document.getElementById(id)?.value.trim()||''; const id=get('admin_pub_id');
+                const data={title:get('admin_pub_title'),category:get('admin_pub_category')||'Document',date:get('admin_pub_date')||new Date().toISOString().slice(0,10),media_url:get('admin_pub_media'),description:get('admin_pub_description')};
+                if(id==='new'){data.id='pub_'+Date.now();this.db.publications.unshift(data);this.toast('Publication added successfully.','success');}else{const p=this.db.publications.find(x=>x.id===id);if(!p)return this.toast('Publication not found.','error');Object.assign(p,data);this.toast('Publication updated successfully.','success');}
+                this.saveDB();this.navigate('admin-dashboard');
+            }
+
+            deletePublication(){
+                if(!this.currentUser?.role?.includes('Admin'))return this.toast('Administrator privileges required.','error'); const id=document.getElementById('admin_pub_id')?.value;
+                if(id==='new')return this.toast('Select a publication to delete.','error'); this.db.publications=this.db.publications.filter(p=>p.id!==id);this.saveDB();this.toast('Publication deleted.','success');this.navigate('admin-dashboard');
+            }
+
+            openPublication(id){
+                const p=this.db.publications.find(x=>x.id===id); if(!p)return; const url=p.media_url||p.url;
+                if(url) window.open(url,'_blank','noopener'); else this.toast('This publication has no document/media link yet.','info');
+            }
+
+            handleWelfareSubmit(e) {
+                e.preventDefault();
+                const type = document.getElementById('w_type').value;
+                let amt = 500;
+                if (type === 'Wedding') amt = 1000;
+                if (type === 'Bereavement') amt = 1500;
+
+                const req = {
+                    id: "wel_" + Date.now(),
+                    memberName: document.getElementById('w_memberName').value,
+                    type: type,
+                    description: document.getElementById('w_desc').value,
+                    amount: amt,
+                    status: "Pending Review",
+                    date: new Date().toISOString().split('T')[0]
+                };
+
+                this.db.welfareRequests.unshift(req);
+                this.saveDB();
+                this.toast('Welfare Claim submitted to Executive Council.', 'success');
+                this.navigate('home');
+            }
+
+            handleAdminPostAnnouncement(e) {
+                e.preventDefault();
+                const ann = {
+                    id: "ann_" + Date.now(),
+                    title: document.getElementById('admin_ann_title').value,
+                    category: document.getElementById('admin_ann_cat').value,
+                    content: document.getElementById('admin_ann_content').value,
+                    date: new Date().toISOString().split('T')[0],
+                    author: "Secretariat Admin"
+                };
+
+                this.db.announcements.unshift(ann);
+                this.saveDB();
+                this.toast('Announcement published live!', 'success');
+                this.navigate('admin-dashboard');
+            }
+
+            deleteMember(id) {
+                this.db.members = this.db.members.filter(m => m.id !== id);
+                this.saveDB();
+                this.toast('Member record updated', 'info');
+                this.navigate('admin-dashboard');
+            }
+
+            approveWelfare(id) {
+                const req = this.db.welfareRequests.find(w => w.id === id);
+                if (req) {
+                    req.status = "Approved & Paid";
+                    this.saveDB();
+                    this.toast('Welfare disbursement approved!', 'success');
+                    this.navigate('admin-dashboard');
+                }
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+                const password = document.getElementById('loginPassword').value;
+                if (!this.supabaseClient) return this.toast('RIBACOM cloud connection is unavailable.', 'error');
+                try {
+                    const { data, error } = await this.supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error || !data?.user) throw new Error(error?.message || 'Login failed');
+                    const { data: profile } = await this.supabaseClient.from('profiles').select('*').eq('id', data.user.id).maybeSingle();
+                    const { data: member } = await this.supabaseClient.from('members').select('*').eq('user_id', data.user.id).maybeSingle();
+                    this.currentUser = { ...(member || {}), ...(profile || {}), id: data.user.id, email: data.user.email, fullName: member?.full_name || profile?.full_name || data.user.email, role: profile?.role || 'member', status: member?.status || 'pending', membershipNo: member?.membership_number || '' };
+                    localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                    this.closeAuthModal();
+                    this.toast(`Welcome back, ${this.currentUser.fullName}`, 'success');
+                    this.navigate(['super_admin','admin'].includes(this.currentUser.role) ? 'admin-dashboard' : 'member-dashboard');
+                } catch (err) {
+                    this.toast(err?.message || 'Login failed. Please check your email and password.', 'error');
+                }
+            }
+
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('ribacom_user');
+                this.toast('Logged out successfully', 'info');
+                this.navigate('home');
+            }
+
+            handleAuthAction() {
+                if (this.currentUser) {
+                    if (this.currentUser.role.includes('Admin')) {
+                        this.navigate('admin-dashboard');
+                    } else {
+                        this.navigate('member-dashboard');
+                    }
+                } else {
+                    this.openLoginModal();
+                }
+            }
+
+            updateAuthHeaderUI() {
+                const container = document.getElementById('authButtonsContainer');
+                const miniStatus = document.getElementById('userMiniStatus');
+                const idBtn = document.getElementById('digitalIdQuickBtn');
+                const mobileProfile = document.getElementById('mobileProfileCard');
+                const mobileFooter = document.getElementById('mobileDrawerFooter');
+
+                if (this.currentUser) {
+                    miniStatus.innerText = this.currentUser.fullName;
+                    if (idBtn) idBtn.classList.remove('hidden');
+
+                    if (mobileProfile) {
+                        mobileProfile.classList.remove('hidden');
+                        document.getElementById('mobileUserName').innerText = this.currentUser.fullName;
+                        document.getElementById('mobileUserRole').innerText = this.currentUser.role || 'Member';
+                    }
+
+                    container.innerHTML = `
+                        <button onclick="app.handleAuthAction()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition border border-white/20">
+                            Portal
+                        </button>
+                        <button onclick="app.logout()" class="text-gray-300 hover:text-white p-1.5 text-xs">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    `;
+
+                    if (mobileFooter) {
+                        mobileFooter.innerHTML = `
+                            <button onclick="app.logout(); app.toggleMobileDrawer();" class="w-full bg-red-600/80 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-xs transition">
+                                Sign Out
+                            </button>
+                        `;
+                    }
+                } else {
+                    miniStatus.innerText = "Guest User";
+                    if (idBtn) idBtn.classList.add('hidden');
+                    if (mobileProfile) mobileProfile.classList.add('hidden');
+
+                    container.innerHTML = `
+                        <button onclick="app.openLoginModal()" class="bg-ribacom-gold hover:bg-yellow-400 text-ribacom-navy font-extrabold px-3.5 py-1.5 rounded-lg text-xs transition shadow-sm">
+                            Member Login
+                        </button>
+                    `;
+
+                    if (mobileFooter) {
+                        mobileFooter.innerHTML = `
+                            <button onclick="app.openLoginModal(); app.toggleMobileDrawer();" class="w-full bg-ribacom-gold text-ribacom-navy font-bold py-2 rounded-xl text-xs transition">
+                                Member Login / Portal
+                            </button>
+                        `;
+                    }
+                }
+            }
+
+            openLoginModal() {
+                document.getElementById('authModal').classList.remove('hidden');
+            }
+
+            closeAuthModal() {
+                document.getElementById('authModal').classList.add('hidden');
+            }
+
+            switchAuthTab(tab) {
+                const loginForm = document.getElementById('loginForm');
+                const regPrompt = document.getElementById('registerPrompt');
+                const tLogin = document.getElementById('tabLoginBtn');
+                const tReg = document.getElementById('tabRegisterBtn');
+
+                if (tab === 'login') {
+                    loginForm.classList.remove('hidden');
+                    regPrompt.classList.add('hidden');
+                    tLogin.className = "flex-1 py-2 text-center text-sm font-bold border-b-2 border-ribacom-green text-ribacom-green";
+                    tReg.className = "flex-1 py-2 text-center text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-700";
+                } else {
+                    loginForm.classList.add('hidden');
+                    regPrompt.classList.remove('hidden');
+                    tReg.className = "flex-1 py-2 text-center text-sm font-bold border-b-2 border-ribacom-green text-ribacom-green";
+                    tLogin.className = "flex-1 py-2 text-center text-sm font-bold border-b-2 border-transparent text-gray-500 hover:text-gray-700";
+                }
+            }
+
+            toggleMobileDrawer() {
+                const drawer = document.getElementById('mobileDrawer');
+                drawer.classList.toggle('hidden');
+            }
+
+            openSupabaseModal() {
+                document.getElementById('supabaseModal').classList.remove('hidden');
+                document.getElementById('supabaseUrlInput').value = localStorage.getItem('supabase_url') || '';
+                document.getElementById('supabaseKeyInput').value = localStorage.getItem('supabase_key') || '';
+            }
+
+            closeSupabaseModal() {
+                document.getElementById('supabaseModal').classList.add('hidden');
+            }
+
+            saveSupabaseConfig() {
+                const url = document.getElementById('supabaseUrlInput').value.trim();
+                const key = document.getElementById('supabaseKeyInput').value.trim();
+
+                if (url && key) {
+                    localStorage.setItem('supabase_url', url);
+                    localStorage.setItem('supabase_key', key);
+                    this.initSupabase();
+                    this.toast('Supabase Connection Saved!', 'success');
+                }
+                this.closeSupabaseModal();
+            }
+
+            resetSupabaseConfig() {
+                localStorage.removeItem('supabase_url');
+                localStorage.removeItem('supabase_key');
+                document.getElementById('backendStatusBadge').innerText = "Local DB (Demo)";
+                document.getElementById('backendStatusBadge').className = "hidden sm:inline";
+                this.toast('Reverted to Offline Engine', 'info');
+                this.closeSupabaseModal();
+            }
+
+            toast(message, type = 'info') {
+                const container = document.getElementById('toastContainer');
+                const t = document.createElement('div');
+                let bg = 'bg-slate-900 text-white';
+                if (type === 'success') bg = 'bg-ribacom-green text-white';
+                if (type === 'error') bg = 'bg-red-600 text-white';
+                if (type === 'warning') bg = 'bg-amber-500 text-white';
+
+                t.className = `${bg} p-3.5 rounded-xl shadow-2xl text-xs font-semibold flex items-center justify-between gap-3 pointer-events-auto transition duration-300 transform translate-y-2`;
+                t.innerHTML = `
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                `;
+                container.appendChild(t);
+
+                setTimeout(() => {
+                    t.remove();
+                }, 4000);
+            }
+        }
+
+        // Global Initialization
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new RibacomApp();
+            app.navigate('home');
+        });
+    </script>
+</body>
+</html>
