@@ -43,6 +43,9 @@
             }
 
             async loadCloudData() {
+                // Test mode is deliberately isolated from Supabase so end-to-end UI checks
+                // never overwrite the synthetic test member with empty production tables.
+                if (this.testMode) return this.db;
                 if (!this.supabaseClient) return this.db;
                 this.cloudErrors = [];
                 const publicSources = {
