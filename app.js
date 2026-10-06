@@ -56,7 +56,8 @@
                     gallery: 'gallery',
                     publications: 'publications',
                     youthContent: 'youth_content',
-                    aboutContent: 'ribacom_about_content'
+                    aboutContent: 'ribacom_about_content',
+                    paymentSettings: 'payment_settings'
                 };
                 // Only request protected datasets after authentication. RLS remains the
                 // authoritative security boundary; this prevents guest startup from
