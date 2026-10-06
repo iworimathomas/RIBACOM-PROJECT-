@@ -10,4 +10,16 @@
     modal.innerHTML=`<div class="bg-white rounded-3xl max-w-2xl w-full p-5 max-h-[90vh] overflow-y-auto"><div class="flex justify-between items-center mb-4"><div><h3 class="font-extrabold text-lg text-ribacom-navy">System Verification</h3><p class="text-xs text-gray-500">Live Supabase connectivity and table access check.</p></div><button onclick="document.getElementById('ribacomSystemCheck')?.remove()" class="text-xl">×</button></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${results.map(r=>`<div class="border rounded-xl p-3"><div class="font-bold text-xs">${r.table}</div><div class="text-[11px] ${r.ok?'text-emerald-600':'text-red-600'}">${r.ok?'✓ Accessible':'✕ '+r.error}</div></div>`).join('')}</div></div>`;
     document.body.appendChild(modal);
   };
+
+  // Stable crest repair: replace the unreliable external raw GitHub image
+  // with the repository-hosted local asset everywhere it appears.
+  const LOGO='/ribacom-official-logo.svg';
+  const repairLogos=()=>{
+    document.querySelectorAll('img[src*="raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-"][src*="ribacom-official-logo"]').forEach(img=>{
+      if(img.getAttribute('src')!==LOGO) img.setAttribute('src',LOGO);
+    });
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',repairLogos,{once:true});
+  else repairLogos();
+  new MutationObserver(repairLogos).observe(document.documentElement,{subtree:true,childList:true});
 })();
