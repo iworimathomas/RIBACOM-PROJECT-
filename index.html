@@ -545,8 +545,10 @@
             }
 
             isMasterAdmin() {
-                return !!this.currentUser && (this.currentUser.isMasterAdmin === true ||
-                    (this.currentUser.email || '').toLowerCase() === RibacomApp.MASTER_ADMIN_EMAIL);
+                // Authorization is authoritative in the Supabase profile role.
+                // Never grant privileged access from an email address or client flag.
+                return !!this.currentUser &&
+                    String(this.currentUser.roleKey || this.currentUser.role || '').toLowerCase() === 'super_admin';
             }
 
             isAdmin() {
