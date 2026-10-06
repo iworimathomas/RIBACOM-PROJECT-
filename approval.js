@@ -1,6 +1,6 @@
 /* RIBACOM Presidential Approval Centre */
 (function(){
-  const APPROVER=['president','super_admin','admin'];
+  const APPROVER=['super_admin'];
   const EXEC=['treasurer','secretary_general','welfare_officer','pro','vice_president','assistant_secretary_general'];
   const canApprove=app=>APPROVER.includes(app?.currentUser?.roleKey);
   const canSubmit=app=>APPROVER.concat(EXEC).includes(app?.currentUser?.roleKey);
