@@ -21,7 +21,7 @@
   };
   RibacomApp.prototype.sendMemberNotification = async function(userId,title,message,type='general',linkRoute=null){
     const role=String(this.currentUser?.roleKey||'').toLowerCase();
-    if(!['admin','super_admin'].includes(role)) return this.toast('Super Admin or Admin access required.','error');
+    if(!['admin','super_admin','secretary_general','vice_president','treasurer','welfare_officer','pro'].includes(role)) return this.toast('Authorized executive access required.','error');
     if(!userId||!String(title||'').trim()||!String(message||'').trim()) return this.toast('Recipient, title and message are required.','warning');
     const {error}=await this.supabaseClient.from('notifications').insert({
       user_id:userId,title:String(title).trim(),message:String(message).trim(),type:String(type||'general').trim(),
@@ -33,7 +33,7 @@
 
   RibacomApp.prototype.broadcastMemberNotification = async function(title,message,type='announcement',linkRoute=null){
     const role=String(this.currentUser?.roleKey||'').toLowerCase();
-    if(!['admin','super_admin'].includes(role)) return this.toast('Super Admin or Admin access required.','error');
+    if(!['admin','super_admin','secretary_general','vice_president','treasurer','welfare_officer','pro'].includes(role)) return this.toast('Authorized executive access required.','error');
     if(!String(title||'').trim()||!String(message||'').trim()) return this.toast('Title and message are required.','warning');
     const {data:members,error}=await this.supabaseClient.from('members').select('user_id').not('user_id','is',null);
     if(error) return this.toast(error.message,'error');
