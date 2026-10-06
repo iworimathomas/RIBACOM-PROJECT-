@@ -390,7 +390,7 @@
                     'finance':['treasurer','admin','super_admin'],
                     'finance-reports':['treasurer','admin','super_admin'],
                     'executive-work':['president','vice_president','secretary_general','assistant_secretary_general','treasurer','welfare_officer','pro','admin','super_admin'],
-                    'approval-center':['admin','super_admin'],
+                    'approval-center':['president','admin','super_admin'],
                     'admin-dashboard':['admin','super_admin'],
                     'admin-members':['admin','super_admin'],
                     'admin-digital-ids':['admin','super_admin'],
