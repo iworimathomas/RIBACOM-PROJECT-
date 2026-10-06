@@ -58,9 +58,9 @@
     if(!attested){this.toast('Voter attestation is required before submitting the ballot.','warning');return;}
     const raw=JSON.stringify({election_id:electionId,voter_member_id:state.member.id,choices:Object.keys(choices).sort().map(k=>[k,choices[k]]),issued_at:new Date().toISOString()});
     const ballotHash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw)).then(b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''));
-    const {data:ballot,error:be}=await this.supabaseClient.from('election_ballots').insert({election_id:electionId,voter_member_id:state.member.id,voter_attestation:true,ballot_hash:ballotHash}).select('id').single();
+    const {data:ballot,error:be}=await this.supabaseClient.from('election_ballots').insert({election_id:electionId,voter_member_id:state.member.id}).select('id').single();
     if(be){this.toast(be.code==='23505'?'You have already voted in this election.':'Unable to create ballot: '+be.message,'error');return;}
-    const rows=Object.entries(choices).map(([position_id,candidate_id])=>({ballot_id:ballot.id,position_id,candidate_id,vote_hash:ballotHash}));
+    const rows=Object.entries(choices).map(([position_id,candidate_id])=>({ballot_id:ballot.id,position_id,candidate_id}));
     const {error:ve}=await this.supabaseClient.from('election_votes').insert(rows);
     if(ve){
       await this.supabaseClient.from('election_ballots').delete().eq('id',ballot.id);
@@ -68,7 +68,6 @@
     }
     const {error:ue}=await this.supabaseClient.from('election_ballots').update({submitted_at:new Date().toISOString()}).eq('id',ballot.id);
     if(ue){this.toast('Vote was recorded but submission confirmation failed. Please contact the Secretariat.','error');return;}
-    await this.supabaseClient.from('election_audit_logs').insert({election_id:electionId,actor_user_id:this.currentUser.id,action:'ballot_submitted',details:{positions:Object.keys(choices).length}});
     this.toast('Your ballot has been submitted successfully.','success');this.currentElectionVoting=null;this.navigate('elections');
   };
 
@@ -138,8 +137,8 @@
     const voterRollCount=await this.supabaseClient.from('election_voter_roll').select('id',{count:'exact',head:true}).eq('election_id',id);
     const voterRollLocked=e?.voter_roll_locked;
     const voterRollPanel='<div class="mt-6 border rounded-2xl p-4 bg-gray-50"><div class="flex flex-wrap justify-between gap-2 items-center"><div><h3 class="font-black text-ribacom-navy">Voter Roll</h3><p class="text-xs text-gray-500">'+(voterRollLocked?'Locked':'Not locked')+' • Eligible entries: '+(voterRollCount.count||0)+'</p></div>'+(voterRollLocked?'':'<button onclick="app.lockElectionVoterRoll(\\''+id+'\\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl text-xs font-bold">Lock Approved-Member Roll</button>')+'</div><div id="electionVoterRoll" class="mt-3 space-y-2 max-h-72 overflow-auto"></div></div>';
-    const finalize=e?.status==='closed'?'<button onclick="app.finalizeElection(\\''+id+'\\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl font-bold text-sm">Finalize Official Results</button>':'';
-    const box=document.getElementById('managerElections');box.innerHTML='<div class="bg-white rounded-2xl shadow border p-5"><button onclick="app.renderElectionManager()" class="text-sm text-ribacom-green font-bold mb-4">← Manager</button><h2 class="text-xl font-black text-ribacom-navy">'+esc(e.title)+'</h2><div class="grid md:grid-cols-2 gap-5 mt-5"><div><h3 class="font-black mb-2">Add Position</h3><input id="posTitle" class="w-full border rounded-xl p-3 mb-2" placeholder="Position e.g. President"><button onclick="app.addElectionPosition(\''+id+'\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl font-bold">Add Position</button><div class="mt-4 space-y-2">'+(p||[]).map(x=>'<div class="border rounded-xl p-3"><strong>'+esc(x.title)+'</strong><div class="text-xs text-gray-500">ID: '+x.id+'</div></div>').join('')+'</div></div><div><h3 class="font-black mb-2">Add Candidate</h3><select id="candidatePosition" class="w-full border rounded-xl p-3 mb-2">'+(p||[]).map(x=>'<option value="'+x.id+'">'+esc(x.title)+'</option>').join('')+'</select><select id="candidateMember" class="w-full border rounded-xl p-3 mb-2"><option value="">Select approved member (optional)</option>'+(members||[]).map(m=>'<option value="'+m.id+'">'+esc(m.full_name)+' — '+esc(m.membership_number||'No membership number')+'</option>').join('')+'</select><input id="candidateName" class="w-full border rounded-xl p-3 mb-2" placeholder="Candidate full name"><textarea id="candidateManifesto" class="w-full border rounded-xl p-3 mb-2" placeholder="Manifesto (optional)"></textarea><button onclick="app.addElectionCandidate(\''+id+'\')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl font-bold">Add Candidate</button><div class="mt-4 space-y-2">'+(c||[]).map(x=>'<div class="border rounded-xl p-3"><strong>'+esc(x.full_name)+'</strong><div class="text-xs text-gray-500">'+esc((p||[]).find(z=>z.id===x.position_id)?.title||'Position')+'</div></div>').join('')+'</div></div></div></div>'+voterRollPanel+'';
+    const finalize=e?.status==='closed'&&!finalized?'<button onclick="app.finalizeElection(\\''+id+'\\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl font-bold text-sm">Finalize Official Results</button>':'';
+    const box=document.getElementById('managerElections');box.innerHTML='<div class="bg-white rounded-2xl shadow border p-5"><button onclick="app.renderElectionManager()" class="text-sm text-ribacom-green font-bold mb-4">← Manager</button><h2 class="text-xl font-black text-ribacom-navy">'+esc(e.title)+'</h2><div class="grid md:grid-cols-2 gap-5 mt-5"><div><h3 class="font-black mb-2">Add Position</h3><input id="posTitle" class="w-full border rounded-xl p-3 mb-2" placeholder="Position e.g. President"><button onclick="app.addElectionPosition(\''+id+'\')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl font-bold">Add Position</button><div class="mt-4 space-y-2">'+(p||[]).map(x=>'<div class="border rounded-xl p-3"><strong>'+esc(x.title)+'</strong><div class="text-xs text-gray-500">ID: '+x.id+'</div></div>').join('')+'</div></div><div><h3 class="font-black mb-2">Add Candidate</h3><select id="candidatePosition" class="w-full border rounded-xl p-3 mb-2">'+(p||[]).map(x=>'<option value="'+x.id+'">'+esc(x.title)+'</option>').join('')+'</select><select id="candidateMember" class="w-full border rounded-xl p-3 mb-2"><option value="">Select approved member (optional)</option>'+(members||[]).map(m=>'<option value="'+m.id+'">'+esc(m.full_name)+' — '+esc(m.membership_number||'No membership number')+'</option>').join('')+'</select><input id="candidateName" class="w-full border rounded-xl p-3 mb-2" placeholder="Candidate full name"><textarea id="candidateManifesto" class="w-full border rounded-xl p-3 mb-2" placeholder="Manifesto (optional)"></textarea><button onclick="app.addElectionCandidate(\''+id+'\')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl font-bold">Add Candidate</button><div class="mt-4 space-y-2">'+(c||[]).map(x=>'<div class="border rounded-xl p-3"><div class="flex justify-between gap-2"><strong>'+esc(x.full_name)+'</strong><span class="text-xs font-bold '+(x.status==='approved'?'text-ribacom-green':'text-amber-600')+'">'+esc(x.status)+'</span></div><div class="text-xs text-gray-500">'+esc((p||[]).find(z=>z.id===x.position_id)?.title||'Position')+'</div>'+(x.status!=='approved'?'<button onclick="app.setElectionCandidateStatus(\\''+x.id+'\\',\\''+id+'\\',\\'approved\\')" class="mt-2 text-xs bg-ribacom-green text-white px-3 py-1.5 rounded-lg font-bold">Approve Candidate</button>':'')+'</div>').join('')+'</div></div></div></div>'+voterRollPanel+'';
     this.refreshElectionVoterRoll(id);
   };
   RibacomApp.prototype.addElectionPosition=async function(electionId){const title=document.getElementById('posTitle')?.value.trim();if(!title)return;const {error}=await this.supabaseClient.from('election_positions').insert({election_id:electionId,title});if(error)this.toast(error.message,'error');else this.toast('Position added.','success');this.manageElectionDetails(electionId);};
@@ -160,6 +159,16 @@
     if(member_id&&(!member||member.status!=='approved')){this.toast('Only approved RIBACOM members can be linked as candidates.','warning');return;}
     const {error}=await this.supabaseClient.from('election_candidates').insert({election_id:electionId,position_id,member_id,full_name,manifesto:document.getElementById('candidateManifesto').value.trim()});
     if(error)this.toast(error.message,'error');else this.toast('Candidate added.','success');
+    this.manageElectionDetails(electionId);
+  };
+
+  RibacomApp.prototype.setElectionCandidateStatus=async function(candidateId,electionId,status){
+    if(!isManager()){this.toast('Election manager access denied.','error');return;}
+    if(!['approved','withdrawn','disqualified','pending'].includes(status)){this.toast('Invalid candidate status.','error');return;}
+    const {error}=await this.supabaseClient.from('election_candidates').update({status}).eq('id',candidateId);
+    if(error){this.toast(error.message,'error');return;}
+    await this.supabaseClient.from('election_audit_logs').insert({election_id:electionId,actor_user_id:this.currentUser.id,action:'candidate_status_changed',details:{candidate_id:candidateId,status}});
+    this.toast('Candidate status updated.','success');
     this.manageElectionDetails(electionId);
   };
 
