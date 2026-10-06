@@ -1,13 +1,14 @@
 /* RIBACOM D4 — Administration and CRUD module */
 (function () {
-  const isAdmin = a => !!a?.currentUser && ['admin','super_admin','treasurer'].includes(a.currentUser.roleKey);
+  const isAdmin = a => !!a?.currentUser && ['admin','super_admin'].includes(a.currentUser.roleKey);
+  const isPaymentManager = a => !!a?.currentUser && ['admin','super_admin','treasurer'].includes(a.currentUser.roleKey);
   const esc = v => String(v ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   const val = id => document.getElementById(id)?.value?.trim() || '';
 
   RibacomApp.prototype.adminRefresh = async function(view='admin-dashboard') { await this.loadCloudData(); this.navigate(view); };
 
   RibacomApp.prototype.openAdminEditor = function(type,id='') {
-    if(!isAdmin(this)) return this.toast('Administrator access required.','error');
+    if(type==='payment_settings' ? !isPaymentManager(this) : !isAdmin(this)) return this.toast(type==='payment_settings'?'Finance access required.':'Administrator access required.','error');
     const existing = id ? (this.db[type]||[]).find(x=>x.id===id) : null;
     const title = id ? `Edit ${type}` : `Add ${type}`;
     const fields = {
@@ -41,7 +42,7 @@
   };
 
   RibacomApp.prototype.saveAdminEditor = async function(type,id='') {
-    if(!isAdmin(this)) return;
+    if(type==='payment_settings' ? !isPaymentManager(this) : !isAdmin(this)) return;
     const schemas={leadership:['name','position','photo_url','biography','phone','email'],advisers:['name','category','photo_url','biography','phone'],announcements:['title','content'],events:['title','description','event_date','location','image_url','organizer'],publications:['title','description','file_url','category','publication_date'],youth_content:['section_title','body_content','image_url'],payment_settings:['method_name','account_name','account_number','bank_name','instructions']};
     const data={}; (schemas[type]||[]).forEach(k=>data[k]=val('adm_'+k));
     if(type==='leadership'||type==='advisers'){
@@ -91,7 +92,7 @@
   };
 
   RibacomApp.prototype.deleteAdminRecord = async function(table,id) {
-    if(!isAdmin(this)) return;
+    if(table==='payment_settings' ? !isPaymentManager(this) : !isAdmin(this)) return;
     if(!confirm(`Delete this ${table} record? This cannot be undone.`)) return;
     const {error}=await this.supabaseClient.from(table).delete().eq('id',id); if(error)return this.toast(error.message,'error');
     this.toast('Record deleted.','success'); await this.adminRefresh();
