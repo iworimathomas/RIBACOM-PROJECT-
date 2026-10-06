@@ -533,6 +533,7 @@
                 this.supabaseClient = null;
                 
                 this.initSupabase();
+                if (this.supabaseClient && this.currentUser) this.hydrateCurrentUser();
             }
 
             loadInitialDB() {
@@ -648,7 +649,7 @@
                             return;
                         }
                         container.innerHTML = this.renderAdminDashboardView();
-                        setTimeout(() => this.loadYouthEditor(), 0);
+                        setTimeout(() => { this.loadYouthEditor(); this.refreshMembershipReview(); }, 0);
                         break;
                     default:
                         container.innerHTML = this.renderHomeView();
@@ -1520,7 +1521,19 @@
 
                         <!-- Admin Management Modules Grid -->
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Members & Welfare Admin Panel -->
+                            <!-- Cloud Membership Review Panel -->
+                        <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
+                            <div class="flex items-center justify-between gap-3">
+                                <div>
+                                    <h3 class="font-bold text-base text-gray-800">Pending Membership Applications</h3>
+                                    <p class="text-xs text-gray-500">Review applications submitted through the live RIBACOM membership form.</p>
+                                </div>
+                                <button onclick="app.refreshMembershipReview()" class="text-xs bg-gray-100 px-3 py-2 rounded-lg font-bold">Refresh</button>
+                            </div>
+                            <div id="cloudMembershipReview" class="text-xs text-gray-500">Loading cloud applications...</div>
+                        </div>
+
+                        <!-- Members & Welfare Admin Panel -->
                             <div class="lg:col-span-2 space-y-6">
                                 <!-- Members Table -->
                                 <div class="bg-white p-6 rounded-3xl border border-gray-100 card-shadow space-y-4">
@@ -1866,22 +1879,127 @@
 
                 try {
                     this.toast('Submitting your membership application...', 'info');
-                    const { data: existing } = await this.supabaseClient.from('membership_applications').select('id,status').eq('email', email).in('status',['pending','under_review']).limit(1);
-                    if (existing?.length) return this.toast('A membership application already exists for this email.', 'error');
+                    const { data: existing } = await this.supabaseClient.from('membership_applications').select('id,status').eq('email', email).in('status',['pending','under_review','approved']).limit(1);
+                    if (existing?.length) return this.toast('A membership application or approved membership already exists for this email.', 'error');
 
-                    const { data: created, error: appError } = await this.supabaseClient.from('membership_applications').insert(application).select('id').single();
+                    // Create the Auth account first so the application can be linked to the applicant.
+                    const { data: authData, error: authError } = await this.supabaseClient.auth.signUp({
+                        email,
+                        password,
+                        options: { data: { full_name: application.full_name } }
+                    });
+                    if (authError) throw authError;
+                    if (!authData?.user?.id) throw new Error('RIBACOM could not create the applicant account.');
+
+                    application.user_id = authData.user.id;
+                    const { data: created, error: appError } = await this.supabaseClient.from('membership_applications').insert(application).select('id,status').single();
                     if (appError) throw appError;
 
-                    const { data: authData, error: authError } = await this.supabaseClient.auth.signUp({ email, password, options: { data: { full_name: application.full_name } } });
-                    if (authError) throw authError;
-                    if (authData?.user?.id) {
-                        await this.supabaseClient.from('membership_applications').update({ user_id: authData.user.id }).eq('id', created.id);
-                    }
-                    this.toast(authData?.session ? 'Application submitted. Your account is ready for Secretariat review.' : 'Application submitted. Check your email to verify your account, then sign in.', 'success');
+                    this.currentUser = {
+                        id: authData.user.id,
+                        email,
+                        fullName: application.full_name,
+                        role: 'member',
+                        status: 'pending',
+                        membershipNo: ''
+                    };
+                    localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                    this.toast(authData.session
+                        ? 'Application submitted successfully. Your membership is now Pending Secretariat Review.'
+                        : 'Application submitted successfully. Check your email to verify your account, then sign in.', 'success');
                     this.navigate('home');
                 } catch (err) {
                     console.error(err);
                     this.toast(err?.message || 'Membership application could not be submitted.', 'error');
+                }
+            }
+
+            async loadPendingMembershipApplications() {
+                if (!this.supabaseClient || !this.isAdmin()) return [];
+                const { data, error } = await this.supabaseClient
+                    .from('membership_applications')
+                    .select('*')
+                    .in('status', ['pending','under_review'])
+                    .order('created_at', { ascending: true });
+                if (error) {
+                    console.error(error);
+                    this.toast('Could not load pending membership applications.', 'error');
+                    return [];
+                }
+                return data || [];
+            }
+
+            async approveMembershipApplication(id) {
+                if (!this.isMasterAdmin()) return this.toast('Only the RIBACOM Master Admin can approve memberships.', 'error');
+                if (!this.supabaseClient) return this.toast('RIBACOM cloud connection is unavailable.', 'error');
+                try {
+                    const { data: app, error: appError } = await this.supabaseClient
+                        .from('membership_applications').select('*').eq('id', id).single();
+                    if (appError) throw appError;
+                    if (!app || !['pending','under_review'].includes(app.status)) return this.toast('This application is no longer pending.', 'error');
+                    if (!app.user_id) return this.toast('Applicant account is not linked to this application.', 'error');
+
+                    const { data: existingMember } = await this.supabaseClient.from('members').select('id,membership_number').eq('user_id', app.user_id).maybeSingle();
+                    const membershipNumber = existingMember?.membership_number || ('RBC-GM-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6));
+
+                    const memberPayload = {
+                        user_id: app.user_id,
+                        membership_number: membershipNumber,
+                        full_name: app.full_name,
+                        email: app.email,
+                        phone: app.phone,
+                        photo_url: app.photo_url || null,
+                        date_of_birth: app.date_of_birth || null,
+                        gender: app.gender || null,
+                        address: app.current_address || null,
+                        nationality: app.nationality || 'Nigerian',
+                        state_of_origin: app.state_of_origin || 'Other',
+                        lga: app.lga || null,
+                        rivers_bayelsa_connection: app.rivers_bayelsa_connection || null,
+                        category: app.membership_category === 'associate' ? 'associate' : 'regular',
+                        status: 'approved',
+                        emergency_contact_name: app.emergency_contact_name || null,
+                        emergency_contact_phone: app.emergency_contact_phone || null
+                    };
+
+                    const { data: member, error: memberError } = await this.supabaseClient
+                        .from('members').upsert(memberPayload, { onConflict: 'user_id' }).select('*').single();
+                    if (memberError) throw memberError;
+
+                    const { error: updateError } = await this.supabaseClient
+                        .from('membership_applications')
+                        .update({ status: 'approved', reviewed_by: this.currentUser.id, reviewed_at: new Date().toISOString() })
+                        .eq('id', id);
+                    if (updateError) throw updateError;
+
+                    const { data: profile, error: profileError } = await this.supabaseClient
+                        .from('profiles').select('id,full_name,email,role').eq('id', app.user_id).maybeSingle();
+                    if (profileError) console.warn(profileError);
+                    this.toast('Membership approved. Member record created: ' + membershipNumber, 'success');
+                    this.navigate('admin-dashboard');
+                } catch (err) {
+                    console.error(err);
+                    this.toast(err?.message || 'Membership approval failed.', 'error');
+                }
+            }
+
+            async rejectMembershipApplication(id) {
+                if (!this.isMasterAdmin()) return this.toast('Only the RIBACOM Master Admin can reject memberships.', 'error');
+                if (!this.supabaseClient) return this.toast('RIBACOM cloud connection is unavailable.', 'error');
+                const note = window.prompt('Optional rejection reason:') || '';
+                try {
+                    const { error } = await this.supabaseClient.from('membership_applications').update({
+                        status: 'rejected',
+                        admin_notes: note,
+                        reviewed_by: this.currentUser.id,
+                        reviewed_at: new Date().toISOString()
+                    }).eq('id', id);
+                    if (error) throw error;
+                    this.toast('Membership application rejected.', 'info');
+                    this.navigate('admin-dashboard');
+                } catch (err) {
+                    console.error(err);
+                    this.toast(err?.message || 'Membership rejection failed.', 'error');
                 }
             }
 
@@ -1997,11 +2115,55 @@
                     this.currentUser = { ...(member || {}), ...(profile || {}), id: data.user.id, email: data.user.email, fullName: member?.full_name || profile?.full_name || data.user.email, role: profile?.role || 'member', status: member?.status || 'pending', membershipNo: member?.membership_number || '' };
                     localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
                     this.closeAuthModal();
+                    await this.hydrateCurrentUser();
                     this.toast(`Welcome back, ${this.currentUser.fullName}`, 'success');
                     this.navigate(['super_admin','admin'].includes(this.currentUser.role) ? 'admin-dashboard' : 'member-dashboard');
                 } catch (err) {
                     this.toast(err?.message || 'Login failed. Please check your email and password.', 'error');
                 }
+            }
+
+            async hydrateCurrentUser() {
+                if (!this.supabaseClient) return;
+                const { data: { user } } = await this.supabaseClient.auth.getUser();
+                if (!user) return;
+                const { data: profile } = await this.supabaseClient.from('profiles').select('*').eq('id', user.id).maybeSingle();
+                const { data: member } = await this.supabaseClient.from('members').select('*').eq('user_id', user.id).maybeSingle();
+                this.currentUser = {
+                    ...(member || {}), ...(profile || {}),
+                    id: user.id, email: user.email,
+                    fullName: member?.full_name || profile?.full_name || user.email,
+                    role: profile?.role || 'member',
+                    status: member?.status || 'pending',
+                    membershipNo: member?.membership_number || ''
+                };
+                localStorage.setItem('ribacom_user', JSON.stringify(this.currentUser));
+                this.updateAuthHeaderUI();
+            }
+
+            async refreshMembershipReview() {
+                const box = document.getElementById('cloudMembershipReview');
+                if (!box) return;
+                const apps = await this.loadPendingMembershipApplications();
+                if (!apps.length) {
+                    box.innerHTML = '<div class="p-4 bg-emerald-50 text-emerald-700 rounded-xl font-semibold">No pending membership applications.</div>';
+                    return;
+                }
+                box.innerHTML = apps.map(a => `
+                    <div class="border rounded-2xl p-4 mb-3 space-y-2">
+                        <div class="flex flex-wrap justify-between gap-2">
+                            <strong class="text-gray-800">${a.full_name}</strong>
+                            <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">${a.status}</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 text-gray-600">
+                            <span>Email: ${a.email}</span><span>Phone: ${a.phone}</span>
+                            <span>Origin: ${a.state_of_origin || '—'} / ${a.lga || '—'}</span><span>Category: ${a.membership_category || '—'}</span>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button onclick="app.approveMembershipApplication('${a.id}')" class="bg-ribacom-green text-white px-3 py-2 rounded-lg font-bold">Approve</button>
+                            <button onclick="app.rejectMembershipApplication('${a.id}')" class="bg-red-50 text-red-600 px-3 py-2 rounded-lg font-bold">Reject</button>
+                        </div>
+                    </div>`).join('');
             }
 
             logout() {
