@@ -53,7 +53,7 @@
     }
     if(type==='leadership') data.display_order=Number(data.display_order||0),data.is_active=true;
     if(type==='advisers') data.is_active=true;
-    if(['announcements','events','publications'].includes(type)) data.is_published=true;
+    if(['announcements','events','publications'].includes(type)) { data.is_published=false; data.approval_status='pending'; }
     if(type==='payment_settings') data.is_active=true;
     if(type==='publications' && !data.publication_date) data.publication_date=new Date().toISOString().slice(0,10);
     if(type==='events' && !data.event_date) data.event_date=new Date().toISOString();
