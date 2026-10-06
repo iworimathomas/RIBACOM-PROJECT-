@@ -36,6 +36,19 @@
     if(!request) return this.toast('Welfare request not found.','error');
     const {error:updateError}=await this.supabaseClient.from('welfare_requests').update(patch).eq('id',id);
     if(updateError) return this.toast(updateError.message,'error');
+    if(status==='paid'){
+      const paidAmount=Number(patch.approved_amount||request.approved_amount||request.amount_requested||0);
+      if(!(paidAmount>0)) return this.toast('A valid approved welfare amount is required before payment.','error');
+      const {data:existingPayment}=await this.supabaseClient.from('finance_transactions').select('id').eq('member_id',request.member_id).eq('category','welfare_payment').eq('description','Welfare request '+request.id).maybeSingle();
+      if(!existingPayment){
+        const {error:financeError}=await this.supabaseClient.from('finance_transactions').insert({
+          member_id:request.member_id,direction:'expense',category:'welfare_payment',amount:paidAmount,
+          payment_method:'Welfare disbursement',reference_number:request.id,
+          description:'Welfare request '+request.id,status:'confirmed',recorded_by:this.currentUser.id
+        });
+        if(financeError) return this.toast('Welfare was marked paid, but the Finance disbursement record failed: '+financeError.message,'error');
+      }
+    }
     const {data:member}=await this.supabaseClient.from('members').select('user_id,full_name').eq('id',request.member_id).maybeSingle();
     if(member?.user_id){
       const label=labels[request.category]||request.category||'Welfare';
