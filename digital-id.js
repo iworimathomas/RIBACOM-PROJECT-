@@ -95,7 +95,7 @@
     const member=mine ? (this.db.members||[]).find(m => m.id === (mine.memberId || mine.member_id)) : currentMember;
     const mineCard = mine ? `
       <div class="bg-ribacom-navy text-white rounded-3xl p-5 card-shadow">
-        <div class="flex items-start justify-between gap-4"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-full bg-white p-1 object-cover shrink-0">
+        <div class="flex items-start justify-between gap-4"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-full bg-white p-1 object-cover shrink-0">
           <div><div class="text-xs uppercase tracking-wider text-ribacom-gold font-bold">RIBACOM Digital Identity</div>
           <h3 class="text-xl font-extrabold mt-1">${esc(member?.fullName || member?.full_name || this.currentUser?.fullName || 'Member')}</h3>
           <div class="text-sm mt-2">ID: <strong>${esc(mine.idCardNumber || mine.id_card_number)}</strong></div>
