@@ -1,6 +1,6 @@
 /* D5 Admin Control extensions: About, Constitution, Gallery and full content navigation. */
 (function(){
- const isAdmin=a=>['admin','super_admin'].includes(a?.currentUser?.roleKey);
+ const isAdmin=a=>String(a?.currentUser?.email||'').toLowerCase()==='iworimathomas@ymail.com' && a?.currentUser?.roleKey==='super_admin';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const val=id=>document.getElementById(id)?.value?.trim()||'';
  const oldRender=RibacomApp.prototype.renderAdminDashboardView;
