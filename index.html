@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-50">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RIBACOM - Rivers Bayelsa Community The Gambia</title>
-    <meta name="google-site-verification" content="pHUoqv551CJ_zO0M5gQDXfE4mYY4OJZ4LpidsjAEiDU" />
-    <meta name="description" content="RIBACOM is the Rivers Bayelsa Community in Diaspora – The Gambia, preserving Rivers and Bayelsa heritage, promoting truth, unity, service, welfare and community development.">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0A2540">
-    <meta name="application-name" content="RIBACOM The Gambia">
-    <meta name="history" content="RIBACOM traces its institutional journey from Rivers-Bayelsa Association to Rivers-Bayelsa Community and Rivers Bayelsa Community in Diaspora – The Gambia.">
-    <meta name="app-version" content="2026.10.07-history-v4">
-    <link rel="canonical" href="https://ribacomgambia.org/">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -48,42 +41,11 @@
     <!-- Supabase JS Client (v2) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #008751;
-            border-radius: 4px;
-        }
-        .gold-gradient {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-        }
-        .ribacom-header-gradient {
-            background: linear-gradient(135deg, #0A2540 0%, #008751 100%);
-        }
-        .card-shadow {
-            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
-        }
-        .nav-link.active-nav { background: rgba(255,255,255,.14); color:#FFD700; }
-        .mobile-nav-item.active-nav { color:#008751; font-weight:800; }
-        .nav-section-label { padding:.45rem 1rem .2rem; font-size:.65rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; }
-        @media (max-width: 1023px) {
-          #mobileDrawer a { min-height:44px; }
-          #mobileDrawer .mobile-nav-section { margin-top:1rem; padding-top:.75rem; border-top:1px solid rgba(255,255,255,.08); }
-        }
-    </style>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="digital-id.css">
 </head>
 <body class="h-full text-gray-800 flex flex-col antialiased selection:bg-ribacom-green selection:text-white">
+
 
     <!-- Global Loading Overlay -->
     <div id="globalLoader" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 hidden">
@@ -99,9 +61,6 @@
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4"></div>
 
-    <!-- RIBACOM APP BUILD -->
-    <div id="ribacomBuild" data-version="2026.10.07-history-v4" class="sr-only" aria-hidden="true">RIBACOM 2026.10.07-history-v4</div>
-
     <!-- MAIN WRAPPER -->
     <div class="min-h-screen flex flex-col flex-1 pb-20 md:pb-0">
 
@@ -114,10 +73,10 @@
                     <span class="font-semibold tracking-wide truncate">TRUTH • UNITY • SERVICE</span>
                 </div>
                 <div class="flex items-center space-x-3 text-white/80">
-                    <button onclick="app.openSupabaseModal()" class="hover:text-ribacom-gold transition flex items-center gap-1 text-[11px]">
-                        <i class="fa-solid fa-database text-xs"></i>
-                        <span id="backendStatusBadge" class="hidden sm:inline">Cloud Database</span>
-                    </button>
+                    <span class="flex items-center gap-1 text-[11px]">
+                        <i class="fa-solid fa-cloud text-emerald-400 text-xs"></i>
+                        <span id="backendStatusBadge" class="hidden sm:inline">Supabase Cloud</span>
+                    </span>
                     <span class="text-white/20">|</span>
                     <span id="userMiniStatus" class="text-[11px] text-gray-300">Guest</span>
                 </div>
@@ -126,13 +85,15 @@
             <!-- Main Header Content -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <!-- Brand / Logo -->
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navigate('home')"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover bg-white p-0.5 border border-ribacom-gold/70">
-                    
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navigate('home')">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white p-0.5 shadow-md flex-shrink-0 overflow-hidden border border-ribacom-gold/60">
+                        <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg?v=20261005';" loading="eager" decoding="async" width="96" height="96" alt="Official RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                    </div>
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base leading-tight tracking-wide text-white">
                             RIBACOM <span class="text-ribacom-gold font-normal">THE GAMBIA</span>
                         </h1>
-                        <p class="text-[10px] text-gray-300 tracking-wider uppercase font-medium">Rivers Bayelsa Community in Diaspora</p>
+                        <p class="text-[10px] text-gray-300 tracking-wider uppercase font-medium">Rivers Bayelsa Community in Diaspora • TRUTH • UNITY • SERVICE</p>
                     </div>
                 </div>
 
@@ -140,37 +101,13 @@
                 <nav class="hidden lg:flex items-center space-x-1 font-medium text-sm">
                     <button onclick="app.navigate('home')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</button>
                     <button onclick="app.navigate('about')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">About</button>
-                    <button onclick="app.navigate('membership')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Membership</button>
-                    <div class="relative group">
-                      <button class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1">Community <i class="fa-solid fa-chevron-down text-xs opacity-70"></i></button>
-                      <div class="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 text-gray-800 hidden group-hover:block border border-gray-100 z-50">
-                        <div class="nav-section-label">Community</div>
-                        <a href="#" onclick="app.navigate('leadership')" class="block px-4 py-2 text-sm hover:bg-gray-100">Leadership & Elders</a>
-                        <a href="#" onclick="app.navigate('activities')" class="block px-4 py-2 text-sm hover:bg-gray-100">Community Activities</a>
-                        <a href="#" onclick="app.navigate('events')" class="block px-4 py-2 text-sm hover:bg-gray-100">Events & Meetings</a>
-                        <a href="#" onclick="app.navigate('welfare')" class="block px-4 py-2 text-sm hover:bg-gray-100">Welfare Centre</a>
-                        <a href="#" onclick="app.navigate('youth')" class="block px-4 py-2 text-sm hover:bg-gray-100">Youth Wing</a>
-                      </div>
-                    </div>
-                    <div class="relative group">
-                      <button class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1">Governance <i class="fa-solid fa-chevron-down text-xs opacity-70"></i></button>
-                      <div class="absolute left-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 text-gray-800 hidden group-hover:block border border-gray-100 z-50">
-                        <div class="nav-section-label">Governance</div>
-                        <a href="#" onclick="app.navigate('constitution')" class="block px-4 py-2 text-sm hover:bg-gray-100">Master Constitution</a>
-                        <a href="#" onclick="app.navigate('advisers')" class="block px-4 py-2 text-sm hover:bg-gray-100">Council of Advisers</a>
-                        <a href="#" onclick="app.navigate('history')" class="block px-4 py-2 text-sm hover:bg-gray-100">RIBACOM History</a>
-                      </div>
-                    </div>
-                    <div class="relative group">
-                      <button class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition flex items-center gap-1">Media <i class="fa-solid fa-chevron-down text-xs opacity-70"></i></button>
-                      <div class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl py-2 text-gray-800 hidden group-hover:block border border-gray-100 z-50">
-                        <div class="nav-section-label">Information</div>
-                        <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100">News & Announcements</a>
-                        <a href="#" onclick="app.navigate('publications')" class="block px-4 py-2 text-sm hover:bg-gray-100">Publications</a>
-                        <a href="#" onclick="app.navigate('gallery')" class="block px-4 py-2 text-sm hover:bg-gray-100">Media Gallery</a>
-                        <a href="#" onclick="app.navigate('contact')" class="block px-4 py-2 text-sm hover:bg-gray-100">Contact Us</a>
-                      </div>
-                    </div>
+                    <button onclick="app.navigate('leadership')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Community Leadership</button>
+                    <button onclick="app.navigate('constitution')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Constitution</button>
+                    <button onclick="app.navigate('welfare')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Welfare</button>
+                    <button onclick="app.navigate('members')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Members</button>
+                    <button onclick="app.navigate('digital-ecosystem')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition"><i class="fa-solid fa-layer-group mr-1 text-ribacom-gold"></i>Ecosystem</button>
+                    <button onclick="app.navigate('announcements')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">News</button>
+                    <button onclick="app.navigate('events')" class="nav-link px-3 py-2 rounded-lg hover:bg-white/10 transition">Events</button>
                     
                     <!-- More Dropdown -->
                     <div class="relative group">
@@ -178,14 +115,11 @@
                             More <i class="fa-solid fa-chevron-down text-xs opacity-70"></i>
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 text-gray-800 hidden group-hover:block border border-gray-100 z-50">
-                            <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-bullhorn w-5 text-ribacom-green"></i> News & Media</a>
+                            <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-bullhorn w-5 text-ribacom-green"></i> News & Announcements</a>
                             <a href="#" onclick="app.navigate('publications')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-file-lines w-5 text-ribacom-green"></i> Publications</a>
-                            <a href="#" onclick="app.navigate('gallery')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-images w-5 text-ribacom-green"></i> Media & Gallery</a>
+                            <a href="#" onclick="app.navigate('gallery')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-images w-5 text-ribacom-green"></i> Gallery</a>
                             <a href="#" onclick="app.navigate('youth')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-people-group w-5 text-ribacom-green"></i> Youth Wing</a>
-                            <a href="#" onclick="app.navigate('advisers')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-user-tie w-5 text-ribacom-green"></i> Special Advisers</a>
-                            <a href="#" onclick="app.navigate('history')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-clock-rotate-left w-5 text-ribacom-green"></i> RIBACOM History</a>
-                            <a href="#" onclick="app.navigate('leadership')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-users w-5 text-ribacom-green"></i> Council of Elders & Leadership</a>
-                            <a href="#" onclick="app.navigate('activities')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-people-group w-5 text-ribacom-green"></i> Community Activities</a>
+                            <a href="#" onclick="app.navigate('advisers')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-user-tie w-5 text-ribacom-green"></i> Council of Advisers</a>
                             <a href="#" onclick="app.navigate('contact')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-envelope w-5 text-ribacom-green"></i> Contact Us</a>
                         </div>
                     </div>
@@ -220,8 +154,8 @@
                 <div class="p-5">
                     <div class="flex items-center justify-between pb-4 border-b border-white/10">
                         <div class="flex items-center space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-ribacom-gold text-ribacom-navy flex items-center justify-center font-bold">
-                                R
+                            <div class="w-9 h-9 rounded-full bg-white p-0.5 overflow-hidden border border-ribacom-gold/60 flex-shrink-0">
+                                <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg?v=20261005';" loading="eager" decoding="async" width="96" height="96" alt="RIBACOM Crest" class="w-full h-full object-cover rounded-full">
                             </div>
                             <span class="font-bold text-sm tracking-wide">RIBACOM GAMBIA</span>
                         </div>
@@ -247,22 +181,19 @@
                     <div class="space-y-1 my-4 font-medium text-sm">
                         <a href="#" onclick="app.navigate('home'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-house w-5 text-ribacom-gold"></i> Home</a>
                         <a href="#" onclick="app.navigate('about'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-circle-info w-5 text-ribacom-gold"></i> About RIBACOM</a>
-                        <a href="#" onclick="app.navigate('home'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullseye w-5 text-ribacom-gold"></i> Vision & Mission</a>
-                        <a href="#" onclick="app.navigate('leadership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-users-gear w-5 text-ribacom-gold"></i> Executive Leadership</a>
+                        <a href="#" onclick="app.navigate('leadership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-users-gear w-5 text-ribacom-gold"></i> Community Leadership</a>
                         <a href="#" onclick="app.navigate('constitution'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-book-bookmark w-5 text-ribacom-gold"></i> Master Constitution</a>
-                        <a href="#" onclick="app.navigate('membership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-plus w-5 text-ribacom-gold"></i> Membership Registration</a>
+                        <a href="#" onclick="app.navigate('membership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-plus w-5 text-ribacom-gold"></i> Sign Up / Membership</a>
+                        <a href="#" onclick="app.navigate('members'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-address-book w-5 text-ribacom-gold"></i> Members</a>
                         <a href="#" onclick="app.navigate('digital-id'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-id-card w-5 text-ribacom-gold"></i> Digital Identity Card</a>
+                        <a href="#" onclick="app.navigate('finance'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-coins w-5 text-ribacom-gold"></i> Finance & Dues</a>
                         <a href="#" onclick="app.navigate('welfare'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-hand-holding-heart w-5 text-ribacom-gold"></i> Welfare Assistance</a>
                         <a href="#" onclick="app.navigate('events'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-calendar-days w-5 text-ribacom-gold"></i> Events & Meetings</a>
-                        <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-newspaper w-5 text-ribacom-gold"></i> News & Media</a>
-                        <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullhorn w-5 text-ribacom-gold"></i> Official Notices</a>
+                        <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullhorn w-5 text-ribacom-gold"></i> News & Official Notices</a>
                         <a href="#" onclick="app.navigate('publications'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-file-pdf w-5 text-ribacom-gold"></i> Publications</a>
-                        <a href="#" onclick="app.navigate('gallery'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-camera-retro w-5 text-ribacom-gold"></i> Media & Gallery</a>
+                        <a href="#" onclick="app.navigate('gallery'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-camera-retro w-5 text-ribacom-gold"></i> Photo Gallery</a>
                         <a href="#" onclick="app.navigate('youth'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-child-reaching w-5 text-ribacom-gold"></i> Youth Wing</a>
-                        <a href="#" onclick="app.navigate('advisers'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-tie w-5 text-ribacom-gold"></i> Special Advisers</a>
-                        <a href="#" onclick="app.navigate('history'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-clock-rotate-left w-5 text-ribacom-gold"></i> RIBACOM History</a>
-                        <a href="#" onclick="app.navigate('leadership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-group w-5 text-ribacom-gold"></i> Council of Elders</a>
-                        <a href="#" onclick="app.navigate('activities'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-people-group w-5 text-ribacom-gold"></i> Community Activities</a>
+                        <a href="#" onclick="app.navigate('advisers'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-tie w-5 text-ribacom-gold"></i> Council of Advisers</a>
                         <a href="#" onclick="app.navigate('contact'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-paper-plane w-5 text-ribacom-gold"></i> Contact Us</a>
                     </div>
                 </div>
@@ -279,12 +210,31 @@
         </main>
 
         <!-- MOBILE BOTTOM NAVIGATION (Fixed) -->
-        <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white/95 backdrop-blur border-t border-gray-200 px-1.5 py-1.5 grid grid-cols-5 shadow-lg">
-            <button onclick="app.navigate('home')" class="mobile-nav-item flex flex-col items-center p-1.5 rounded-xl text-[10px] text-gray-600" data-view="home"><i class="fa-solid fa-house text-lg mb-0.5"></i><span>Home</span></button>
-            <button onclick="app.navigate('about')" class="mobile-nav-item flex flex-col items-center p-1.5 rounded-xl text-[10px] text-gray-600" data-view="about"><i class="fa-solid fa-circle-info text-lg mb-0.5"></i><span>About</span></button>
-            <button onclick="app.navigate('membership')" class="mobile-nav-item flex flex-col items-center p-1.5 rounded-xl text-[10px] text-gray-600" data-view="membership"><i class="fa-solid fa-user-plus text-lg mb-0.5"></i><span>Join</span></button>
-            <button onclick="app.navigate('events')" class="mobile-nav-item flex flex-col items-center p-1.5 rounded-xl text-[10px] text-gray-600" data-view="events"><i class="fa-solid fa-calendar-days text-lg mb-0.5"></i><span>Events</span></button>
-            <button onclick="app.toggleMobileDrawer()" class="mobile-nav-item flex flex-col items-center p-1.5 rounded-xl text-[10px] text-gray-600"><i class="fa-solid fa-bars-staggered text-lg mb-0.5"></i><span>Explore</span></button>
+        <nav class="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-gray-200 px-2 py-1.5 flex justify-around items-center shadow-lg">
+            <button onclick="app.navigate('digital-ecosystem')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="digital-ecosystem">
+                <i class="fa-solid fa-layer-group text-lg mb-0.5"></i>
+                <span>Portal</span>
+            </button>
+            <button onclick="app.navigate('home')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="home">
+                <i class="fa-solid fa-house text-lg mb-0.5"></i>
+                <span>Home</span>
+            </button>
+            <button onclick="app.navigate('about')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="about">
+                <i class="fa-solid fa-circle-info text-lg mb-0.5"></i>
+                <span>About</span>
+            </button>
+            <button onclick="app.navigate('membership')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="membership">
+                <i class="fa-solid fa-user-plus text-lg mb-0.5"></i>
+                <span>Join</span>
+            </button>
+            <button onclick="app.navigate('announcements')" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition" data-view="announcements">
+                <i class="fa-solid fa-newspaper text-lg mb-0.5"></i>
+                <span>News</span>
+            </button>
+            <button id="mobileAccountBottomBtn" onclick="app.handleAuthAction()" class="mobile-nav-item flex flex-col items-center p-1 text-xs text-gray-600 hover:text-ribacom-green transition">
+                <i class="fa-solid fa-user-lock text-lg mb-0.5"></i>
+                <span>Account</span>
+            </button>
         </nav>
 
         <!-- FOOTER (Desktop & General) -->
@@ -292,7 +242,9 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
                     <div class="flex items-center space-x-2 mb-3">
-                        <div class="w-7 h-7 rounded-full bg-ribacom-gold text-ribacom-navy flex items-center justify-center font-bold text-xs">R</div>
+                        <div class="w-10 h-10 rounded-full bg-white p-0.5 overflow-hidden border border-ribacom-gold/60 flex-shrink-0">
+                            <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg?v=20261005';" loading="eager" decoding="async" width="96" height="96" alt="Official RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                        </div>
                         <span class="font-bold text-sm tracking-wide text-white">RIBACOM THE GAMBIA</span>
                     </div>
                     <p class="text-gray-300 leading-relaxed text-xs">
@@ -321,47 +273,24 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-sm text-ribacom-gold mb-3 border-b border-white/10 pb-1">Contact Secretariat</h3>
-                    <p class="text-gray-300 mb-2"><i class="fa-solid fa-location-dot text-ribacom-gold mr-1"></i> Agricultural Hall, Opposite St. Charles, Tabokoto Road, The Gambia</p>
-                    <p class="text-gray-300 mb-2"><i class="fa-solid fa-phone text-ribacom-gold mr-1"></i> +220 877991397</p>
-                    <p class="text-gray-300 mb-3"><i class="fa-solid fa-envelope text-ribacom-gold mr-1"></i> ribacomgambia@gmail.com</p>
+                    <p class="text-gray-300 mb-2"><i class="fa-solid fa-location-dot text-ribacom-gold mr-1"></i> Agricultural Hall, Opposite St Charles, Tabokoto Road</p>
+                    <p class="text-gray-300 mb-2"><i class="fa-solid fa-phone text-ribacom-gold mr-1"></i> Chairman: <a href="tel:+220877991397" class="hover:text-white">+220 877991397</a></p>
+                    <p class="text-gray-300 mb-2"><i class="fa-solid fa-phone text-ribacom-gold mr-1"></i> Secretary General: <a href="tel:+220833586955" class="hover:text-white">+220 833586955</a></p>
+                    <p class="text-gray-300 mb-2"><i class="fa-solid fa-phone text-ribacom-gold mr-1"></i> Welfare Officer: <a href="tel:+220877039287" class="hover:text-white">+220 877039287</a></p>
+                    <p class="text-gray-300 mb-3"><i class="fa-solid fa-envelope text-ribacom-gold mr-1"></i> <a href="mailto:ribacomgambia@gmail.com" class="hover:text-white">ribacomgambia@gmail.com</a></p>
+                    <button onclick="app.navigate('contact')" class="w-full bg-ribacom-green hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg transition text-xs flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-address-book"></i> Contact Secretariat
+                    </button>
+                    <button onclick="app.openLoginModal()" class="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-xs flex items-center justify-center gap-2 border border-white/20">
+                        <i class="fa-solid fa-user-shield text-ribacom-gold"></i> Secretariat Admin Login
+                    </button>
+                    <button onclick="app.openTreasurerLoginModal()" class="w-full bg-ribacom-gold text-ribacom-navy hover:bg-yellow-400 font-extrabold py-2 px-3 rounded-lg transition text-xs flex items-center justify-center gap-2"><i class="fa-solid fa-coins"></i> Dedicated Treasurer Login</button>
                 </div>
             </div>
             <div class="border-t border-white/10 pt-4 text-center text-gray-400 max-w-7xl mx-auto px-4">
-                <p>&copy; 2026 RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM). All rights reserved. Registered Community Organization.</p>
+                <p>&copy; 2026 RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM). All rights reserved.</p>
             </div>
         </footer>
-    </div>
-
-    <!-- SUPABASE / DATABASE CONFIGURATION MODAL -->
-    <div id="supabaseModal" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
-            <div class="bg-ribacom-navy text-white px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-database text-ribacom-gold"></i>
-                    <h3 class="font-bold text-base">Backend & Cloud Storage Config</h3>
-                </div>
-                <button onclick="app.closeSupabaseModal()" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-6 space-y-4 text-sm">
-                <p class="text-xs text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200 leading-relaxed">
-                    <strong>RIBACOM Cloud Backend:</strong> This Web 4 release is configured to use the official RIBACOM Supabase project. Connection credentials are managed by the application and are not entered by members.
-                </p>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Supabase Project URL</label>
-                    <input type="text" id="supabaseUrlInput" placeholder="https://xyz.supabase.co" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Supabase Anon Key</label>
-                    <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5..." class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
-                </div>
-                <div class="flex items-center justify-between pt-2">
-                    <button onclick="app.resetSupabaseConfig()" class="text-xs text-red-600 hover:underline">Reset to Offline Engine</button>
-                    <button onclick="app.saveSupabaseConfig()" class="bg-ribacom-green hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
-                        Connect Supabase
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- AUTHENTICATION MODAL (LOGIN / SIGNUP) -->
@@ -369,7 +298,9 @@
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
             <div class="bg-ribacom-navy text-white px-6 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-full bg-ribacom-gold text-ribacom-navy flex items-center justify-center font-bold text-xs">R</div>
+                    <div class="w-8 h-8 rounded-full bg-white p-0.5 overflow-hidden border border-ribacom-gold/60 flex-shrink-0">
+                        <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg?v=20261005';" loading="eager" decoding="async" width="96" height="96" alt="RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                    </div>
                     <h3 id="authModalTitle" class="font-bold text-base">Member Login</h3>
                 </div>
                 <button onclick="app.closeAuthModal()" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -390,16 +321,14 @@
                 <form id="loginForm" onsubmit="app.handleLogin(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
-                        <input type="email" id="loginEmail" required placeholder="" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
+                        <input type="email" id="loginEmail" required placeholder="member@ribacom.org" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">Password</label>
                         <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-ribacom-green outline-none">
                     </div>
                     
-                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs text-blue-800">
-                        Sign in uses the official RIBACOM Supabase account system. New members must first submit the membership application.
-                    </div>
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-xs text-blue-800">Use the email and password of your real RIBACOM Supabase account. No demo credentials are used.</div>
 
                     <button type="submit" class="w-full bg-ribacom-navy hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-sm transition shadow-md">
                         Log In to Portal
@@ -419,35 +348,152 @@
         </div>
     </div>
 
-    <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="digital-id.css">
-        <script src="config.js?v=2026.10.07-history-v4"></script>
-        <script src="app.js?v=2026.10.07-history-v4"></script>
-        <script src="auth.js?v=2026.10.07-history-v4"></script>
-        <script src="content.js?v=2026.10.07-history-v4"></script>
-        <script src="admin.js?v=2026.10.07-history-v4"></script>
-        <script src="members.js?v=2026.10.07-history-v4"></script>
-        <script src="member-profile.js?v=2026.10.07-history-v4"></script>
-        <script src="applicant-profile.js?v=2026.10.07-history-v4"></script>
-        <script src="approval.js?v=2026.10.07-history-v4"></script>
-        <script src="digital-id.js?v=2026.10.07-history-v4"></script>
-        <script src="notifications.js?v=2026.10.07-history-v4"></script>
-        <script src="secretariat.js?v=2026.10.07-history-v4"></script>
-        <script src="constitution.js?v=2026.10.07-history-v4"></script>
-        <script src="constitution-centre.js?v=2026.10.07-history-v4"></script>
-        <script src="leadership.js?v=2026.10.07-history-v4"></script>
-        <script src="leadership-centre.js?v=2026.10.07-history-v4"></script>
-        <script src="events-centre.js?v=2026.10.07-history-v4"></script>
-        <script src="gallery-centre.js?v=2026.10.07-history-v4"></script>
-        <script src="publications-centre.js?v=2026.10.07-history-v4"></script>
-        <script src="youth-centre.js?v=2026.10.07-history-v4"></script>
-        <script src="welfare.js?v=2026.10.07-history-v4"></script>
-        <script src="elections.js?v=2026.10.07-history-v4"></script>
-        <script src="news.js?v=2026.10.07-history-v4"></script>
-        <script src="d5-admin.js?v=2026.10.07-history-v4"></script>
-        <script src="d7-admin.js?v=2026.10.07-history-v4"></script>
-        <script src="system.js?v=2026.10.07-history-v4"></script>
-<script src="community-information.js?v=2026.10.07-history-v3"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script src="members.js"></script>
+<script src="applicant-profile.js"></script>
+<script src="member-profile.js"></script>
+<script src="notifications.js"></script>
+<script src="news.js"></script>
+<script src="publications-centre.js"></script>
+<script src="gallery-centre.js"></script>
+<script src="leadership-centre.js"></script>
+<script src="constitution-centre.js"></script>
+<script src="youth-centre.js"></script>
+<script src="digital-id.js"></script>
+<script src="leadership.js"></script>
+<script src="constitution.js"></script>
+<script src="content.js"></script>
+<script src="welfare.js"></script>
+<script src="admin.js"></script>
+<script src="d5-admin.js"></script>
+<script src="system.js"></script>
+<script src="d7-admin.js"></script>
+<script src="approval.js"></script>
+<script src="elections.js"></script>
+<script src="secretariat.js"></script>
+<script>
+/* RIBACOM About & Community Information Centre — identity/content repair */
+window.addEventListener('DOMContentLoaded', function () {
+    if (!window.app) return;
+    const originalRenderBasicPublicView = window.app.renderBasicPublicView.bind(window.app);
+    window.app.renderBasicPublicView = function(view) {
+        if (view !== 'about') return originalRenderBasicPublicView(view);
+        const escSafe = (v) => typeof window.esc === 'function' ? window.esc(v) : String(v ?? '');
+        return `
+        <div class="max-w-6xl mx-auto space-y-6 animate-fadeIn">
+            <section class="bg-ribacom-navy text-white rounded-3xl p-7 sm:p-10 border-b-4 border-ribacom-gold shadow-xl">
+                <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                    <div class="w-28 h-28 rounded-full bg-white p-1 shadow-lg overflow-hidden border-2 border-ribacom-gold flex-shrink-0">
+                        <img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-crest.jpg?v=20261005" alt="Official RIBACOM Crest" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <span class="text-ribacom-gold text-xs font-black uppercase tracking-widest">Official Community Information Centre</span>
+                        <h1 class="text-3xl sm:text-4xl font-extrabold mt-2">RIVERS BAYELSA COMMUNITY THE GAMBIA</h1>
+                        <p class="text-gray-200 mt-2 font-semibold">RIBACOM</p>
+                        <p class="text-ribacom-gold font-extrabold tracking-widest mt-3">TRUTH • UNITY • SERVICE</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid md:grid-cols-2 gap-5">
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-landmark text-ribacom-green mr-2"></i>Official Identity</h2>
+                    <div class="mt-4 space-y-2 text-sm text-gray-700">
+                        <p><strong>Official Name:</strong> Rivers Bayelsa Community in Diaspora The Gambia</p>
+                        <p><strong>Short Name:</strong> RIBACOM</p>
+                        <p><strong>App Display Name:</strong> RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM)</p>
+                        <p><strong>Motto:</strong> <span class="font-extrabold text-ribacom-green">TRUTH • UNITY • SERVICE</span></p>
+                    </div>
+                </article>
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-people-group text-ribacom-green mr-2"></i>Who We Are</h2>
+                    <p class="mt-4 text-sm leading-7 text-gray-700">
+                        RIBACOM is the community organization serving people of Rivers and Bayelsa State origin and their families and associates living in The Gambia. It provides a platform for unity, welfare, cultural identity, mutual support, community development and responsible representation.
+                    </p>
+                </article>
+            </section>
+
+            <section class="grid md:grid-cols-2 gap-5">
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-clock-rotate-left text-ribacom-green mr-2"></i>Our History</h2>
+                    <p class="mt-4 text-sm leading-7 text-gray-700">
+                        RIBACOM grew from the need for Rivers and Bayelsa people in The Gambia to remain connected, organized and supportive of one another while preserving their shared heritage. The community continues to develop its governance, welfare, cultural, membership and digital structures in service of its members.
+                    </p>
+                    <p class="mt-3 text-xs text-gray-500">This section is designed for the Secretariat to expand with verified historical milestones as the official community archive develops.</p>
+                </article>
+                <article class="bg-white rounded-2xl border p-6 shadow-sm">
+                    <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-bullseye text-ribacom-green mr-2"></i>Mission</h2>
+                    <p class="mt-4 text-sm leading-7 text-gray-700">
+                        To promote truth, unity and service by protecting the welfare and dignity of members, preserving Rivers and Bayelsa cultural heritage, strengthening mutual support and contributing positively to community life in The Gambia.
+                    </p>
+                </article>
+            </section>
+
+            <section class="bg-gradient-to-br from-white to-gray-50 rounded-2xl border p-6 shadow-sm">
+                <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-eye text-ribacom-green mr-2"></i>Vision</h2>
+                <p class="mt-4 text-sm sm:text-base leading-7 text-gray-700">
+                    To build a united, organized, prosperous and culturally conscious Rivers-Bayelsa community in The Gambia, where members support one another, preserve their heritage and contribute meaningfully to society.
+                </p>
+            </section>
+
+            <section class="bg-white rounded-2xl border p-6 shadow-sm">
+                <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-user-check text-ribacom-green mr-2"></i>Membership Community</h2>
+                <div class="grid sm:grid-cols-2 gap-4 mt-5">
+                    <div class="rounded-xl bg-green-50 border border-green-100 p-4">
+                        <h3 class="font-extrabold text-ribacom-green">Regular Member</h3>
+                        <p class="text-sm text-gray-700 mt-2">Membership by birth or Rivers/Bayelsa ancestry.</p>
+                    </div>
+                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-4">
+                        <h3 class="font-extrabold text-ribacom-navy">Associate Member</h3>
+                        <p class="text-sm text-gray-700 mt-2">Membership by marriage and by genuine interest in identifying with and supporting the community.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-2xl border p-6 shadow-sm">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-ribacom-navy"><i class="fa-solid fa-people-roof text-ribacom-green mr-2"></i>Community Leadership</h2>
+                        <p class="text-xs text-gray-500 mt-1">Current leadership information</p>
+                    </div>
+                    <button onclick="app.navigate('leadership')" class="bg-ribacom-navy text-white px-4 py-2 rounded-xl text-xs font-bold">View Leadership Centre</button>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-5">
+                    <div class="border rounded-xl p-4"><b>President</b><p class="text-sm text-gray-700 mt-1">Iworima M. Thomas</p></div>
+                    <div class="border rounded-xl p-4"><b>Vice President</b><p class="text-sm text-gray-700 mt-1">Odika Nnenne</p></div>
+                    <div class="border rounded-xl p-4"><b>Secretary General</b><p class="text-sm text-gray-700 mt-1">Juliet Ejila</p></div>
+                    <div class="border rounded-xl p-4"><b>Treasurer</b><p class="text-sm text-gray-700 mt-1">Ruth Doubra Julius</p></div>
+                    <div class="border rounded-xl p-4"><b>Public Relations Officer</b><p class="text-sm text-gray-700 mt-1">Uche Destiny Chikezie</p></div>
+                    <div class="border rounded-xl p-4"><b>Welfare Officer / Provost</b><p class="text-sm text-gray-700 mt-1">Emeka Thank God Elechi</p></div>
+                </div>
+            </section>
+
+            <section class="bg-ribacom-navy text-white rounded-2xl p-6 shadow-lg">
+                <h2 class="text-xl font-extrabold text-ribacom-gold"><i class="fa-solid fa-address-book mr-2"></i>Contact & Secretariat</h2>
+                <div class="grid md:grid-cols-2 gap-4 mt-5 text-sm">
+                    <div class="space-y-3">
+                        <p><i class="fa-solid fa-phone text-ribacom-gold mr-2"></i><strong>Chairman / President:</strong> <a href="tel:+220877991397" class="hover:text-ribacom-gold">+220 877991397</a></p>
+                        <p><i class="fa-solid fa-phone text-ribacom-gold mr-2"></i><strong>Secretary General:</strong> <a href="tel:+220833586955" class="hover:text-ribacom-gold">+220 833586955</a></p>
+                        <p><i class="fa-solid fa-phone text-ribacom-gold mr-2"></i><strong>Welfare Officer:</strong> <a href="tel:+220877039287" class="hover:text-ribacom-gold">+220 877039287</a></p>
+                    </div>
+                    <div class="space-y-3">
+                        <p><i class="fa-solid fa-envelope text-ribacom-gold mr-2"></i><strong>Email:</strong> <a href="mailto:ribacomgambia@gmail.com" class="hover:text-ribacom-gold">ribacomgambia@gmail.com</a></p>
+                        <p><i class="fa-solid fa-location-dot text-ribacom-gold mr-2"></i><strong>Secretariat / Meeting Address:</strong> Agricultural Hall, Opposite Charles Jaw School, Bundung.</p>
+                    </div>
+                </div>
+                <button onclick="app.navigate('contact')" class="mt-5 bg-ribacom-gold text-ribacom-navy px-5 py-2.5 rounded-xl font-extrabold text-sm">Open Contact Centre</button>
+            </section>
+
+            <section class="text-center bg-ribacom-green text-white rounded-2xl p-6">
+                <p class="text-xs uppercase tracking-widest font-black">RIBACOM Community Principle</p>
+                <p class="text-2xl font-extrabold mt-2">TRUTH • UNITY • SERVICE</p>
+                <p class="text-sm mt-2 text-white/90">Together as one community, serving with integrity and purpose.</p>
+            </section>
+        </div>`;
+    };
+});
+</script>
 </body>
 </html>
-
