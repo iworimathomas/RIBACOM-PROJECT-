@@ -13,11 +13,11 @@
     const title = id ? `Edit ${type}` : `Add ${type}`;
     const fields = {
       leadership:[['name','Name'],['position','Position'],['biography','Biography'],['phone','Phone'],['email','Email']],
-      advisers:[['name','Name'],['category','Category'],['photo_url','Photo URL'],['biography','Biography'],['phone','Phone'],['email','Email']],
+      advisers:[['name','Name'],['category','Category'],['biography','Biography'],['phone','Phone'],['email','Email']],
       announcements:[['title','Title'],['content','Content']],
       events:[['title','Title'],['description','Description'],['event_date','Date & time'],['location','Location'],['organizer','Organizer']],
       publications:[['title','Title'],['description','Description'],['file_url','Document URL'],['category','Category'],['publication_date','Publication date']],
-      youth_content:[['section_title','Section title'],['body_content','Body content'],['image_url','Image URL']],
+      youth_content:[['section_title','Section title'],['body_content','Body content']],
       payment_settings:[['method_name','Method'],['account_name','Account name'],['account_number','Account number'],['bank_name','Bank name'],['instructions','Instructions']]
     }[type]||[];
     const body=fields.map(([k,l])=>`<label class="block text-xs font-bold text-gray-700 mb-2">${esc(l)}<input id="adm_${k}" value="${esc(existing?.[k])}" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" ${k.includes('biography')||k==='content'||k==='description'||k==='instructions'||k==='body_content'?'':'type="text"'}></label>`).join('')+
