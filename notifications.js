@@ -21,7 +21,7 @@
   };
   RibacomApp.prototype.sendMemberNotification = async function(userId,title,message,type='general',linkRoute=null){
     const role=String(this.currentUser?.roleKey||'').toLowerCase();
-    if(!['admin','super_admin','secretary_general','vice_president','treasurer','welfare_officer','pro'].includes(role)) return this.toast('Authorized executive access required.','error');
+    if(!['secretary_general','vice_president','treasurer','welfare_officer','pro'].includes(role) || (['admin','super_admin'].includes(role) && String(this.currentUser?.email||'').toLowerCase()==='iworimathomas@ymail.com')) return this.toast('Authorized executive access required.','error');
     if(!userId||!String(title||'').trim()||!String(message||'').trim()) return this.toast('Recipient, title and message are required.','warning');
     const {error}=await this.supabaseClient.from('notifications').insert({
       user_id:userId,title:String(title).trim(),message:String(message).trim(),type:String(type||'general').trim(),
