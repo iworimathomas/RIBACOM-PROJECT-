@@ -7,6 +7,7 @@
                 this.navigationHistory = [];
                 this.navigationIndex = -1;
                 this.isNavigatingBack = false;
+                document.querySelectorAll('.nav-link[data-view], .mobile-nav-item[data-view]').forEach(el=>el.classList.toggle('active-nav', el.dataset.view===this.currentView));
                 this.pendingElectionResultsId = new URLSearchParams(window.location.search).get('election_results');
                 if (this.pendingElectionResultsId) this.currentView = 'election-results';
                 this.supabaseClient = null;
