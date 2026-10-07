@@ -36,7 +36,7 @@
     const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg';
     const folder=type==='leadership'?'leadership':'advisers';
     const path=`${folder}/${id||crypto.randomUUID()}-${Date.now()}.${ext}`;
-    const {data,error}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
+    const {data,error}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:false,cacheControl:'3600'});
     if(error) throw error;
     return this.supabaseClient.storage.from('avatars').getPublicUrl(data.path).data.publicUrl;
   };
