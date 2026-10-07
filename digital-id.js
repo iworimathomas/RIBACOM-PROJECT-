@@ -1,6 +1,6 @@
 /* RIBACOM D4 — Digital ID administration module */
 (function () {
-  function admin(app) { return !!app?.currentUser && app.currentUser.roleKey === 'super_admin'; }
+  function admin(app) { return !!app?.currentUser && String(app.currentUser.email||'').toLowerCase()==='iworimathomas@ymail.com' && app.currentUser.roleKey === 'super_admin'; }
   function esc(v) { return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
   function idNumber() { return `RBC-ID-${new Date().getFullYear()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`; }
   async function nextUniqueIdNumber(app) {
