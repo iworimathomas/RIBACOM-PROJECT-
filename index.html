@@ -7,7 +7,7 @@
     <meta name="google-site-verification" content="pHUoqv551CJ_zO0M5gQDXfE4mYY4OJZ4LpidsjAEiDU" />
     <meta name="description" content="RIBACOM is the Rivers Bayelsa Community in Diaspora – The Gambia, promoting peace, unity, progress, welfare, culture and community support.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://ribacomgambia.vercel.app/">
+    <link rel="canonical" href="https://ribacomgambia.org/">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -112,7 +112,7 @@
             <!-- Main Header Content -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <!-- Brand / Logo -->
-                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navigate('home')">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navigate('home')"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover bg-white p-0.5 border border-ribacom-gold/70">
                     
                     <div>
                         <h1 class="font-extrabold text-sm sm:text-base leading-tight tracking-wide text-white">
@@ -137,11 +137,11 @@
                             More <i class="fa-solid fa-chevron-down text-xs opacity-70"></i>
                         </button>
                         <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 text-gray-800 hidden group-hover:block border border-gray-100 z-50">
-                            <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-bullhorn w-5 text-ribacom-green"></i> Announcements</a>
+                            <a href="#" onclick="app.navigate('announcements')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-bullhorn w-5 text-ribacom-green"></i> News & Media</a>
                             <a href="#" onclick="app.navigate('publications')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-file-lines w-5 text-ribacom-green"></i> Publications</a>
-                            <a href="#" onclick="app.navigate('gallery')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-images w-5 text-ribacom-green"></i> Gallery</a>
+                            <a href="#" onclick="app.navigate('gallery')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-images w-5 text-ribacom-green"></i> Media & Gallery</a>
                             <a href="#" onclick="app.navigate('youth')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-people-group w-5 text-ribacom-green"></i> Youth Wing</a>
-                            <a href="#" onclick="app.navigate('advisers')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-user-tie w-5 text-ribacom-green"></i> Council of Advisers</a>
+                            <a href="#" onclick="app.navigate('advisers')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-user-tie w-5 text-ribacom-green"></i> Special Advisers</a>
                             <a href="#" onclick="app.navigate('contact')" class="block px-4 py-2 text-sm hover:bg-gray-100"><i class="fa-solid fa-envelope w-5 text-ribacom-green"></i> Contact Us</a>
                         </div>
                     </div>
@@ -203,17 +203,19 @@
                     <div class="space-y-1 my-4 font-medium text-sm">
                         <a href="#" onclick="app.navigate('home'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-house w-5 text-ribacom-gold"></i> Home</a>
                         <a href="#" onclick="app.navigate('about'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-circle-info w-5 text-ribacom-gold"></i> About RIBACOM</a>
+                        <a href="#" onclick="app.navigate('home'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullseye w-5 text-ribacom-gold"></i> Vision & Mission</a>
                         <a href="#" onclick="app.navigate('leadership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-users-gear w-5 text-ribacom-gold"></i> Executive Leadership</a>
                         <a href="#" onclick="app.navigate('constitution'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-book-bookmark w-5 text-ribacom-gold"></i> Master Constitution</a>
                         <a href="#" onclick="app.navigate('membership'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-plus w-5 text-ribacom-gold"></i> Membership Registration</a>
                         <a href="#" onclick="app.navigate('digital-id'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-id-card w-5 text-ribacom-gold"></i> Digital Identity Card</a>
                         <a href="#" onclick="app.navigate('welfare'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-hand-holding-heart w-5 text-ribacom-gold"></i> Welfare Assistance</a>
                         <a href="#" onclick="app.navigate('events'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-calendar-days w-5 text-ribacom-gold"></i> Events & Meetings</a>
+                        <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-newspaper w-5 text-ribacom-gold"></i> News & Media</a>
                         <a href="#" onclick="app.navigate('announcements'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-bullhorn w-5 text-ribacom-gold"></i> Official Notices</a>
                         <a href="#" onclick="app.navigate('publications'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-file-pdf w-5 text-ribacom-gold"></i> Publications</a>
-                        <a href="#" onclick="app.navigate('gallery'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-camera-retro w-5 text-ribacom-gold"></i> Photo Gallery</a>
+                        <a href="#" onclick="app.navigate('gallery'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-camera-retro w-5 text-ribacom-gold"></i> Media & Gallery</a>
                         <a href="#" onclick="app.navigate('youth'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-child-reaching w-5 text-ribacom-gold"></i> Youth Wing</a>
-                        <a href="#" onclick="app.navigate('advisers'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-tie w-5 text-ribacom-gold"></i> Council of Advisers</a>
+                        <a href="#" onclick="app.navigate('advisers'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-user-tie w-5 text-ribacom-gold"></i> Special Advisers</a>
                         <a href="#" onclick="app.navigate('contact'); app.toggleMobileDrawer();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 text-gray-200"><i class="fa-solid fa-paper-plane w-5 text-ribacom-gold"></i> Contact Us</a>
                     </div>
                 </div>
