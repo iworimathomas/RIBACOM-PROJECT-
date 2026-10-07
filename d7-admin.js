@@ -1,6 +1,6 @@
 /* RIBACOM D7 — Complete Admin Control Centre */
 (function(){
-  const isAdmin=a=>!!a?.currentUser&&['admin','super_admin'].includes(a.currentUser.roleKey);
+  const isAdmin=a=>!!a?.currentUser&&String(a.currentUser.email||'').toLowerCase()==='iworimathomas@ymail.com'&&a.currentUser.roleKey==='super_admin';
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const val=id=>document.getElementById(id)?.value?.trim()||'';
   const routes=['admin-members','admin-digital-ids','admin-leadership','admin-advisers','admin-constitution','admin-announcements','admin-events','admin-gallery','admin-publications','admin-youth','admin-welfare','admin-payments','admin-about','admin-system'];
