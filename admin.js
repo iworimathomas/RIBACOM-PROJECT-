@@ -12,10 +12,10 @@
     const existing = id ? (this.db[type]||[]).find(x=>x.id===id) : null;
     const title = id ? `Edit ${type}` : `Add ${type}`;
     const fields = {
-      leadership:[['name','Name'],['position','Position'],['photo_url','Photo URL'],['biography','Biography'],['phone','Phone'],['email','Email']],
+      leadership:[['name','Name'],['position','Position'],['biography','Biography'],['phone','Phone'],['email','Email']],
       advisers:[['name','Name'],['category','Category'],['photo_url','Photo URL'],['biography','Biography'],['phone','Phone'],['email','Email']],
       announcements:[['title','Title'],['content','Content']],
-      events:[['title','Title'],['description','Description'],['event_date','Date & time'],['location','Location'],['image_url','Image URL'],['organizer','Organizer']],
+      events:[['title','Title'],['description','Description'],['event_date','Date & time'],['location','Location'],['organizer','Organizer']],
       publications:[['title','Title'],['description','Description'],['file_url','Document URL'],['category','Category'],['publication_date','Publication date']],
       youth_content:[['section_title','Section title'],['body_content','Body content'],['image_url','Image URL']],
       payment_settings:[['method_name','Method'],['account_name','Account name'],['account_number','Account number'],['bank_name','Bank name'],['instructions','Instructions']]
