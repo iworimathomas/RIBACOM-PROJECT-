@@ -229,7 +229,7 @@
                     const preferred=String(localStorage.getItem('ribacom_last_view')||'');
                     const privileged=['admin-dashboard','treasurer-dashboard','executive-work'];
                     const allowed=preferred && (!privileged.includes(preferred) ||
-                      (preferred==='admin-dashboard' && ['admin','super_admin'].includes(roleKey)) ||
+                      (preferred==='admin-dashboard' && String(this.currentUser?.email||'').toLowerCase()==='iworimathomas@ymail.com' && roleKey==='super_admin') ||
                       (preferred==='treasurer-dashboard' && roleKey==='treasurer') ||
                       (preferred==='executive-work' && ['president','vice_president','secretary_general','assistant_secretary_general','welfare_officer','pro'].includes(roleKey)));
                     if(allowed) this.currentView=preferred;
@@ -728,7 +728,7 @@
                 if(error){this.toast(error.message,'error');return;} await this.loadCloudData(); this.toast('Digital ID issued successfully.','success'); this.navigate('admin-digital-ids');
             }
             async changeDigitalIdStatus(id,status) {
-                if (!['admin','super_admin'].includes(this.currentUser?.roleKey)) return;
+                if (!String(this.currentUser?.email||'').toLowerCase()==='iworimathomas@ymail.com' && this.currentUser?.roleKey==='super_admin') return;
                 const {error}=await this.supabaseClient.from('digital_ids').update({status}).eq('id',id); if(error){this.toast(error.message,'error');return;} await this.loadCloudData(); this.navigate('admin-digital-ids');
             }
             async renewDigitalId(id) {
