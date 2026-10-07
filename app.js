@@ -4,6 +4,9 @@
                 this.db = {members:[],digitalIds:[],membershipApplications:[],financeTransactions:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
                 this.currentUser = null;
                 this.currentView = 'home';
+                this.navigationHistory = [];
+                this.navigationIndex = -1;
+                this.isNavigatingBack = false;
                 this.pendingElectionResultsId = new URLSearchParams(window.location.search).get('election_results');
                 if (this.pendingElectionResultsId) this.currentView = 'election-results';
                 this.supabaseClient = null;
@@ -416,8 +419,30 @@
                 return '<div class="max-w-5xl mx-auto space-y-5 animate-fadeIn"><div><h2 class="text-2xl font-extrabold text-ribacom-navy">'+esc(title)+'</h2><p class="text-xs text-gray-500">RIBACOM Digital Ecosystem</p></div>'+body+'</div>';
             }
 
+            renderNavigationBackControl() {
+                if (this.currentView === 'home') return '';
+                const previous = this.navigationHistory.length > 1 ? this.navigationHistory[this.navigationHistory.length - 2] : 'home';
+                const label = previous === 'home' ? 'Home' : 'Back';
+                return '<div class="max-w-5xl mx-auto px-4 sm:px-6 pt-4"><button type="button" onclick="app.goBack()" class="inline-flex items-center gap-2 bg-white border border-gray-200 text-ribacom-navy hover:bg-ribacom-navy hover:text-white shadow-sm px-4 py-2.5 rounded-xl font-extrabold text-sm transition active:scale-95"><i class="fa-solid fa-arrow-left"></i><span>'+label+'</span></button></div>';
+            }
+
+            goBack() {
+                if (this.navigationHistory.length <= 1) {
+                    return this.navigate('home', {fromBack:true});
+                }
+                this.navigationHistory.pop();
+                const previous = this.navigationHistory[this.navigationHistory.length - 1] || 'home';
+                this.isNavigatingBack = true;
+                return this.navigate(previous, {fromBack:true});
+            }
+
             navigate(view, params=null) {
                 this.currentView=view||'home';
+                if (!this.isNavigatingBack) {
+                    const last = this.navigationHistory[this.navigationHistory.length - 1];
+                    if (last !== this.currentView) this.navigationHistory.push(this.currentView);
+                }
+                this.isNavigatingBack = false;
                 try { localStorage.setItem('ribacom_last_view',this.currentView); } catch (_) {}
                 const protectedViews=['member-dashboard','digital-id','welfare','notifications','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
                 const roleRoutes={
@@ -496,8 +521,8 @@
                     else html=this.renderBasicPublicView(this.currentView);
                     const target=document.getElementById('appViewport');
                     if(target) {
-                        if(html && typeof html.then==='function') html.then(h=>{target.innerHTML=h||'';this.updateAuthHeaderUI();window.scrollTo({top:0,behavior:'smooth'});});
-                        else { target.innerHTML=html||this.renderBasicPublicView(this.currentView); this.updateAuthHeaderUI(); window.scrollTo({top:0,behavior:'smooth'}); }
+                        if(html && typeof html.then==='function') html.then(h=>{target.innerHTML=(this.renderNavigationBackControl()+ (h||''));this.updateAuthHeaderUI();window.scrollTo({top:0,behavior:'smooth'});});
+                        else { target.innerHTML=this.renderNavigationBackControl()+(html||this.renderBasicPublicView(this.currentView)); this.updateAuthHeaderUI(); window.scrollTo({top:0,behavior:'smooth'}); }
                     }
                 } catch(error) {
                     console.error('RIBACOM navigation error:',error);
