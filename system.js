@@ -1,6 +1,6 @@
 /* RIBACOM D4 — system verification */
 (function(){
-  const admin=a=>!!a?.currentUser&&['admin','super_admin'].includes(a.currentUser.roleKey);
+  const admin=a=>!!a?.currentUser&&String(a.currentUser.email||'').toLowerCase()==='iworimathomas@ymail.com'&&a.currentUser.roleKey==='super_admin';
   RibacomApp.prototype.runSystemVerification=async function(){
     if(!admin(this))return this.toast('Administrator access required.','error');
     const tables=['profiles','members','digital_ids','leadership','advisers','constitution','announcements','events','gallery','publications','youth_content','welfare_requests','payment_settings','ribacom_about_content'];
