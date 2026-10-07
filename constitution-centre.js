@@ -23,7 +23,7 @@
  const oldNav=RibacomApp.prototype.navigate;
  RibacomApp.prototype.navigate=function(v,p=null){
   if(v==='governance-centre'){this.currentView=v;const c=document.getElementById('appViewport');this.renderGovernanceOverview().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI&&this.updateAuthHeaderUI()});return}
-  if(v==='constitution-centre'){this.currentView=v;const c=document.getElementById('appViewport');this.renderConstitutionCentre().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI&&this.updateAuthHeaderUI()});return}
+  if(v==='constitution'||v==='constitution-centre'){this.currentView='constitution';const c=document.getElementById('appViewport');this.renderConstitutionCentre().then(h=>{if(c)c.innerHTML=h;this.updateAuthHeaderUI&&this.updateAuthHeaderUI()});return}
   return oldNav.call(this,v,p);
  };
 })();
