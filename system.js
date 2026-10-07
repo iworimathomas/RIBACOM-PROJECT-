@@ -3,7 +3,7 @@
   const admin=a=>!!a?.currentUser&&String(a.currentUser.email||'').toLowerCase()==='iworimathomas@ymail.com'&&a.currentUser.roleKey==='super_admin';
   RibacomApp.prototype.runSystemVerification=async function(){
     if(!admin(this))return this.toast('Administrator access required.','error');
-    const tables=['profiles','members','digital_ids','leadership','advisers','constitution','announcements','events','gallery','publications','youth_content','welfare_requests','payment_settings','ribacom_about_content'];
+    const tables=['profiles','members','digital_ids','leadership','advisers','constitution','announcements','events','gallery','publications','youth_content','welfare_requests','payment_settings','ribacom_about_content','ribacom_council_elders','ribacom_history','ribacom_community_activities'];
     const results=[];
     for(const t of tables){const {error}=await this.supabaseClient.from(t).select('*',{count:'exact',head:true});results.push({table:t,ok:!error,error:error?.message||''});}
     const modal=document.createElement('div'); modal.id='ribacomSystemCheck'; modal.className='fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4';
