@@ -33,8 +33,11 @@
   };
 
   RibacomApp.prototype.renderRibacomHistory=async function(){
-    const {data,error}=await fetchRows(this,'ribacom_history',q=>q.eq('is_published',true).order('display_order').order('year_label',{ascending:true}));
-    if(error)return '<div class="bg-white border rounded-2xl p-6 text-red-600">'+e(error.message)+'</div>';
+    let data=Array.isArray(this.db.history)?this.db.history.filter(x=>x.is_published!==false):[];
+    let error=null;
+    if(!data.length && this.supabaseClient){const result=await fetchRows(this,'ribacom_history',q=>q.eq('is_published',true).order('display_order').order('year_label',{ascending:true}));data=result.data||[];error=result.error||null;}
+    if(!data.length && this.db.about&&this.db.about.history){data=[{year_label:'2008 – Present',title:'The Story of RIBACOM',description:this.db.about.history,is_published:true}];}
+    if(error&&!data.length)return '<div class="bg-white border rounded-2xl p-6 text-red-600">'+e(error.message)+'</div>';
     return '<div class="max-w-5xl mx-auto space-y-6"><section class="bg-ribacom-navy text-white rounded-3xl p-7 border-b-4 border-ribacom-gold"><span class="text-[10px] uppercase font-black text-ribacom-gold">Institutional Archive</span><h2 class="text-3xl font-extrabold mt-1">RIBACOM History & Timeline</h2><p class="text-sm text-gray-200 mt-2">The official RIBACOM story is published below. It traces the community journey from Rivers-Bayelsa Association to Rivers-Bayelsa Community and ultimately Rivers Bayelsa Community in Diaspora – The Gambia.</p></section><div class="space-y-4">'+(data.length?data.map(x=>'<article class="bg-white border rounded-3xl p-6"><div class="flex gap-4"><div class="text-ribacom-green font-black min-w-20">'+e(x.year_label)+'</div><div class="flex-1"><h3 class="text-lg font-extrabold text-ribacom-navy">'+e(x.title)+'</h3><p class="text-sm text-gray-700 whitespace-pre-line mt-2">'+e(x.description)+'</p>'+(x.document_url?'<a href="'+e(x.document_url)+'" target="_blank" rel="noopener" class="inline-block mt-3 text-xs font-bold text-ribacom-green">Open supporting document →</a>':'')+'</div></div></article>').join(''):'<div class="bg-white border rounded-3xl p-8 text-center"><h3 class="font-extrabold text-ribacom-navy">History archive ready</h3><p class="text-sm text-gray-500 mt-2">No historical milestones have been officially entered yet. We will not invent dates or events.</p></div>')+'</div></div>';
   };
 
