@@ -339,7 +339,7 @@
     return `
       <div class="max-w-5xl mx-auto space-y-5 animate-fadeIn">
         <div class="bg-ribacom-navy text-white rounded-3xl p-6 sm:p-8 border-b-4 border-ribacom-gold">
-          <div class="flex items-center gap-4"><img src="https://raw.githubusercontent.com/iworimathomas/RIBACOM-PROJECT-/main/ribacom-official-logo.jpg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-2xl bg-white p-1 object-cover"><div><span class="text-[10px] uppercase font-black text-ribacom-gold">RIBACOM Membership</span><h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Membership Application Form</h2><p class="text-xs text-white/70 mt-1">Create your secure account and submit your application for Secretariat review.</p></div></div>
+          <div class="flex items-center gap-4"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-2xl bg-white p-1 object-cover"><div><span class="text-[10px] uppercase font-black text-ribacom-gold">RIBACOM Membership</span><h2 class="text-2xl sm:text-3xl font-extrabold mt-1">Membership Application Form</h2><p class="text-xs text-white/70 mt-1">Create your secure account and submit your application for Secretariat review.</p></div></div>
         </div>
         <form onsubmit="app.handleMembershipSubmit(event)" class="bg-white rounded-3xl border shadow-sm p-5 sm:p-7 space-y-7">
           <section><h3 class="font-extrabold text-ribacom-navy text-lg">1. Personal Information</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
