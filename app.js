@@ -63,7 +63,6 @@
                     aboutContent: 'ribacom_about_content',
                     paymentSettings: 'payment_settings',
                     councilElders: 'ribacom_council_elders',
-                    history: 'ribacom_history',
                     communityActivities: 'ribacom_community_activities'
                 };
                 // Only request protected datasets after authentication. RLS remains the
