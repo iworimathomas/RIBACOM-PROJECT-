@@ -170,32 +170,7 @@
     return oldNav.call(this,v,p);
   };
 
-  const oldUpdate=RibacomApp.prototype.updateAuthHeaderUI;
-  RibacomApp.prototype.updateAuthHeaderUI=function(){
-    const result=oldUpdate?oldUpdate.call(this):undefined;
-    setTimeout(()=>{
-      const role=this.currentUser?.roleKey;
-      let b=document.getElementById('ribacomApprovalBtn');
-      if(!b){
-        const footer=document.querySelector('footer .max-w-7xl');
-        if(footer){
-          const blocks=footer.querySelectorAll(':scope > div');
-          const target=blocks[3];
-          if(target){
-            b=document.createElement('button');
-            b.id='ribacomApprovalBtn';
-            b.className='w-full mt-2 bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-3 rounded-lg transition text-xs flex items-center justify-center gap-2 border border-ribacom-gold/40';
-            b.onclick=()=>this.navigate(canApprove(this)?'approval-center':'executive-work');
-            target.appendChild(b);
-          }
-        }
-      }
-      if(b){
-        const show=canSubmit(this);
-        b.classList.toggle('hidden',!show);
-        b.innerHTML=canApprove(this)?'<i class="fa-solid fa-check-double text-ribacom-gold"></i> Presidential Approval Centre':'<i class="fa-solid fa-pen-to-square text-ribacom-gold"></i> Executive Work Centre';
-      }
-    },0);
-    return result;
-  };
+  // Approval tools are accessed from the authenticated executive/admin workspace.
+  // Do not inject a separate Presidential Approval button into the public footer.
+
 })();
