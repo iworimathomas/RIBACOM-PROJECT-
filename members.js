@@ -36,8 +36,12 @@
       const password=val('m_password'), confirm=val('m_passwordConfirm');
       const stateRaw=val('m_state'), lga=val('m_lga'), address=val('m_address'), photo=val('m_photo');
       const photoFile=document.getElementById('m_photo_file')?.files?.[0];
-      if(!fullName||!phone||!email||!address||password.length<8) return fail('Please complete all required fields.','warning');
-      if(password!==confirm) return fail('Passwords do not match.','warning');
+      if(!fullName||!phone||!email||!address) return fail('Please complete all required fields.','warning');
+      const {data:sessionData}=await this.supabaseClient.auth.getSession();
+      const activeUser=sessionData?.session?.user||null;
+      const submittingForExistingAccount=!!activeUser && String(activeUser.email||'').toLowerCase()===email;
+      if(!submittingForExistingAccount && password.length<8) return fail('Please create a password of at least 8 characters.','warning');
+      if(!submittingForExistingAccount && password!==confirm) return fail('Passwords do not match.','warning');
       if(!checked('m_constitutionConsent')||!checked('m_declaration')) return fail('Please accept the Constitution consent and declaration before submitting.','warning');
       if(photoFile){
         if(!photoFile.type.startsWith('image/')) return fail('Please select a valid image file.','warning');
@@ -73,18 +77,25 @@
         }
       }
 
-      this.toast('Creating your RIBACOM account…','info');
-      const redirectTo=window.location.origin+window.location.pathname;
-      const {data:authData,error:authError}=await this.supabaseClient.auth.signUp({
-        email,password,options:{emailRedirectTo:redirectTo,data:{full_name:fullName,phone,application_details:details}}
-      });
-      if(authError){
-        const msg=String(authError.message||'Account creation failed.');
-        if(/already registered|already exists|user already/i.test(msg)) return fail('This email already has a RIBACOM account. Please use Member Login instead, then submit/update your membership application.');
-        return fail(msg);
+      let authData=null, user=null;
+      if(submittingForExistingAccount){
+        authData={user:activeUser,session:sessionData.session};
+        user=activeUser;
+      }else{
+        this.toast('Creating your RIBACOM account…','info');
+        const redirectTo=window.location.origin+window.location.pathname;
+        const result=await this.supabaseClient.auth.signUp({
+          email,password,options:{emailRedirectTo:redirectTo,data:{full_name:fullName,phone,application_details:details}}
+        });
+        authData=result.data; const authError=result.error;
+        if(authError){
+          const msg=String(authError.message||'Account creation failed.');
+          if(/already registered|already exists|user already/i.test(msg)) return fail('This email already has a RIBACOM account. Please log in first, then open the membership form to submit your details.');
+          return fail(msg);
+        }
+        user=authData?.user;
       }
-      const user=authData?.user;
-      if(!user?.id) return fail('Account creation did not return a valid user.');
+      if(!user?.id) return fail('Account could not be confirmed. Please log in and try again.');
 
       // Public applicants are allowed to submit the application while the Auth account
       // is awaiting email verification. Do not require a profile/session at this point.
@@ -380,6 +391,8 @@
 
   // Public membership application form — separate from login.
   RibacomApp.prototype.renderMembershipApplicationView = function(){
+    const signedInEmail=String(this.currentUser?.email||'').toLowerCase();
+    const signedIn=!!this.currentUser?.id;
     return `
       <div class="max-w-5xl mx-auto space-y-5 animate-fadeIn">
         <div class="bg-ribacom-navy text-white rounded-3xl p-6 sm:p-8 border-b-4 border-ribacom-gold">
@@ -427,10 +440,7 @@
           <section><h3 class="font-extrabold text-ribacom-navy text-lg">5. Community Interests</h3><div class="grid sm:grid-cols-2 gap-3 mt-4 text-sm">
             <label><input id="m_welfareInterest" type="checkbox" class="mr-2">Welfare activities</label><label><input id="m_youthInterest" type="checkbox" class="mr-2">Youth activities</label><label><input id="m_culturalInterest" type="checkbox" class="mr-2">Cultural activities</label><label><input id="m_volunteer" type="checkbox" class="mr-2">Community volunteering</label>
           </div></section>
-          <section><h3 class="font-extrabold text-ribacom-navy text-lg">6. Secure Account</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
-            <div><label for="m_password" class="text-xs font-bold">Password *</label><div class="relative mt-1"><input id="m_password" type="password" minlength="8" autocomplete="new-password" required class="w-full border rounded-xl px-3 py-2.5 pr-16"><button type="button" onclick="togglePasswordVisibility('m_password', this)" aria-controls="m_password" aria-pressed="false" aria-label="Show password" class="absolute inset-y-0 right-2 px-2 text-xs font-bold text-ribacom-green hover:text-ribacom-navy">Show</button></div></div>
-            <div><label for="m_passwordConfirm" class="text-xs font-bold">Confirm Password *</label><div class="relative mt-1"><input id="m_passwordConfirm" type="password" minlength="8" autocomplete="new-password" required class="w-full border rounded-xl px-3 py-2.5 pr-16"><button type="button" onclick="togglePasswordVisibility('m_passwordConfirm', this)" aria-controls="m_passwordConfirm" aria-pressed="false" aria-label="Show password" class="absolute inset-y-0 right-2 px-2 text-xs font-bold text-ribacom-green hover:text-ribacom-navy">Show</button></div></div>
-          </div><p class="text-xs text-gray-500 mt-2">Use at least 8 characters and confirm that both password fields match. Email verification may be required before login.</p></section>
+          ${signedIn ? '<section class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><h3 class="font-extrabold text-emerald-800">Existing RIBACOM Account</h3><p class="text-sm text-emerald-800 mt-1">You are signed in. Your application will be linked to '+esc(signedInEmail)+'. You do not need to create another account or enter a password.</p></section>' : '<section><h3 class="font-extrabold text-ribacom-navy text-lg">6. Secure Account</h3><div class="grid sm:grid-cols-2 gap-4 mt-4"><div><label for="m_password" class="text-xs font-bold">Password *</label><div class="relative mt-1"><input id="m_password" type="password" minlength="8" autocomplete="new-password" required class="w-full border rounded-xl px-3 py-2.5 pr-16"><button type="button" onclick="togglePasswordVisibility(\'m_password\', this)" aria-controls="m_password" aria-pressed="false" aria-label="Show password" class="absolute inset-y-0 right-2 px-2 text-xs font-bold text-ribacom-green hover:text-ribacom-navy">Show</button></div></div><div><label for="m_passwordConfirm" class="text-xs font-bold">Confirm Password *</label><div class="relative mt-1"><input id="m_passwordConfirm" type="password" minlength="8" autocomplete="new-password" required class="w-full border rounded-xl px-3 py-2.5 pr-16"><button type="button" onclick="togglePasswordVisibility(\'m_passwordConfirm\', this)" aria-controls="m_passwordConfirm" aria-pressed="false" aria-label="Show password" class="absolute inset-y-0 right-2 px-2 text-xs font-bold text-ribacom-green hover:text-ribacom-navy">Show</button></div></div></div><p class="text-xs text-gray-500 mt-2">Use at least 8 characters and confirm that both password fields match. Email verification may be required before login.</p></section>'}
           <section class="border rounded-2xl p-4 bg-gray-50 space-y-3 text-xs"><label class="flex gap-2 items-start"><input id="m_constitutionConsent" type="checkbox" required class="mt-0.5"><span>I confirm that I have read and agree to abide by the RIBACOM Constitution.</span></label><label class="flex gap-2 items-start"><input id="m_declaration" type="checkbox" required class="mt-0.5"><span>I declare that the information provided is true and complete and consent to its use for legitimate RIBACOM membership administration.</span></label></section>
           <div class="flex flex-wrap gap-3 pt-2"><button type="submit" class="bg-ribacom-green text-white px-6 py-3 rounded-xl font-extrabold">Submit Membership Application</button><button type="button" onclick="app.openLoginModal()" class="bg-ribacom-navy text-white px-6 py-3 rounded-xl font-bold">Existing Member / Login</button><button type="button" onclick="app.navigate('home')" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold">Cancel</button></div>
         </form>
