@@ -57,7 +57,7 @@
       if(memberError) throw memberError;
       if(!memberResult?.id) throw new Error('Your member record is not linked to this login yet.');
       const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-      const path='member-id-photos/'+this.currentUser.id+'/'+Date.now()+'.'+ext;
+      const path='memberships/'+this.currentUser.id+'/'+Date.now()+'.'+ext;
       const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
       if(upError) throw upError;
       const photoUrl=this.supabaseClient.storage.from('avatars').getPublicUrl(up.path).data.publicUrl;
