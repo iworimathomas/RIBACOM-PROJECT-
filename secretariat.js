@@ -140,28 +140,7 @@
     return oldNav.call(this,v,p);
   };
 
-  const oldUpdate=RibacomApp.prototype.updateAuthHeaderUI;
-  RibacomApp.prototype.updateAuthHeaderUI=function(){
-    const result=oldUpdate?oldUpdate.call(this):undefined;
-    setTimeout(()=>{
-      if(!canUse(this)) return;
-      let b=document.getElementById('ribacomSecretariatBtn');
-      if(!b){
-        const footer=document.querySelector('footer .max-w-7xl');
-        if(footer){
-          const blocks=footer.querySelectorAll(':scope > div');
-          const target=blocks[3];
-          if(target){
-            b=document.createElement('button');
-            b.id='ribacomSecretariatBtn';
-            b.className='w-full mt-2 bg-ribacom-green hover:bg-emerald-700 text-white font-semibold py-2 px-3 rounded-lg transition text-xs flex items-center justify-center gap-2';
-            b.onclick=()=>this.navigate('secretariat');
-            b.innerHTML='<i class="fa-solid fa-folder-open text-ribacom-gold"></i> Secretariat Management';
-            target.appendChild(b);
-          }
-        }
-      }
-    },0);
-    return result;
-  };
+  // Secretariat tools are accessed after the authorised Super Admin/executive login.
+  // Do not inject a separate Secretariat button into the public footer.
+
 })();
