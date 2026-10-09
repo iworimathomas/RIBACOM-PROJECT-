@@ -89,6 +89,24 @@
     return `<div class="space-y-5 animate-fadeIn"><div class="flex items-center justify-between gap-3"><div><h2 class="text-2xl font-extrabold text-ribacom-navy">Digital ID Administration</h2><p class="text-xs text-gray-500">Issue, edit, renew, activate, suspend and revoke official RIBACOM Digital IDs.</p></div><button onclick="app.navigate('admin-dashboard')" class="px-4 py-2 rounded-xl bg-ribacom-navy text-white text-xs font-bold">Back</button></div><div class="bg-white rounded-3xl p-5 card-shadow"><h3 class="font-extrabold mb-3">Approved Members Awaiting ID</h3>${eligible.length?eligible.map(m=>`<div class="flex items-center justify-between gap-3 border rounded-xl p-3 mb-2"><div><b>${esc(m.fullName)}</b><div class="text-[11px] text-gray-500">${esc(m.membershipNo||'No membership number')}</div></div><button onclick="app.createDigitalId('${m.id}')" class="bg-ribacom-green text-white px-3 py-2 rounded-lg text-xs font-bold">Issue ID</button></div>`).join(''):'<p class="text-xs text-gray-500">No approved members are waiting for a Digital ID.</p>'}</div><div class="bg-white rounded-3xl p-5 card-shadow overflow-x-auto"><h3 class="font-extrabold mb-3">Issued Digital IDs</h3><table class="w-full text-left text-xs"><thead><tr class="bg-gray-50"><th class="p-3">Member</th><th class="p-3">ID Number</th><th class="p-3">Status</th><th class="p-3">Expiry</th><th class="p-3 text-right">Actions</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="p-6 text-center text-gray-500">No Digital IDs issued yet.</td></tr>'}</tbody></table></div></div>`;
   };
 
+  RibacomApp.prototype.uploadMemberDigitalPhoto = async function(input) {
+    const file=input?.files?.[0]; if(!file) return;
+    if(!file.type?.startsWith('image/')) { this.toast('Please choose an image file.','warning'); input.value=''; return; }
+    if(file.size>5*1024*1024) { this.toast('Photo must be 5 MB or smaller.','warning'); input.value=''; return; }
+    const user=this.currentUser||{}; const member=(this.db.members||[]).find(m=>m.id===user.memberId||m.user_id===user.id);
+    if(!member?.id) { this.toast('Your member record could not be found. Please contact the Secretariat.','error'); return; }
+    try {
+      const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+      const path='member-id-photos/'+user.id+'/'+Date.now()+'.'+ext;
+      const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
+      if(upError) throw upError;
+      const url=this.supabaseClient.storage.from('avatars').getPublicUrl(up.path).data.publicUrl;
+      const {error:updateError}=await this.supabaseClient.from('members').update({photo_url:url}).eq('id',member.id);
+      if(updateError) throw updateError;
+      await this.loadCloudData(); this.toast('Member photo saved. Your Digital ID will now display it.','success'); this.navigate('digital-id');
+    } catch(err) { console.error('[RIBACOM ID photo]',err); this.toast('Photo could not be saved: '+(err?.message||'Please try again.'),'error'); }
+    finally { input.value=''; }
+  };
   RibacomApp.prototype.renderDigitalIdView = function() {
     const currentMember=(this.db.members||[]).find(m => m.id===this.currentUser?.memberId || m.user_id===this.currentUser?.id);
     const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === (currentMember?.id || this.currentUser?.memberId));
@@ -146,6 +164,7 @@
           <button onclick="app.navigate('home')" class="px-4 py-2 rounded-xl bg-ribacom-navy text-white text-xs font-bold">Back</button>
         </div>
         ${card}
+        <div class="bg-white rounded-3xl p-5 card-shadow print:hidden"><h3 class="font-extrabold text-ribacom-navy">Add or change your ID photo</h3><p class="mt-1 mb-3 text-xs text-gray-500">Upload a clear face photo to display on your official Digital ID. Image files up to 5 MB.</p><input type="file" accept="image/*" onchange="app.uploadMemberDigitalPhoto(this)" class="block w-full text-sm"></div>
         <div class="bg-white rounded-3xl p-5 card-shadow print:hidden">
           <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-shield-halved text-ribacom-green"></i><h3 class="font-extrabold">Verify a RIBACOM Digital ID</h3></div>
           <p class="text-xs text-gray-500 mb-4">Enter the ID number printed on the card to check whether it is active and valid.</p>
