@@ -62,7 +62,7 @@
       if(upError) throw upError;
       const photoUrl=this.supabaseClient.storage.from('avatars').getPublicUrl(up.path).data.publicUrl;
       if(!photoUrl) throw new Error('Could not create a photo URL.');
-      const {error:updateError}=await this.supabaseClient.from('members').update({photo_url:photoUrl}).eq('id',memberResult.id);
+      const {error:updateError}=await this.supabaseClient.rpc('set_my_member_photo',{p_photo_url:photoUrl});
       if(updateError) throw updateError;
       await this.loadCloudData();
       this.toast('Profile photo saved. It will appear on your profile and Digital ID.','success');
