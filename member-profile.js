@@ -8,7 +8,13 @@
     // Load the signed-in member's own records directly, so this page does not depend on stale startup cache.
     if(this.supabaseClient && this.currentUser.id && !this.testMode){
       try {
-        const mr=await this.supabaseClient.from('members').select('*').eq('user_id',this.currentUser.id).maybeSingle();
+        let mr=await this.supabaseClient.from('members').select('*').eq('user_id',this.currentUser.id).maybeSingle();
+        // Some older RIBACOM records may be linked by the authenticated email rather than auth user id.
+        // Only search the signed-in user's own email; never attach another member's record.
+        if(!mr.data && this.currentUser.email){
+          const byEmail=await this.supabaseClient.from('members').select('*').ilike('email',this.currentUser.email).maybeSingle();
+          if(byEmail.data) mr=byEmail;
+        }
         if(mr.data){
           m={...mr.data,fullName:mr.data.full_name||'',membershipNo:mr.data.membership_number||'',stateOfOrigin:mr.data.state_of_origin||'',photoUrl:mr.data.photo_url||'',emergencyContactName:mr.data.emergency_contact_name||'',emergencyContactPhone:mr.data.emergency_contact_phone||''};
           this.currentUser.memberId=m.id;
@@ -17,7 +23,11 @@
           if(dr.data){d={...dr.data,memberId:dr.data.member_id,idCardNumber:dr.data.id_card_number,expiresAt:dr.data.expires_at};this.db.digitalIds=[...(this.db.digitalIds||[]).filter(x=>(x.memberId||x.member_id)!==m.id),d];}
           else d=null;
         }
-        const ar=await this.supabaseClient.from('membership_applications').select('*').eq('user_id',this.currentUser.id).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        let ar=await this.supabaseClient.from('membership_applications').select('*').eq('user_id',this.currentUser.id).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        if(!ar.data && this.currentUser.email){
+          const byEmail=await this.supabaseClient.from('membership_applications').select('*').ilike('email',this.currentUser.email).order('created_at',{ascending:false}).limit(1).maybeSingle();
+          if(byEmail.data) ar=byEmail;
+        }
         if(ar.data)a=ar.data;
       } catch(err){console.warn('Member profile refresh failed:',err);}
     }
