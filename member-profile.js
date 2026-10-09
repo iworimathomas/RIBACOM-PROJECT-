@@ -2,14 +2,30 @@
 (function(){
   RibacomApp.prototype.renderMemberProfile = async function(){
     if(!this.currentUser) return '<div class="p-8 text-center">Please sign in.</div>';
-    const m=(this.db.members||[]).find(x=>x.id===this.currentUser.memberId)||{};
-    const a=(this.db.membershipApplications||[]).filter(x=>x.user_id===this.currentUser.id).sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0))[0]||{};
-    const d=(this.db.digitalIds||[]).find(x=>x.memberId===m.id||x.member_id===m.id)||null;
+    let m=(this.db.members||[]).find(x=>x.id===this.currentUser.memberId)||{};
+    let a=(this.db.membershipApplications||[]).filter(x=>(x.user_id||x.userId)===this.currentUser.id).sort((x,y)=>new Date(y.created_at||0)-new Date(x.created_at||0))[0]||{};
+    let d=(this.db.digitalIds||[]).find(x=>(x.memberId||x.member_id)===m.id)||null;
+    // Load the signed-in member's own records directly, so this page does not depend on stale startup cache.
+    if(this.supabaseClient && this.currentUser.id && !this.testMode){
+      try {
+        const mr=await this.supabaseClient.from('members').select('*').eq('user_id',this.currentUser.id).maybeSingle();
+        if(mr.data){
+          m={...mr.data,fullName:mr.data.full_name||'',membershipNo:mr.data.membership_number||'',stateOfOrigin:mr.data.state_of_origin||'',photoUrl:mr.data.photo_url||'',emergencyContactName:mr.data.emergency_contact_name||'',emergencyContactPhone:mr.data.emergency_contact_phone||''};
+          this.currentUser.memberId=m.id;
+          this.db.members=[...(this.db.members||[]).filter(x=>x.id!==m.id),m];
+          const dr=await this.supabaseClient.from('digital_ids').select('*').eq('member_id',m.id).maybeSingle();
+          if(dr.data){d={...dr.data,memberId:dr.data.member_id,idCardNumber:dr.data.id_card_number,expiresAt:dr.data.expires_at};this.db.digitalIds=[...(this.db.digitalIds||[]).filter(x=>(x.memberId||x.member_id)!==m.id),d];}
+          else d=null;
+        }
+        const ar=await this.supabaseClient.from('membership_applications').select('*').eq('user_id',this.currentUser.id).order('created_at',{ascending:false}).limit(1).maybeSingle();
+        if(ar.data)a=ar.data;
+      } catch(err){console.warn('Member profile refresh failed:',err);}
+    }
     const e=v=>typeof esc==='function'?esc(v):String(v??'—');
     const f=(l,v)=>'<div class="bg-gray-50 rounded-xl p-3"><div class="text-[10px] uppercase font-bold text-gray-400">'+l+'</div><div class="text-sm font-semibold mt-1 break-words">'+e(v||'—')+'</div></div>';
     return '<div class="max-w-5xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6"><div class="text-[10px] uppercase font-black text-ribacom-gold">RIBACOM Member Centre</div><h2 class="text-2xl font-extrabold mt-1">My Profile & Digital Identity</h2><p class="text-xs text-white/70 mt-1">Your official membership information.</p></div>'+
     '<div class="bg-white rounded-3xl p-6 card-shadow"><div class="flex flex-wrap gap-4 items-center"><div class="w-24 h-24 rounded-2xl bg-gray-100 overflow-hidden border">'+(m.photoUrl?'<img src="'+e(m.photoUrl)+'" class="w-full h-full object-cover">':'<div class="w-full h-full flex items-center justify-center text-gray-400"><i class="fa-solid fa-user text-3xl"></i></div>')+'</div><div><h3 class="text-xl font-extrabold text-ribacom-navy">'+e(m.fullName||a.full_name)+'</h3><p class="text-sm text-gray-500">'+e(m.email||a.email)+'</p><p class="text-sm text-gray-500">'+e(m.phone||a.phone)+'</p></div></div></div>'+
-    '<div class="grid md:grid-cols-3 gap-3">'+f('Membership Number',m.membershipNo||m.membership_number)+f('Status',m.status)+f('Category',a.membership_category||m.category)+f('State of Origin',m.stateOfOrigin||m.state_of_origin)+f('LGA',m.lga)+f('Nationality',m.nationality)+'</div>'+
+    '<div class="grid md:grid-cols-3 gap-3">'+f('Membership Number',m.membershipNo||m.membership_number)+f('Membership Status',m.status||a.status)+f('Category',a.membership_category||m.category)+f('Email Address',m.email||a.email||this.currentUser.email)+f('Phone Number',m.phone||a.phone||this.currentUser.phone)+f('Date of Birth',m.date_of_birth||a.date_of_birth)+f('Gender',m.gender||a.gender)+f('State of Origin',m.stateOfOrigin||m.state_of_origin||a.state_of_origin)+f('LGA',m.lga||a.lga)+f('Nationality',m.nationality||a.nationality)+f('Residential Address',m.address||a.current_address)+f('Community Connection',m.rivers_bayelsa_connection||a.rivers_bayelsa_connection)+f('Emergency Contact Name',m.emergencyContactName||m.emergency_contact_name||a.emergency_contact_name)+f('Emergency Contact Phone',m.emergencyContactPhone||m.emergency_contact_phone||a.emergency_contact_phone)+'</div>'+
     '<div class="bg-white rounded-3xl p-6 card-shadow"><h3 class="font-extrabold text-ribacom-navy mb-3">Digital Identity</h3>'+(d?'<div class="grid md:grid-cols-3 gap-3">'+f('ID Card Number',d.idCardNumber||d.id_card_number)+f('Status',d.status)+f('Expiry',(d.expiresAt||d.expires_at||'').slice(0,10))+'</div><div class="mt-4"><button onclick="app.navigate(\'digital-id\')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-bold">Open Digital ID</button></div>':'<p class="text-sm text-gray-500">Digital ID will appear after membership approval.</p>')+'</div>'+
     '<div class="bg-white rounded-3xl p-6 card-shadow"><h3 class="font-extrabold text-ribacom-navy mb-3">Edit My Contact Details</h3><form onsubmit="event.preventDefault();app.saveMemberProfileFromView()" class="grid md:grid-cols-2 gap-3">'+
     '<label class="text-xs font-bold text-gray-600">Full Name<input id="mp_full_name" value="'+e(m.fullName||m.full_name||a.full_name)+'" class="mt-1 w-full border rounded-xl p-3 text-sm"></label>'+
