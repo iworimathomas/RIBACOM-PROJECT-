@@ -5,6 +5,13 @@
     const raw = atob((value + pad).replace(/-/g, '+').replace(/_/g, '/'));
     return Uint8Array.from(raw, c => c.charCodeAt(0));
   };
+  const originalRenderNotifications = RibacomApp.prototype.renderNotifications;
+  RibacomApp.prototype.renderNotifications = async function () {
+    const html = await originalRenderNotifications.call(this);
+    if (!this.currentUser || !html.includes('Notifications')) return html;
+    const panel = '<div class="bg-white rounded-2xl border p-4"><h3 class="font-bold text-ribacom-navy">Phone alerts</h3><p class="text-sm text-gray-600 mt-1">Choose whether this device can receive RIBACOM alerts.</p><div class="flex flex-wrap gap-2 mt-3"><button onclick="app.enablePhoneNotifications()" class="bg-ribacom-green text-white rounded-xl px-4 py-2 text-xs font-bold">Enable phone alerts</button><button onclick="app.disablePhoneNotifications()" class="border rounded-xl px-4 py-2 text-xs font-bold">Disable on this device</button></div></div>';
+    return html.replace('</div><div class="space-y-3">', '</div>' + panel + '<div class="space-y-3">');
+  };
   RibacomApp.prototype.enablePhoneNotifications = async function () {
     const client = this.supabaseClient;
     const user = this.currentUser;
