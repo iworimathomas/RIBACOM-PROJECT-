@@ -105,6 +105,27 @@
     return `<div class="space-y-6 animate-fadeIn"><div class="bg-ribacom-navy text-white rounded-3xl p-6"><div class="flex flex-wrap justify-between gap-4"><div><span class="text-ribacom-gold text-xs font-bold uppercase">RIBACOM Administration</span><h2 class="text-2xl font-extrabold mt-1">Control Centre</h2><p class="text-xs text-gray-300 mt-1">Manage the live Supabase records used by the public application.</p></div><div class="flex flex-wrap gap-2"><button onclick="app.navigate('admin-digital-ids')" class="bg-ribacom-gold text-ribacom-navy px-4 py-2 rounded-xl text-xs font-extrabold">Digital IDs</button><button onclick="app.openMembershipApplications()" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-file-circle-check mr-1"></i> Membership Applications</button><button onclick="app.openExecutiveAccounts()" class="bg-white text-ribacom-navy px-4 py-2 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-user-shield mr-1"></i> Executive Account Management</button></div></div></div><div class="grid grid-cols-2 md:grid-cols-4 gap-3">${[['Members',counts.members],['Digital IDs',counts.ids],['Welfare',counts.welfare],['Leadership',counts.leaders]].map(x=>`<div class="bg-white rounded-2xl p-4 card-shadow"><div class="text-[10px] text-gray-500 uppercase font-bold">${x[0]}</div><div class="text-2xl font-extrabold text-ribacom-navy">${x[1]}</div></div>`).join('')}</div><div class="bg-white rounded-3xl p-5 card-shadow"><h3 class="font-extrabold text-ribacom-navy mb-3">Member Applications</h3><div class="overflow-x-auto"><table class="w-full text-left text-xs"><thead><tr class="bg-gray-50"><th class="p-2">Name</th><th class="p-2">Category</th><th class="p-2">Status</th><th class="p-2">Actions</th></tr></thead><tbody>${(this.db.members||[]).map(m=>`<tr class="border-b"><td class="p-2 font-bold">${esc(m.fullName)}</td><td class="p-2">${esc(m.category)}</td><td class="p-2">${esc(m.status)}</td><td class="p-2 whitespace-nowrap">${m.status==='pending'?`<button onclick="app.approveMember('${m.id}')" class="text-emerald-600 font-bold mr-2">Approve</button><button onclick="app.rejectMember('${m.id}')" class="text-amber-600 font-bold mr-2">Reject</button>`:''}${m.status==='approved'?`<button onclick="app.suspendMember('${m.id}')" class="text-amber-600 font-bold mr-2">Suspend</button>`:''}<button onclick="app.openMemberEditor('${m.id}')" class="text-blue-600 font-bold mr-2">Edit</button><button onclick="app.deleteMember('${m.id}')" class="text-red-600 font-bold">Delete</button></td></tr>`).join('')||'<tr><td colspan="4" class="p-4 text-center">No members.</td></tr>'}</tbody></table></div></div>${section('Executive Committee','leadership',this.db.leadership||[])}${section('Special Advisers','advisers',this.db.advisers||[])}${section('Announcements','announcements',this.db.announcements||[])}${section('Events','events',this.db.events||[])}${section('Publications','publications',this.db.publications||[])}${section('Youth Content','youth_content',this.db.youth?.id?[this.db.youth]:this.db.youth? [this.db.youth]:[])}${section('Payment Settings','payment_settings',this.db.paymentSettings||[])}${this.renderWelfareFinancialSettings()}</div>`;
   };
 
+  // Delete action used by the Control Centre's Registered Members table.
+  // Keep it separate from generic content deletion and restrict it to the President.
+  RibacomApp.prototype.deleteMember = async function(id) {
+    if(String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin' || !isAdmin(this))
+      return this.toast('President / Super Admin access is required to delete a member.','error');
+    if(!this.supabaseClient) return this.toast('Supabase connection is unavailable.','error');
+    const member=(this.db.members||[]).find(m=>String(m.id)===String(id));
+    if(!member) return this.toast('Member record not found. Refresh the dashboard and try again.','error');
+    const label=member.fullName||member.full_name||member.email||'this member';
+    if(!confirm('Permanently delete '+label+'?\\n\\nLinked Digital ID, welfare, attendance and election voter records may also be deleted by database rules. Financial transactions are retained but may become unlinked. This cannot be undone.')) return;
+    if(prompt('Type DELETE to confirm permanent deletion:','')!=='DELETE')
+      return this.toast('Deletion cancelled. Confirmation did not match.','warning');
+    const {error}=await this.supabaseClient.from('members').delete().eq('id',id);
+    if(error) {
+      console.error('[RIBACOM deleteMember]',error);
+      return this.toast('Member was not deleted: '+error.message,'error');
+    }
+    this.toast('Member deleted successfully.','success');
+    await this.adminRefresh('admin-dashboard');
+  };
+
   RibacomApp.prototype.openMemberEditor = function(id) {
     if(!isAdmin(this)) return;
     const m=(this.db.members||[]).find(x=>x.id===id); if(!m)return;
