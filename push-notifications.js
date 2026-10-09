@@ -9,7 +9,7 @@
   RibacomApp.prototype.renderNotifications = async function () {
     const html = await originalRenderNotifications.call(this);
     if (!this.currentUser || !html.includes('Notifications')) return html;
-    const panel = '<div class="bg-white rounded-2xl border p-4"><h3 class="font-bold text-ribacom-navy">Phone alerts</h3><p class="text-sm text-gray-600 mt-1">Choose whether this device can receive RIBACOM alerts.</p><div class="flex flex-wrap gap-2 mt-3"><button onclick="app.enablePhoneNotifications()" class="bg-ribacom-green text-white rounded-xl px-4 py-2 text-xs font-bold">Enable phone alerts</button><button onclick="app.disablePhoneNotifications()" class="border rounded-xl px-4 py-2 text-xs font-bold">Disable on this device</button></div></div>';
+    const panel = '<div class="bg-white rounded-2xl border p-4"><h3 class="font-bold text-ribacom-navy">Phone alerts</h3><p class="text-sm text-gray-600 mt-1">Choose whether this device can receive RIBACOM alerts.</p><div class="flex flex-wrap gap-2 mt-3"><button onclick="app.enablePhoneNotifications()" class="bg-ribacom-green text-white rounded-xl px-4 py-2 text-xs font-bold">Enable phone alerts</button><button onclick="app.disablePhoneNotifications()" class="border rounded-xl px-4 py-2 text-xs font-bold">Disable on this device</button><button onclick="app.testPhoneNotification()" class="border border-ribacom-green text-ribacom-green rounded-xl px-4 py-2 text-xs font-bold">Send test alert</button></div></div>';
     return html.replace('</div><div class="space-y-3">', '</div>' + panel + '<div class="space-y-3">');
   };
   RibacomApp.prototype.enablePhoneNotifications = async function () {
@@ -38,6 +38,17 @@
     } catch (err) {
       console.error('RIBACOM phone notifications:', err);
       this.toast('Could not register this device: ' + (err.message || 'please try again'), 'error');
+    }
+  };
+  RibacomApp.prototype.testPhoneNotification = async function () {
+    if (!this.currentUser || !this.supabaseClient) return this.toast('Please sign in first.', 'warning');
+    try {
+      const { data, error } = await this.supabaseClient.functions.invoke('send-member-push-test', { body: { action: 'test-self' } });
+      if (error) throw error;
+      if (data && data.sent > 0) this.toast('Test alert sent to ' + data.sent + ' device(s). Check your phone notifications.', 'success');
+      else this.toast((data && data.message) || 'No test alert was delivered.', 'warning');
+    } catch (err) {
+      this.toast('Test alert failed: ' + (err.message || 'check push setup'), 'error');
     }
   };
   RibacomApp.prototype.disablePhoneNotifications = async function () {
