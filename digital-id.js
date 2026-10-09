@@ -97,7 +97,7 @@
     if(!member?.id) { this.toast('Your member record could not be found. Please contact the Secretariat.','error'); return; }
     try {
       const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-      const path='member-id-photos/'+user.id+'/'+Date.now()+'.'+ext;
+      const path='memberships/'+user.id+'/'+Date.now()+'.'+ext;
       const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
       if(upError) throw upError;
       const url=this.supabaseClient.storage.from('avatars').getPublicUrl(up.path).data.publicUrl;
