@@ -101,7 +101,7 @@
       const {data:up,error:upError}=await this.supabaseClient.storage.from('avatars').upload(path,file,{contentType:file.type,upsert:true,cacheControl:'3600'});
       if(upError) throw upError;
       const url=this.supabaseClient.storage.from('avatars').getPublicUrl(up.path).data.publicUrl;
-      const {error:updateError}=await this.supabaseClient.from('members').update({photo_url:url}).eq('id',member.id);
+      const {error:updateError}=await this.supabaseClient.rpc('set_my_member_photo',{p_photo_url:url});
       if(updateError) throw updateError;
       await this.loadCloudData(); this.toast('Member photo saved. Your Digital ID will now display it.','success'); this.navigate('digital-id');
     } catch(err) { console.error('[RIBACOM ID photo]',err); this.toast('Photo could not be saved: '+(err?.message||'Please try again.'),'error'); }
