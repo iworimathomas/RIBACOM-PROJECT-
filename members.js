@@ -288,18 +288,35 @@
   };
   RibacomApp.prototype.renderMembershipReviewD7 = async function(){
     const role=String(this.currentUser?.roleKey||'').toLowerCase();
-    if(role!=='super_admin'){
-      return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">President / Super Admin access required for membership approval.</div>';
-    }
+    if(role!=='super_admin') return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">President / Super Admin access required for membership decisions.</div>';
     if(!this.supabaseClient) return '<div class="bg-white rounded-3xl border p-8 text-center">Supabase connection unavailable.</div>';
-    const {data:apps,error}=await this.supabaseClient.from('membership_applications').select('*').in('status',['pending','under_review']).order('created_at',{ascending:false});
-    if(error) return '<div class="bg-white rounded-3xl border p-8 text-red-600">'+esc(error.message)+'</div>';
+    const {data:apps,error}=await this.supabaseClient.from('membership_applications').select('*').order('created_at',{ascending:false});
+    if(error) return '<div class="bg-white rounded-3xl border p-8 text-red-600">Could not load applications: '+esc(error.message)+'</div>';
     const rows=apps||[];
-    const cards=rows.length?rows.map(a=>{
-      const safe=JSON.stringify(a).replace(/"/g,'&quot;');
-      return '<div class="bg-white rounded-2xl border p-5"><div class="flex flex-wrap justify-between gap-3"><div><span class="text-[10px] font-black uppercase text-ribacom-green">Membership Application</span><h3 class="font-extrabold text-ribacom-navy mt-1">'+esc(a.full_name||'Applicant')+'</h3></div><span class="px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold">'+esc(displayStatus(a.status))+'</span></div><div class="grid sm:grid-cols-2 gap-3 mt-4 text-xs"><div><span class="text-gray-400">Email</span><p class="font-semibold">'+esc(a.email||'—')+'</p></div><div><span class="text-gray-400">Phone</span><p class="font-semibold">'+esc(a.phone||'—')+'</p></div><div><span class="text-gray-400">Category</span><p class="font-semibold">'+esc(displayCategory(a.membership_category))+'</p></div><div><span class="text-gray-400">Submitted</span><p class="font-semibold">'+esc(String(a.created_at||'').slice(0,10))+'</p></div></div><div class="mt-4 flex flex-wrap gap-2"><button onclick="app.reviewMembershipFromAdmin('+safe+')" class="bg-ribacom-green text-white px-4 py-2 rounded-xl text-xs font-extrabold">Review / Approve</button><button onclick="app.rejectMembershipApplication('+JSON.stringify(a.id).replace(/"/g,'&quot;')+')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-extrabold">Reject</button></div></div>';
-    }).join(''):'<div class="bg-white rounded-2xl border p-8 text-center text-sm text-gray-500">No pending membership applications.</div>';
-    return '<div class="max-w-6xl mx-auto space-y-5"><div class="bg-ribacom-navy text-white rounded-3xl p-6 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase text-ribacom-gold">Membership Administration</span><h2 class="text-2xl font-extrabold mt-1">Application Review</h2><p class="text-xs text-gray-300 mt-1">'+rows.length+' application(s) awaiting action.</p></div><div class="space-y-3">'+cards+'</div></div>';
+    const statusOf=a=>String(a.status||'pending').toLowerCase();
+    const pending=rows.filter(a=>['pending','under_review'].includes(statusOf(a)));
+    const approved=rows.filter(a=>statusOf(a)==='approved');
+    const rejected=rows.filter(a=>statusOf(a)==='rejected');
+    const date=v=>v?new Date(v).toLocaleDateString(): '—';
+    const renderCard=a=>{
+      const status=statusOf(a),isPending=['pending','under_review'].includes(status);
+      const badge=status==='approved'?'bg-emerald-100 text-emerald-800':status==='rejected'?'bg-red-100 text-red-800':status==='under_review'?'bg-amber-100 text-amber-800':'bg-blue-100 text-blue-800';
+      const reason=a.admin_notes||a.rejection_reason||'';
+      const safeId=JSON.stringify(a.id);
+      return '<article class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">'+
+        '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><span class="text-[10px] font-black uppercase tracking-wider text-ribacom-green">Membership Application</span><h3 class="text-lg font-extrabold text-ribacom-navy mt-1 break-words">'+esc(a.full_name||'Applicant')+'</h3><p class="text-xs text-gray-500 mt-1">'+esc(displayCategory(a.membership_category))+' · Submitted '+esc(date(a.created_at))+'</p></div><span class="shrink-0 px-3 py-1 rounded-full text-xs font-extrabold '+badge+'">'+esc(displayStatus(status))+'</span></div>'+
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-sm"><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">Email</span><p class="font-semibold break-all">'+esc(a.email||'—')+'</p></div><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">Phone / WhatsApp</span><p class="font-semibold">'+esc(a.phone||'—')+'</p></div><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">State / LGA</span><p class="font-semibold">'+esc(a.state_of_origin||'—')+' / '+esc(a.lga||'—')+'</p></div><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">Reviewed</span><p class="font-semibold">'+esc(date(a.reviewed_at))+'</p></div></div>'+
+        (reason?'<div class="mt-3 rounded-xl border border-red-100 bg-red-50 p-3 text-sm"><p class="text-xs font-extrabold text-red-800">Rejection reason / administrative note</p><p class="text-red-900 mt-1">'+esc(reason)+'</p></div>':'')+
+        (isPending?'<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4"><button onclick="app.reviewMembershipFromAdmin('+JSON.stringify(a).replace(/"/g,'&quot;')+')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl text-sm font-extrabold"><i class="fa-solid fa-check-circle mr-2"></i>Approve Membership</button><button onclick="app.rejectMembershipApplication('+safeId+')" class="bg-white border border-red-300 text-red-700 hover:bg-red-50 px-4 py-3 rounded-xl text-sm font-extrabold"><i class="fa-solid fa-circle-xmark mr-2"></i>Reject Application</button></div>':'<div class="mt-4 pt-3 border-t text-xs text-gray-500">Decision recorded'+(a.reviewed_at?' on '+esc(date(a.reviewed_at)):'')+'.</div>')+
+        '</article>';
+    };
+    const section=(title,subtitle,list,accent,empty)=>'<section class="space-y-3"><div class="flex items-end justify-between gap-3"><div><h3 class="text-lg font-extrabold text-ribacom-navy">'+title+'</h3><p class="text-xs text-gray-500 mt-1">'+subtitle+'</p></div><span class="rounded-full px-3 py-1 text-xs font-extrabold '+accent+'">'+list.length+'</span></div>'+(list.length?'<div class="space-y-3">'+list.map(renderCard).join('')+'</div>':'<div class="bg-white rounded-2xl border border-dashed p-5 text-center text-sm text-gray-500">'+empty+'</div>')+'</section>';
+    return '<div class="max-w-6xl mx-auto space-y-6 pb-6">'+
+      '<div class="bg-ribacom-navy text-white rounded-3xl p-5 sm:p-7 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase tracking-widest text-ribacom-gold">RIBACOM · President / Super Admin</span><h2 class="text-2xl sm:text-3xl font-extrabold mt-2">Membership Decisions</h2><p class="text-sm text-white/75 mt-2 max-w-2xl">Review applications, approve eligible members in one press, or reject with a recorded reason. Only the President / Super Admin can make the final decision.</p><div class="grid grid-cols-3 gap-2 sm:gap-3 mt-5"><div class="rounded-2xl bg-white/10 p-3"><p class="text-[10px] uppercase tracking-wide text-white/70">Awaiting decision</p><p class="text-2xl font-extrabold text-ribacom-gold">'+pending.length+'</p></div><div class="rounded-2xl bg-white/10 p-3"><p class="text-[10px] uppercase tracking-wide text-white/70">Approved</p><p class="text-2xl font-extrabold text-emerald-300">'+approved.length+'</p></div><div class="rounded-2xl bg-white/10 p-3"><p class="text-[10px] uppercase tracking-wide text-white/70">Rejected</p><p class="text-2xl font-extrabold text-red-300">'+rejected.length+'</p></div></div></div>'+
+      section('Awaiting decision','Applications that still need your attention.',pending,'bg-amber-100 text-amber-800','No applications are awaiting a decision.')+
+      section('Approved members','Applications with an approval decision.',approved,'bg-emerald-100 text-emerald-800','No approved applications found.')+
+      section('Rejected applications','Rejected applications and their recorded reasons.',rejected,'bg-red-100 text-red-800','No rejected applications found.')+
+      '<p class="text-center text-[11px] text-gray-400">Total applications: '+rows.length+' · Records are loaded from the RIBACOM database.</p></div>';
   };
 
   RibacomApp.prototype.reviewMembershipFromAdmin = function(application){
