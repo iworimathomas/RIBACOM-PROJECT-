@@ -56,4 +56,51 @@
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(err => console.warn('RIBACOM service worker:', err)));
   }
+
+  // Keep the signed-in member aware of new in-app notifications while using RIBACOM.
+  // The database remains the source of truth; this polling does not mark anything read.
+  let watchedUserId = null;
+  let knownNotificationIds = new Set();
+  let notificationPollBusy = false;
+  async function pollMemberNotifications() {
+    const instance = window.app;
+    if (!instance || !instance.currentUser || !instance.currentUser.id || !instance.supabaseClient) {
+      watchedUserId = null;
+      knownNotificationIds = new Set();
+      return;
+    }
+    if (notificationPollBusy) return;
+    notificationPollBusy = true;
+    try {
+      const userId = instance.currentUser.id;
+      const { data, error } = await instance.supabaseClient
+        .from('notifications').select('id,title,message,type,created_at')
+        .eq('user_id', userId).order('created_at', { ascending: false }).limit(20);
+      if (error || !Array.isArray(data)) return;
+      if (watchedUserId !== userId) {
+        watchedUserId = userId;
+        knownNotificationIds = new Set(data.map(row => row.id));
+        return;
+      }
+      const fresh = data.filter(row => row.id && !knownNotificationIds.has(row.id));
+      data.forEach(row => knownNotificationIds.add(row.id));
+      fresh.reverse().forEach(row => {
+        if (typeof instance.toast === 'function') {
+          instance.toast((row.title || 'RIBACOM notification') + (row.message ? ': ' + row.message : ''), 'info');
+        }
+        if ('Notification' in window && Notification.permission === 'granted' && document.visibilityState === 'hidden') {
+          try { new Notification(row.title || 'RIBACOM Update', { body: row.message || 'There is a new RIBACOM notification.', icon: '/ribacom-official-logo.svg' }); } catch (_) {}
+        }
+      });
+      if (knownNotificationIds.size > 100) knownNotificationIds = new Set(data.map(row => row.id));
+    } catch (err) {
+      console.warn('RIBACOM notification refresh:', err);
+    } finally {
+      notificationPollBusy = false;
+    }
+  }
+  window.setInterval(pollMemberNotifications, 45000);
+  window.addEventListener('focus', pollMemberNotifications);
+  window.addEventListener('load', () => window.setTimeout(pollMemberNotifications, 5000));
+
 })();
