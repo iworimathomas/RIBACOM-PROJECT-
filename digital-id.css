@@ -7,3 +7,50 @@
 .ribacom-id-status{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase}
 .ribacom-id-status.active{background:#dcfce7;color:#166534}.ribacom-id-status.suspended{background:#fef3c7;color:#92400e}.ribacom-id-status.revoked,.ribacom-id-status.expired{background:#fee2e2;color:#991b1b}
 @media print{body *{visibility:hidden!important}.ribacom-id-print,.ribacom-id-print *{visibility:visible!important}.ribacom-id-print{position:absolute;left:0;top:0;width:100%}.no-print{display:none!important}}
+
+/* Premium RIBACOM Digital ID front/back design */
+.ribacom-id-stack{width:100%;max-width:1050px;margin-inline:auto;color:#0a2540}
+.ribacom-id-card{position:relative;width:100%;max-width:none;min-height:290px;border-radius:18px;overflow:hidden;border:1px solid #d4dce5;box-shadow:0 12px 30px rgba(10,37,64,.15);background:linear-gradient(115deg,#fff 0%,#f7fafc 65%,#eaf1f5 100%);}
+.ribacom-id-topline{height:7px;background:linear-gradient(90deg,#061b40 0%,#0b6b38 55%,#d5a72e 100%)}
+.ribacom-id-front-head{display:flex;align-items:center;gap:18px;padding:15px 22px 10px;background:linear-gradient(100deg,rgba(10,37,64,.04),transparent)}
+.ribacom-id-crest{width:108px;height:108px;object-fit:contain;flex:0 0 auto;background:#fff;border-radius:50%;border:2px solid #d5a72e;padding:3px}
+.ribacom-id-brand{min-width:0;flex:1;text-align:center}
+.ribacom-id-org{font-size:clamp(13px,2.1vw,22px);font-weight:900;line-height:1.12;letter-spacing:.02em;color:#0a2540}
+.ribacom-id-sub{font-size:clamp(10px,1.6vw,16px);font-weight:900;color:#08713d;margin-top:3px}
+.ribacom-id-acronym{font-size:clamp(23px,3.4vw,35px);font-weight:950;line-height:1.05;margin-top:4px;letter-spacing:.035em}
+.ribacom-id-motto{display:inline-block;background:#0a2540;color:#fff;border-bottom:2px solid #d5a72e;border-radius:20px;padding:4px 15px;margin-top:6px;font-size:10px;font-weight:900;letter-spacing:.07em}
+.ribacom-id-front-body{display:grid;grid-template-columns:minmax(0,1fr) 118px 110px;gap:14px;align-items:start;padding:8px 22px 16px}
+.ribacom-id-details{display:grid;gap:7px;min-width:0}
+.ribacom-id-field{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;align-items:start;font-size:12px;line-height:1.25}
+.ribacom-id-field>span{font-size:9px;font-weight:900;letter-spacing:.035em;color:#243b5a;padding-top:2px}
+.ribacom-id-field>strong{font-size:12px;overflow-wrap:anywhere;color:#111827}
+.ribacom-id-field .ribacom-id-number{color:#08713d;font-size:13px}
+.ribacom-id-category{display:inline-block!important;width:max-content;max-width:100%;background:#0a2540;color:#fff!important;border-radius:16px;padding:4px 10px;font-size:10px!important}
+.ribacom-id-photo-wrap{display:flex;flex-direction:column;align-items:center;gap:7px}
+.ribacom-id-photo{width:112px;height:132px;border-radius:9px;object-fit:cover;border:2px solid #d5a72e;background:#e9eef2}
+.ribacom-id-no-photo{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#718096;font-size:10px;font-weight:800}
+.ribacom-id-no-photo i{font-size:35px}
+.ribacom-id-active{font-size:9px;font-weight:900;color:#08713d;border:1px solid #9ed4b2;background:#e8f7ed;padding:3px 9px;border-radius:20px}
+.ribacom-id-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:9px;font-weight:900;text-align:center;color:#0a2540}
+.ribacom-id-qr{width:104px;height:104px;background:#fff;border:1px solid #d5dce5;padding:4px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.ribacom-id-qr img,.ribacom-id-qr canvas{max-width:100%;height:auto!important}
+.ribacom-id-ribbon{display:flex;align-items:center;justify-content:center;gap:12px;padding:7px;background:#0a2540;color:#fff;border-top:3px solid #d5a72e;font-size:11px;font-weight:900;letter-spacing:.09em}
+.ribacom-id-ribbon b{color:#d5a72e}
+.ribacom-id-foot{display:flex;justify-content:space-between;gap:10px;padding:7px 16px;background:#08713d;color:#fff;font-size:9px;font-weight:800;letter-spacing:.035em}
+.ribacom-id-back{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:265px}
+.ribacom-id-back-left{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 15px;background:linear-gradient(145deg,#061b40,#0a3861 65%,#08713d);color:#fff;border-right:4px solid #d5a72e}
+.ribacom-id-back-crest{width:130px;height:130px;object-fit:contain;border-radius:50%;background:#fff;padding:3px;border:2px solid #d5a72e}
+.ribacom-id-back-left strong{font-size:25px;letter-spacing:.08em;margin-top:8px}
+.ribacom-id-back-left span{font-size:10px;font-weight:800;line-height:1.45;margin-top:2px}
+.ribacom-id-back-left em{font-style:normal;font-size:9px;font-weight:900;color:#f6d56c;margin-top:8px}
+.ribacom-id-back-main{padding:20px 22px 12px;display:flex;flex-direction:column;min-width:0}
+.ribacom-id-back-title{background:#0a2540;color:#fff;border-radius:18px;text-align:center;padding:8px 12px;font-size:13px;font-weight:900;letter-spacing:.04em;border-bottom:2px solid #d5a72e}
+.ribacom-id-back-main p{font-size:12px;line-height:1.55;color:#202938;margin:12px 0 8px}
+.ribacom-id-back-main ol{font-size:10px;line-height:1.65;padding-left:18px;margin:0 0 12px;color:#263449}
+.ribacom-id-contact-title{font-size:10px;font-weight:900;letter-spacing:.06em;color:#0a2540;border-bottom:1px solid #d5a72e;padding-bottom:5px;margin-bottom:7px}
+.ribacom-id-contact{display:grid;gap:6px;font-size:11px;font-weight:800;color:#17365d;overflow-wrap:anywhere}
+.ribacom-id-contact span{display:flex;gap:8px;align-items:center}
+.ribacom-id-contact i{color:#08713d;width:14px;text-align:center}
+.ribacom-id-back-bottom{display:flex;justify-content:space-between;gap:10px;border-top:2px solid #08713d;margin-top:auto;padding-top:9px;font-size:9px;font-weight:900;color:#0a2540}
+@media(max-width:640px){.ribacom-id-card{border-radius:14px}.ribacom-id-front-head{gap:10px;padding:12px 12px 8px}.ribacom-id-crest{width:68px;height:68px}.ribacom-id-front-body{grid-template-columns:minmax(0,1fr) 82px;gap:10px;padding:7px 12px 12px}.ribacom-id-details{grid-column:1;grid-row:1 / span 2;gap:8px}.ribacom-id-field{grid-template-columns:1fr;gap:2px}.ribacom-id-field>span{font-size:8px}.ribacom-id-field>strong{font-size:11px}.ribacom-id-photo-wrap{grid-column:2;grid-row:1}.ribacom-id-photo{width:80px;height:95px}.ribacom-id-qr-wrap{grid-column:2;grid-row:2}.ribacom-id-qr{width:76px;height:76px}.ribacom-id-ribbon{font-size:9px;padding:6px;gap:8px}.ribacom-id-foot{font-size:8px;padding:7px 10px}.ribacom-id-back{grid-template-columns:1fr}.ribacom-id-back-left{border-right:0;border-bottom:4px solid #d5a72e;padding:14px}.ribacom-id-back-crest{width:82px;height:82px}.ribacom-id-back-left strong{font-size:21px}.ribacom-id-back-main{padding:14px}.ribacom-id-back-main p{font-size:11px}.ribacom-id-contact{font-size:10px}}
+@media print{@page{size:A4 portrait;margin:10mm}body *{visibility:hidden!important}.ribacom-id-stack,.ribacom-id-stack *{visibility:visible!important}.ribacom-id-stack{position:absolute;left:0;top:0;width:100%;max-width:none}.ribacom-id-card{break-inside:avoid;box-shadow:none;margin:0 0 8mm;border:1px solid #aab5c1;print-color-adjust:exact;-webkit-print-color-adjust:exact}.ribacom-id-front{min-height:75mm}.ribacom-id-back{min-height:65mm}.ribacom-id-stack .print\\:hidden{display:none!important}}
