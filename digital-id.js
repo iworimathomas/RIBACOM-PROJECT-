@@ -93,31 +93,63 @@
     const currentMember=(this.db.members||[]).find(m => m.id===this.currentUser?.memberId || m.user_id===this.currentUser?.id);
     const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === (currentMember?.id || this.currentUser?.memberId));
     const member=mine ? (this.db.members||[]).find(m => m.id === (mine.memberId || mine.member_id)) : currentMember;
-    const mineCard = mine ? `
-      <div class="bg-ribacom-navy text-white rounded-3xl p-5 card-shadow">
-        <div class="flex items-start justify-between gap-4"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-16 h-16 rounded-full bg-white p-1 object-cover shrink-0">
-          <div><div class="text-xs uppercase tracking-wider text-ribacom-gold font-bold">RIBACOM Digital Identity</div>
-          <h3 class="text-xl font-extrabold mt-1">${esc(member?.fullName || member?.full_name || this.currentUser?.fullName || 'Member')}</h3>
-          <div class="text-sm mt-2">ID: <strong>${esc(mine.idCardNumber || mine.id_card_number)}</strong></div>
-          <div class="text-xs mt-1 opacity-80">Status: ${esc(mine.status || 'active')} • Expires: ${esc((mine.expires_at || mine.expiresAt || '').slice(0,10) || '—')}</div></div>
-          <div id="ribacomDigitalIdQr" class="bg-white rounded-xl p-2 shrink-0"></div>
-        </div>
-      </div>` : '';
+    const idNumber=mine ? (mine.idCardNumber || mine.id_card_number || 'Pending') : '';
+    const expiry=mine ? ((mine.expires_at || mine.expiresAt || '').slice(0,10) || '—') : '—';
+    const status=String(mine?.status || 'active').toUpperCase();
+    const photo=member?.photo_url || member?.profile_photo_url || member?.photo || member?.avatar_url || '';
+    const memberName=member?.fullName || member?.full_name || this.currentUser?.fullName || this.currentUser?.full_name || 'RIBACOM Member';
+    const category=member?.category || member?.membership_category || member?.member_type || 'Regular Member';
+    const since=(member?.approved_at || member?.created_at || mine?.issued_at || mine?.issuedAt || '').slice(0,10) || '—';
+    const state=member?.state_of_origin || member?.state || '—';
+    const lga=member?.lga || member?.local_government_area || '—';
+    const card=mine ? `
+      <div class="ribacom-id-stack space-y-5">
+        <article class="ribacom-id-card ribacom-id-front" aria-label="Front of RIBACOM Digital ID">
+          <div class="ribacom-id-topline"></div>
+          <div class="ribacom-id-front-head">
+            <img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="ribacom-id-crest">
+            <div class="ribacom-id-brand"><div class="ribacom-id-org">RIVERS BAYELSA COMMUNITY</div><div class="ribacom-id-sub">IN DIASPORA — THE GAMBIA</div><div class="ribacom-id-acronym">RIBACOM</div><div class="ribacom-id-motto">TRUTH • UNITY • SERVICE</div></div>
+          </div>
+          <div class="ribacom-id-front-body">
+            <div class="ribacom-id-details">
+              <div class="ribacom-id-field"><span>MEMBER NAME</span><strong>${esc(memberName)}</strong></div>
+              <div class="ribacom-id-field"><span>MEMBERSHIP ID</span><strong class="ribacom-id-number">${esc(idNumber)}</strong></div>
+              <div class="ribacom-id-field"><span>MEMBER SINCE</span><strong>${esc(since)}</strong></div>
+              <div class="ribacom-id-field"><span>CATEGORY</span><strong class="ribacom-id-category">${esc(category)}</strong></div>
+              <div class="ribacom-id-field"><span>STATE OF ORIGIN</span><strong>${esc(state)}</strong></div>
+              <div class="ribacom-id-field"><span>LGA</span><strong>${esc(lga)}</strong></div>
+            </div>
+            <div class="ribacom-id-photo-wrap">${photo ? `<img class="ribacom-id-photo" src="${esc(photo)}" alt="Member photograph" onerror="this.style.display='none'">` : '<div class="ribacom-id-photo ribacom-id-no-photo"><i class="fa-solid fa-user"></i><span>MEMBER PHOTO</span></div>'}<div class="ribacom-id-active">${esc(status)}</div></div>
+            <div class="ribacom-id-qr-wrap"><div id="ribacomDigitalIdQr" class="ribacom-id-qr"></div><span>SCAN TO VERIFY</span></div>
+          </div>
+          <div class="ribacom-id-ribbon"><span>TRUTH</span><b>•</b><span>UNITY</span><b>•</b><span>SERVICE</span></div>
+          <div class="ribacom-id-foot"><span>OFFICIAL DIGITAL MEMBERSHIP ID</span><span>VALID UNTIL: ${esc(expiry)}</span></div>
+        </article>
+        <article class="ribacom-id-card ribacom-id-back" aria-label="Back of RIBACOM Digital ID">
+          <div class="ribacom-id-back-left"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="ribacom-id-back-crest"><strong>RIBACOM</strong><span>RIVERS BAYELSA COMMUNITY<br>IN DIASPORA — THE GAMBIA</span><em>TRUTH • UNITY • SERVICE</em></div>
+          <div class="ribacom-id-back-main">
+            <div class="ribacom-id-back-title">THIS CARD CERTIFIES THAT</div>
+            <p>The bearer identified on the front of this card is a registered member of Rivers Bayelsa Community in Diaspora – The Gambia (RIBACOM), subject to the community constitution, rules and regulations.</p>
+            <ol><li>This card is non-transferable.</li><li>It remains the property of RIBACOM.</li><li>It must be presented upon request by an authorised officer.</li><li>If found, please return it to the RIBACOM Secretariat.</li></ol>
+            <div class="ribacom-id-contact-title">OFFICIAL CONTACT</div>
+            <div class="ribacom-id-contact"><span><i class="fa-solid fa-envelope"></i> ribacomgambia@gmail.com</span><span><i class="fa-solid fa-phone"></i> +220 77 991 1397</span><span><i class="fa-solid fa-globe"></i> ribacomgambia.vercel.app</span></div>
+            <div class="ribacom-id-back-bottom"><span>ISSUED: ${esc((mine.issued_at || mine.issuedAt || '').slice(0,10) || since)}</span><span>VALID UNTIL: ${esc(expiry)}</span></div>
+          </div>
+        </article>
+        <div class="flex flex-wrap gap-2 justify-end print:hidden"><button onclick="window.print()" class="bg-ribacom-navy text-white px-4 py-3 rounded-xl text-sm font-bold"><i class="fa-solid fa-print mr-2"></i>Print / Save ID</button></div>
+      </div>` : `
+      <div class="bg-white rounded-3xl p-7 text-center border border-dashed border-gray-300"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-20 h-20 object-contain mx-auto mb-4"><h3 class="text-lg font-extrabold text-ribacom-navy">Your Digital ID is not available yet</h3><p class="text-sm text-gray-500 mt-2">Your Digital ID will appear here after your membership has been approved and the ID has been issued by RIBACOM.</p></div>`;
     return `
-      <div class="max-w-3xl mx-auto space-y-5 animate-fadeIn">
-        <div class="flex items-center justify-between gap-3">
-          <div><h2 class="text-2xl font-extrabold text-ribacom-navy">Digital Identity</h2>
-          <p class="text-xs text-gray-500">View your RIBACOM Digital ID and verify an ID number.</p></div>
+      <div class="max-w-6xl mx-auto space-y-5 animate-fadeIn">
+        <div class="flex items-center justify-between gap-3 print:hidden">
+          <div><h2 class="text-2xl font-extrabold text-ribacom-navy">Digital Identity</h2><p class="text-xs text-gray-500">Your official RIBACOM membership card. Keep your member details secure.</p></div>
           <button onclick="app.navigate('home')" class="px-4 py-2 rounded-xl bg-ribacom-navy text-white text-xs font-bold">Back</button>
         </div>
-        ${mineCard}
-        <div class="bg-white rounded-3xl p-5 card-shadow">
+        ${card}
+        <div class="bg-white rounded-3xl p-5 card-shadow print:hidden">
           <div class="flex items-center gap-3 mb-2"><i class="fa-solid fa-shield-halved text-ribacom-green"></i><h3 class="font-extrabold">Verify a RIBACOM Digital ID</h3></div>
           <p class="text-xs text-gray-500 mb-4">Enter the ID number printed on the card to check whether it is active and valid.</p>
-          <form onsubmit="event.preventDefault(); app.verifyDigitalIdFromView();" class="flex flex-col sm:flex-row gap-2">
-            <input id="ribacomDigitalIdVerifyInput" class="flex-1 border rounded-xl px-4 py-3 text-sm" placeholder="e.g. RBC-ID-2026-ABC123" autocomplete="off">
-            <button type="submit" class="bg-ribacom-green text-white px-5 py-3 rounded-xl text-sm font-bold">Verify ID</button>
-          </form>
+          <form onsubmit="event.preventDefault(); app.verifyDigitalIdFromView();" class="flex flex-col sm:flex-row gap-2"><input id="ribacomDigitalIdVerifyInput" class="flex-1 border rounded-xl px-4 py-3 text-sm" placeholder="e.g. RBC-ID-2026-ABC123" autocomplete="off"><button type="submit" class="bg-ribacom-green text-white px-5 py-3 rounded-xl text-sm font-bold">Verify ID</button></form>
           <div id="ribacomDigitalIdVerifyResult" class="mt-4 hidden"></div>
         </div>
       </div>`;
@@ -126,11 +158,12 @@
   RibacomApp.prototype.renderDigitalIdQr = function() {
     const box=document.getElementById('ribacomDigitalIdQr');
     if(!box || typeof QRCode==='undefined') return;
+    const currentMember=(this.db.members||[]).find(m => m.id===this.currentUser?.memberId || m.user_id===this.currentUser?.id);
     const mine=(this.db.digitalIds||[]).find(x => (x.memberId || x.member_id) === (currentMember?.id || this.currentUser?.memberId));
     if(!mine) return;
     const data=mine.qrCodeData || mine.qr_code_data || ('RIBACOM-GAMBIA|ID:'+(mine.idCardNumber || mine.id_card_number));
     box.innerHTML='';
-    new QRCode(box,{text:data,width:110,height:110});
+    new QRCode(box,{text:data,width:100,height:100,colorDark:'#0a2540',colorLight:'#ffffff'});
   };
 
   RibacomApp.prototype.verifyDigitalIdFromView = async function() {
