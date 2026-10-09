@@ -187,9 +187,48 @@
   RibacomApp.prototype.navigate = function(view, params=null) {
     if(view === 'digital-id') {
       this.currentView=view;
+      try { localStorage.setItem('ribacom_last_view','digital-id'); } catch (_) {}
       const container=document.getElementById('appViewport');
       if(container) { container.innerHTML=this.renderDigitalIdView(); setTimeout(()=>this.renderDigitalIdQr(),0); }
       this.updateAuthHeaderUI();
+      // Refresh this member's records directly from Supabase when opening the card.
+      // The old cached arrays could be empty if authentication/data loading raced.
+      const app=this;
+      (async function refreshOwnDigitalId(){
+        try {
+          if(!app.supabaseClient || !app.currentUser?.id || app.testMode) return;
+          let member=app.currentUser.memberId
+            ? (app.db.members||[]).find(m=>m.id===app.currentUser.memberId)
+            : null;
+          const memberQuery=app.supabaseClient.from('members').select('*').eq('user_id',app.currentUser.id).maybeSingle();
+          const memberResult=await memberQuery;
+          if(memberResult.error) console.warn('Digital ID member refresh:',memberResult.error.message);
+          if(memberResult.data) member=memberResult.data;
+          if(!member) {
+            if(container) container.innerHTML=app.renderDigitalIdView();
+            return;
+          }
+          const normalizedMember={...member,fullName:member.fullName||member.full_name||'',membershipNo:member.membershipNo||member.membership_number||'',stateOfOrigin:member.stateOfOrigin||member.state_of_origin||'',photoUrl:member.photoUrl||member.photo_url||''};
+          app.db.members=[...(app.db.members||[]).filter(m=>m.id!==normalizedMember.id),normalizedMember];
+          app.currentUser.memberId=normalizedMember.id;
+          app.currentUser.membershipNumber=normalizedMember.membership_number||app.currentUser.membershipNumber||'';
+          app.currentUser.status=normalizedMember.status||app.currentUser.status;
+          const idResult=await app.supabaseClient.from('digital_ids').select('*').eq('member_id',normalizedMember.id).maybeSingle();
+          if(idResult.error) console.warn('Digital ID record refresh:',idResult.error.message);
+          if(idResult.data) {
+            const id={...idResult.data,memberId:idResult.data.member_id,idCardNumber:idResult.data.id_card_number,qrCodeData:idResult.data.qr_code_data,expiresAt:idResult.data.expires_at,issuedAt:idResult.data.issued_at};
+            app.db.digitalIds=[...(app.db.digitalIds||[]).filter(x=>(x.memberId||x.member_id)!==normalizedMember.id),id];
+          } else {
+            app.db.digitalIds=(app.db.digitalIds||[]).filter(x=>(x.memberId||x.member_id)!==normalizedMember.id);
+          }
+          if(container && app.currentView==='digital-id') {
+            container.innerHTML=app.renderDigitalIdView();
+            setTimeout(()=>app.renderDigitalIdQr(),0);
+          }
+        } catch(error) {
+          console.warn('Digital ID refresh failed:',error);
+        }
+      })();
       return;
     }
     return previousDigitalIdNav.call(this, view, params);
