@@ -291,8 +291,15 @@
     if(role!=='super_admin') return '<div class="bg-white rounded-3xl border p-8 text-center text-red-600 font-bold">President / Super Admin access required for membership decisions.</div>';
     if(!this.supabaseClient) return '<div class="bg-white rounded-3xl border p-8 text-center">Supabase connection unavailable.</div>';
     const {data:apps,error}=await this.supabaseClient.from('membership_applications').select('*').order('created_at',{ascending:false});
+    const {data:registeredMembers, error:registeredMembersError}=await this.supabaseClient.from('members').select('id,full_name,email,phone,membership_number,status,created_at,user_id').order('created_at',{ascending:false});
+
     if(error) return '<div class="bg-white rounded-3xl border p-8 text-red-600">Could not load applications: '+esc(error.message)+'</div>';
     const rows=apps||[];
+    const memberRows=registeredMembers||[];
+    const memberSection=registeredMembersError
+      ? '<section class="bg-white rounded-2xl border p-5"><h3 class="font-extrabold text-ribacom-navy">Registered Members</h3><p class="text-sm text-red-600 mt-2">Could not load registered members: '+esc(registeredMembersError.message)+'</p></section>'
+      : '<section class="space-y-3"><div class="flex items-end justify-between gap-3"><div><h3 class="text-lg font-extrabold text-ribacom-navy">Registered Members</h3><p class="text-xs text-gray-500 mt-1">Manage member records. Deletion requires President / Super Admin confirmation.</p></div><span class="rounded-full px-3 py-1 text-xs font-extrabold bg-slate-100 text-slate-700">'+memberRows.length+'</span></div>'+(memberRows.length?'<div class="space-y-2">'+memberRows.map(m=>'<article class="bg-white rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div class="min-w-0"><h4 class="font-extrabold text-ribacom-navy break-words">'+esc(m.full_name||'Unnamed member')+'</h4><p class="text-xs text-gray-500 break-all mt-1">'+esc(m.email||'No email')+' · '+esc(m.membership_number||'No membership number')+'</p><p class="text-xs text-gray-500 mt-1">Status: '+esc(displayStatus(m.status))+' · '+esc(m.phone||'No phone')+'</p></div><button onclick="app.deleteRegisteredMember('+JSON.stringify(m.id)+')" class="shrink-0 border border-red-300 text-red-700 hover:bg-red-50 px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-trash mr-1"></i>Delete Member</button></article>').join('')+'</div>':'<div class="bg-white rounded-2xl border border-dashed p-5 text-center text-sm text-gray-500">No registered members found.</div>')+'</section>';
+
     const statusOf=a=>String(a.status||'pending').toLowerCase();
     const pending=rows.filter(a=>['pending','under_review'].includes(statusOf(a)));
     const approved=rows.filter(a=>statusOf(a)==='approved');
@@ -313,10 +320,30 @@
     const section=(title,subtitle,list,accent,empty)=>'<section class="space-y-3"><div class="flex items-end justify-between gap-3"><div><h3 class="text-lg font-extrabold text-ribacom-navy">'+title+'</h3><p class="text-xs text-gray-500 mt-1">'+subtitle+'</p></div><span class="rounded-full px-3 py-1 text-xs font-extrabold '+accent+'">'+list.length+'</span></div>'+(list.length?'<div class="space-y-3">'+list.map(renderCard).join('')+'</div>':'<div class="bg-white rounded-2xl border border-dashed p-5 text-center text-sm text-gray-500">'+empty+'</div>')+'</section>';
     return '<div class="max-w-6xl mx-auto space-y-6 pb-6">'+
       '<div class="bg-ribacom-navy text-white rounded-3xl p-5 sm:p-7 border-b-4 border-ribacom-gold"><span class="text-[10px] font-black uppercase tracking-widest text-ribacom-gold">RIBACOM · President / Super Admin</span><h2 class="text-2xl sm:text-3xl font-extrabold mt-2">Membership Decisions</h2><p class="text-sm text-white/75 mt-2 max-w-2xl">Review applications, approve eligible members in one press, or reject with a recorded reason. Only the President / Super Admin can make the final decision.</p><div class="grid grid-cols-3 gap-2 sm:gap-3 mt-5"><div class="rounded-2xl bg-white/10 p-3"><p class="text-[10px] uppercase tracking-wide text-white/70">Awaiting decision</p><p class="text-2xl font-extrabold text-ribacom-gold">'+pending.length+'</p></div><div class="rounded-2xl bg-white/10 p-3"><p class="text-[10px] uppercase tracking-wide text-white/70">Approved</p><p class="text-2xl font-extrabold text-emerald-300">'+approved.length+'</p></div><div class="rounded-2xl bg-white/10 p-3"><p class="text-[10px] uppercase tracking-wide text-white/70">Rejected</p><p class="text-2xl font-extrabold text-red-300">'+rejected.length+'</p></div></div></div>'+
+      memberSection+
       section('Awaiting decision','Applications that still need your attention.',pending,'bg-amber-100 text-amber-800','No applications are awaiting a decision.')+
       section('Approved members','Applications with an approval decision.',approved,'bg-emerald-100 text-emerald-800','No approved applications found.')+
       section('Rejected applications','Rejected applications and their recorded reasons.',rejected,'bg-red-100 text-red-800','No rejected applications found.')+
       '<p class="text-center text-[11px] text-gray-400">Total applications: '+rows.length+' · Records are loaded from the RIBACOM database.</p></div>';
+  };
+
+  RibacomApp.prototype.deleteRegisteredMember = async function(memberId){
+    if(String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('President / Super Admin access is required to delete a registered member.','error');
+    if(!this.supabaseClient) return this.toast('Supabase connection is unavailable.','error');
+    const member=(this.db.members||[]).find(m=>String(m.id)===String(memberId));
+    const name=member?.full_name||'this member';
+    const confirmed=confirm('PERMANENTLY DELETE '+name+'?\\n\\nThis removes the member record and linked Digital ID, welfare requests, and attendance/election voter records that the database cascades. Financial transactions are retained but may no longer be linked to the member. This cannot be undone.');
+    if(!confirmed) return;
+    const typed=prompt('To confirm permanent deletion, type DELETE:','');
+    if(typed!=='DELETE') return this.toast('Deletion cancelled. The confirmation text did not match.','warning');
+    const {error}=await this.supabaseClient.from('members').delete().eq('id',memberId);
+    if(error){
+      console.error('[RIBACOM delete member]',error);
+      return this.toast('Member was not deleted: '+error.message,'error');
+    }
+    this.toast('Member record deleted successfully. Linked records followed the database deletion rules.','success');
+    await this.loadCloudData();
+    this.navigate('admin-members');
   };
 
   RibacomApp.prototype.reviewMembershipFromAdmin = function(application){
