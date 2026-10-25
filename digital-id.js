@@ -126,7 +126,7 @@
           <div class="ribacom-id-topline"></div>
           <div class="ribacom-id-front-head">
             <img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="ribacom-id-crest">
-            <div class="ribacom-id-brand"><div class="ribacom-id-org">RIVERS BAYELSA COMMUNITY</div><div class="ribacom-id-sub">IN  — THE GAMBIA</div><div class="ribacom-id-acronym">RIBACOM</div><div class="ribacom-id-motto">TRUTH • UNITY • SERVICE</div></div>
+            <div class="ribacom-id-brand"><div class="ribacom-id-org">RIVERS BAYELSA COMMUNITY</div><div class="ribacom-id-sub">THE GAMBIA</div><div class="ribacom-id-acronym">RIBACOM</div><div class="ribacom-id-motto">TRUTH • UNITY • SERVICE</div></div>
           </div>
           <div class="ribacom-id-front-body">
             <div class="ribacom-id-details">
@@ -144,7 +144,7 @@
           <div class="ribacom-id-foot"><span>OFFICIAL DIGITAL MEMBERSHIP ID</span><span>VALID UNTIL: ${esc(expiry)}</span></div>
         </article>
         <article class="ribacom-id-card ribacom-id-back" aria-label="Back of RIBACOM Digital ID">
-          <div class="ribacom-id-back-left"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="ribacom-id-back-crest"><strong>RIBACOM</strong><span>RIVERS BAYELSA COMMUNITY<br>IN  — THE GAMBIA</span><em>TRUTH • UNITY • SERVICE</em></div>
+          <div class="ribacom-id-back-left"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="ribacom-id-back-crest"><strong>RIBACOM</strong><span>RIVERS BAYELSA COMMUNITY<br>THE GAMBIA</span><em>TRUTH • UNITY • SERVICE</em></div>
           <div class="ribacom-id-back-main">
             <div class="ribacom-id-back-title">THIS CARD CERTIFIES THAT</div>
             <p>The bearer identified on the front of this card is a registered member of Rivers Bayelsa Community – The Gambia (RIBACOM), in accordance with RIBACOM membership rules and applicable policies.</p>
