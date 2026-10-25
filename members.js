@@ -325,7 +325,7 @@
         '<div class="flex items-start justify-between gap-3"><div class="min-w-0"><span class="text-[10px] font-black uppercase tracking-wider text-ribacom-green">Membership Application</span><h3 class="text-lg font-extrabold text-ribacom-navy mt-1 break-words">'+esc(a.full_name||'Applicant')+'</h3><p class="text-xs text-gray-500 mt-1">'+esc(displayCategory(a.membership_category))+' · Submitted '+esc(date(a.created_at))+'</p></div><span class="shrink-0 px-3 py-1 rounded-full text-xs font-extrabold '+badge+'">'+esc(displayStatus(status))+'</span></div>'+
         '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-sm"><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">Email</span><p class="font-semibold break-all">'+esc(a.email||'—')+'</p></div><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">Phone / WhatsApp</span><p class="font-semibold">'+esc(a.phone||'—')+'</p></div><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">State / LGA</span><p class="font-semibold">'+esc(a.state_of_origin||'—')+' / '+esc(a.lga||'—')+'</p></div><div class="rounded-xl bg-gray-50 p-3"><span class="text-xs text-gray-500">Reviewed</span><p class="font-semibold">'+esc(date(a.reviewed_at))+'</p></div></div>'+
         (reason?'<div class="mt-3 rounded-xl border border-red-100 bg-red-50 p-3 text-sm"><p class="text-xs font-extrabold text-red-800">Rejection reason / administrative note</p><p class="text-red-900 mt-1">'+esc(reason)+'</p></div>':'')+
-        (isPending?'<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4"><button onclick="app.reviewMembershipFromAdmin('+JSON.stringify(a).replace(/"/g,'&quot;')+')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl text-sm font-extrabold"><i class="fa-solid fa-check-circle mr-2"></i>Approve Membership</button><button onclick="app.rejectMembershipApplication('+safeId+')" class="bg-white border border-red-300 text-red-700 hover:bg-red-50 px-4 py-3 rounded-xl text-sm font-extrabold"><i class="fa-solid fa-circle-xmark mr-2"></i>Reject Application</button></div>':'<div class="mt-4 pt-3 border-t text-xs text-gray-500">Decision recorded'+(a.reviewed_at?' on '+esc(date(a.reviewed_at)):'')+'.</div>')+
+        '<div class="mt-4"><button onclick="app.showMembershipApplicationDetails('+safeId+')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 px-4 py-2.5 rounded-xl text-xs font-extrabold"><i class="fa-solid fa-file-lines mr-2"></i>View Full Application Details</button></div>'+(isPending?'<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3"><button onclick="app.reviewMembershipFromAdmin('+JSON.stringify(a).replace(/"/g,'&quot;')+')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl text-sm font-extrabold"><i class="fa-solid fa-check-circle mr-2"></i>Approve Membership</button><button onclick="app.rejectMembershipApplication('+safeId+')" class="bg-white border border-red-300 text-red-700 hover:bg-red-50 px-4 py-3 rounded-xl text-sm font-extrabold"><i class="fa-solid fa-circle-xmark mr-2"></i>Reject Application</button></div>':'<div class="mt-4 pt-3 border-t text-xs text-gray-500">Decision recorded'+(a.reviewed_at?' on '+esc(date(a.reviewed_at)):'')+'.</div>')+
         '</article>';
     };
     const section=(title,subtitle,list,accent,empty)=>'<section class="space-y-3"><div class="flex items-end justify-between gap-3"><div><h3 class="text-lg font-extrabold text-ribacom-navy">'+title+'</h3><p class="text-xs text-gray-500 mt-1">'+subtitle+'</p></div><span class="rounded-full px-3 py-1 text-xs font-extrabold '+accent+'">'+list.length+'</span></div>'+(list.length?'<div class="space-y-3">'+list.map(renderCard).join('')+'</div>':'<div class="bg-white rounded-2xl border border-dashed p-5 text-center text-sm text-gray-500">'+empty+'</div>')+'</section>';
@@ -336,6 +336,42 @@
       section('Approved members','Applications with an approval decision.',approved,'bg-emerald-100 text-emerald-800','No approved applications found.')+
       section('Rejected applications','Rejected applications and their recorded reasons.',rejected,'bg-red-100 text-red-800','No rejected applications found.')+
       '<p class="text-center text-[11px] text-gray-400">Total applications: '+rows.length+' · Records are loaded from the RIBACOM database.</p></div>';
+  };
+
+  RibacomApp.prototype.showMembershipApplicationDetails = async function(applicationId){
+    if(String(this.currentUser?.roleKey||'').toLowerCase()!=='super_admin') return this.toast('President / Super Admin access is required to view full applications.','error');
+    if(!this.supabaseClient) return this.toast('Supabase connection is unavailable.','error');
+    const {data:a,error}=await this.supabaseClient.from('membership_applications').select('*').eq('id',applicationId).maybeSingle();
+    if(error) return this.toast('Could not load application details: '+error.message,'error');
+    if(!a) return this.toast('Application not found.','error');
+    const rows=[
+      ['Full Name',a.full_name],['Email',a.email],['Phone / WhatsApp',a.phone||a.whatsapp],
+      ['Membership Category',a.membership_category],['Date of Birth',a.date_of_birth],['Place of Birth',a.place_of_birth],
+      ['Gender',a.gender],['Marital Status',a.marital_status],['Nationality',a.nationality],
+      ['State of Origin',a.state_of_origin],['LGA',a.lga],['Town / Village',a.town_village],
+      ['Community / Clan',a.community_clan],['Clan / Ward',a.clan_ward],['Father’s Name',a.father_name],
+      ['Mother’s Name',a.mother_name],['Passport / National ID',a.national_id_number||a.nigerian_passport_number],
+      ['Gambian Residence Permit',a.gambian_residence_permit_number],['Current Address',a.current_address],
+      ['Area / Location',a.area_location],['Date of Arrival in The Gambia',a.date_of_arrival_gambia],
+      ['Preferred Contact Method',a.preferred_contact_method],['Spouse Name',a.spouse_name],
+      ['Number of Children',a.children_count],['Next of Kin',a.next_of_kin_name],
+      ['Next of Kin Relationship',a.next_of_kin_relationship],['Next of Kin Phone',a.next_of_kin_phone],
+      ['Emergency Contact',a.emergency_contact_name],['Emergency Contact Phone',a.emergency_contact_phone],
+      ['Occupation',a.occupation],['Employer / Business',a.employer_business],['Work Address',a.work_address],
+      ['Skills / Profession',a.skills],['Previous Association',a.previous_association],
+      ['Medical Emergency Information',a.medical_emergency_information],
+      ['Proof of Nigerian Origin URL',a.proof_of_nigerian_origin_url],['Photo URL',a.photo_url],
+      ['Community Interests',a.interests?JSON.stringify(a.interests):null],
+      ['Declaration Accepted',a.declaration_accepted?'Yes':'No'],['Digital Signature',a.digital_signature],
+      ['Application Status',a.status],['Submitted',a.created_at?new Date(a.created_at).toLocaleString():null],
+      ['Administrative Notes',a.admin_notes]
+    ];
+    document.getElementById('ribacomApplicationDetailsModal')?.remove();
+    const modal=document.createElement('div');
+    modal.id='ribacomApplicationDetailsModal';
+    modal.className='fixed inset-0 z-[140] bg-black/60 flex items-center justify-center p-3 sm:p-5';
+    modal.innerHTML='<div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto p-5 sm:p-7"><div class="flex justify-between items-start gap-3 mb-5"><div><p class="text-[10px] uppercase tracking-widest text-ribacom-green font-black">RIBACOM · Secretariat</p><h3 class="text-xl sm:text-2xl font-extrabold text-ribacom-navy mt-1">Full Membership Application</h3><p class="text-xs text-gray-500 mt-1">Review all details supplied by '+esc(a.full_name||'the applicant')+'.</p></div><button onclick="document.getElementById(\'ribacomApplicationDetailsModal\')?.remove()" aria-label="Close" class="text-2xl px-2">×</button></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">'+rows.map(([label,value])=>'<div class="border rounded-xl p-3 min-w-0"><span class="text-[10px] uppercase text-gray-400 font-bold">'+esc(label)+'</span><p class="text-sm font-semibold mt-1 break-words whitespace-pre-wrap">'+esc(value===null||value===undefined||value===''?'—':String(value))+'</p></div>').join('')+'</div><button onclick="document.getElementById(\'ribacomApplicationDetailsModal\')?.remove()" class="mt-5 w-full bg-ribacom-navy text-white py-3 rounded-xl font-bold">Close Details</button></div>';
+    document.body.appendChild(modal);
   };
 
   RibacomApp.prototype.deleteRegisteredMember = async function(memberId){
