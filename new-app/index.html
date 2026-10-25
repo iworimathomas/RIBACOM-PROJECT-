@@ -904,7 +904,6 @@ const routes = {
   home: renderHome,
   about: renderAbout,
   leadership: renderLeadership,
-  constitution: renderConstitution,
   announcements: renderAnnouncements,
   events: renderEvents,
   gallery: renderGallery,
@@ -1368,68 +1367,6 @@ function leaderCard(role, name) {
       </div>
 
     </article>
-  `;
-}
-
-/* =========================================================
-   CONSTITUTION
-========================================================= */
-
-async function renderConstitution() {
-  app.innerHTML = `
-    ${page(
-      "RIBACOM Constitution",
-      "The governing framework of the community"
-    )}
-
-    <section class="card">
-
-      <h2>Master Constitution</h2>
-
-      <p>
-        The RIBACOM Constitution provides the governing
-        framework for the organization, its leadership,
-        membership, meetings, welfare and community
-        administration.
-      </p>
-
-      <div class="section">
-        <h3>Structure</h3>
-
-        <p>
-          The current Master Constitution contains
-          13 Chapters and 97 Articles.
-        </p>
-      </div>
-
-      <div class="section">
-        <h3>Executive Committee</h3>
-
-        <p>
-          The executive structure provides for the
-          approved community leadership offices and
-          responsibilities.
-        </p>
-      </div>
-
-      <div class="section">
-        <h3>Membership</h3>
-
-        <p>
-          Membership includes Regular Members and
-          Associate Members according to the approved
-          membership provisions.
-        </p>
-      </div>
-
-      <div class="alert alert-info">
-        The full constitution will be connected to
-        Supabase so authorized administrators can
-        update the published document without
-        changing this HTML file.
-      </div>
-
-    </section>
   `;
 }
 
