@@ -398,7 +398,7 @@
                 let body='';
                 if(view==='home') {
                     const cfg=window.RIBACOM_CONFIG||{}, leaders=this.db.leadership||[], events=(this.db.events||[]).filter(x=>x.is_published!==false).slice(0,3);
-                    const required=['Chairman','Vice-Chair','Secretary General','Assistant Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
+                    const required=['Chairman','Vice-Chair','Secretary General','Treasurer','Public Relations Officer','Welfare Officer / Provost'];
                     const roster=required.map(role=>leaders.find(x=>String(x.position||'').toLowerCase()===role.toLowerCase())||{position:role,name:'Position Vacant',is_vacant:true});
                     const leadershipCards=roster.map(x=>{const photo=x.photo_url||x.photoUrl||x.image_url||x.imageUrl||x.photo||'';return '<article class="bg-white rounded-2xl p-4 border flex items-center gap-3"><div class="shrink-0">'+(photo?'<img src="'+esc(photo)+'" alt="'+esc(x.name)+'" class="w-14 h-14 rounded-full object-cover border-2 border-ribacom-gold">':'<div class="w-14 h-14 rounded-full bg-ribacom-green text-white flex items-center justify-center text-lg font-black">'+esc((x.name||'R').charAt(0))+'</div>')+'</div><div class="min-w-0"><div class="text-[9px] uppercase font-black '+(x.is_vacant?'text-amber-600':'text-ribacom-green')+'">'+esc(x.position)+(x.is_vacant?' • VACANT':'')+'</div><div class="font-extrabold text-sm text-ribacom-navy truncate">'+esc(x.name)+'</div></div></article>';}).join('');
                     const publications=(this.db.publications||[]).filter(x=>x.is_published!==false&&x.approval_status!=='pending').slice(0,3);
