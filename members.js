@@ -465,7 +465,9 @@
             <label class="text-xs font-bold">Membership Category *<select id="m_category" required class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="regular">Regular Member</option><option value="associate">Associate Member</option></select></label>
             <label class="text-xs font-bold">Date of Birth<input id="m_dob" type="date" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
             <label class="text-xs font-bold">Gender<select id="m_gender" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select</option><option>Male</option><option>Female</option></select></label>
-            <label class="text-xs font-bold">Nationality<input id="m_nationality" value="Nigerian" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>\n            <label class="text-xs font-bold">Place of Birth<input id="m_placeOfBirth" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>\n            <label class="text-xs font-bold">Marital Status<select id="m_maritalStatus" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></label>
+            <label class="text-xs font-bold">Nationality<input id="m_nationality" value="Nigerian" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Place of Birth<input id="m_placeOfBirth" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Marital Status<select id="m_maritalStatus" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></label>
             <label class="text-xs font-bold">Other / Previous Name<input id="m_otherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
           </div></section>
           <section><h3 class="font-extrabold text-ribacom-navy text-lg">2. Rivers / Bayelsa Connection</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
@@ -476,7 +478,8 @@
             <label class="text-xs font-bold">Clan / Ward<input id="m_clanWard" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
             <label class="text-xs font-bold">Father's Name<input id="m_fatherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
             <label class="text-xs font-bold">Mother's Name<input id="m_motherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
-            <label class="text-xs font-bold">Passport / National ID No.<input id="m_idNumber" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>\n            <label class="text-xs font-bold">Gambian Residence Permit No. (optional)<input id="m_gambianPermit" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Passport / National ID No.<input id="m_idNumber" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Gambian Residence Permit No. (optional)<input id="m_gambianPermit" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
           </div></section>
           <section><h3 class="font-extrabold text-ribacom-navy text-lg">3. Residence & Contact</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
             <label class="text-xs font-bold sm:col-span-2">Current Address in The Gambia *<textarea id="m_address" required rows="2" class="mt-1 w-full border rounded-xl px-3 py-2.5"></textarea></label>
