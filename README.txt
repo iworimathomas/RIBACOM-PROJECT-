@@ -6,7 +6,7 @@ Display name: RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM)
 Motto: TRUTH • UNITY • SERVICE
 
 SYSTEM REPAIR RELEASE
-The application branding and public navigation have been aligned with the official name Rivers Bayelsa Community – The Gambia. Public constitution navigation and references have been removed; database records are retained.
+The application branding and public navigation have been aligned with the official name Rivers Bayelsa Community – The Gambia. Public governance-document navigation and related interface references have been removed; database records are retained.
 Supabase is the authoritative backend and Supabase Auth is the authentication/session authority.
 Only the browser-safe Supabase publishable key is included. No service-role or secret key is included.
 
