@@ -50,7 +50,7 @@
       if(submitButton){ submitButton.disabled=true; submitButton.textContent='Submitting…'; }
 
       const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
-      const category=normalizeCategory(val('m_category'));
+      const category=String(val('m_category')||'regular').toLowerCase()==='associate'?'associate':'regular';
       const details={
         previous_name:val('m_otherName'),date_of_birth:val('m_dob'),place_of_birth:val('m_placeOfBirth'),gender:val('m_gender'),marital_status:val('m_maritalStatus'),
         nationality:val('m_nationality')||'Nigerian',passport_or_id:val('m_idNumber'),
