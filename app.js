@@ -1,7 +1,7 @@
 // Empty in-memory UI cache; Supabase is the authoritative data source.
         class RibacomApp {
             constructor() {
-                this.db = {members:[],digitalIds:[],membershipApplications:[],financeTransactions:[],leadership:[],advisers:[],constitution:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
+                this.db = {members:[],digitalIds:[],membershipApplications:[],financeTransactions:[],leadership:[],advisers:[],announcements:[],events:[],gallery:[],publications:[],youth:{title:'RIBACOM Youth',content:'',image:''},paymentSettings:[],welfareRequests:[],welfareSettings:{},about:{name:window.RIBACOM_CONFIG.orgName,displayName:window.RIBACOM_CONFIG.orgName,motto:window.RIBACOM_CONFIG.motto}};
                 this.currentUser = null;
                 this.currentView = 'home';
                 this.navigationHistory = [];
@@ -54,7 +54,6 @@
                 const publicSources = {
                     leadership: 'leadership',
                     advisers: 'advisers',
-                    constitution: 'constitution',
                     announcements: 'announcements',
                     events: 'events',
                     gallery: 'gallery',
@@ -392,8 +391,8 @@
             }
 
             renderBasicPublicView(view) {
-                const titles={about:'About RIBACOM',members:'Members',announcements:'News & Announcements',events:'Events',gallery:'Media Gallery',publications:'Publications',youth:'Youth Wing',advisers:'Council of Advisers',contact:'Contact Us',constitution:'Constitution'};
-                const keyMap={announcements:'announcements',events:'events',gallery:'gallery',publications:'publications',advisers:'advisers',constitution:'constitution'};
+                const titles={about:'About RIBACOM',members:'Members',announcements:'News & Announcements',events:'Events',gallery:'Media Gallery',publications:'Publications',youth:'Youth Wing',advisers:'Council of Advisers',contact:'Contact Us'};
+                const keyMap={announcements:'announcements',events:'events',gallery:'gallery',publications:'publications',advisers:'advisers'};
                 const title=titles[view]||'RIBACOM';
                 const key=keyMap[view];
                 let body='';
@@ -421,7 +420,7 @@
                     const historyCards=history.length?history.map(x=>'<article class="bg-white rounded-2xl border p-4"><div class="text-xs font-black text-ribacom-green">'+esc(x.year_label)+'</div><h4 class="font-extrabold text-ribacom-navy mt-1">'+esc(x.title)+'</h4><p class="text-xs text-gray-500 mt-1 line-clamp-3">'+esc(x.description)+'</p></article>').join(''):'<div class="bg-white rounded-2xl border p-5 text-sm text-gray-500 md:col-span-3">Our official history archive is ready for approved milestones.</div>';
                     const activityCards=activities.length?activities.map(x=>'<article class="bg-white rounded-2xl border overflow-hidden">'+(x.image_url?'<img src="'+esc(x.image_url)+'" class="w-full h-32 object-cover">':'')+'<div class="p-4"><div class="text-[9px] uppercase font-black text-ribacom-green">'+esc(x.category||'Community Activity')+'</div><h4 class="font-extrabold text-sm text-ribacom-navy mt-1">'+esc(x.title)+'</h4><p class="text-xs text-gray-500 mt-1">'+esc(x.location||'')+'</p></div></article>').join(''):'<div class="bg-white rounded-2xl border p-5 text-sm text-gray-500 md:col-span-3">Community activities will appear here as approved records are published.</div>';
                     body='<div class="space-y-8 animate-fadeIn">'+
-                    '<section class="relative overflow-hidden bg-ribacom-navy text-white rounded-[2rem] p-7 sm:p-10 border-b-4 border-ribacom-gold"><div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-ribacom-green/20"></div><div class="relative flex flex-col md:flex-row items-center md:items-start gap-6"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-white p-1 object-contain border-2 border-ribacom-gold shadow-xl"><div class="text-center md:text-left flex-1"><span class="text-ribacom-gold text-xs font-black uppercase tracking-[.2em]">Official Community Portal</span><h1 class="text-3xl sm:text-5xl font-black mt-2 leading-tight">Rivers Bayelsa Community<br class="hidden sm:block"> in Diaspora – The Gambia</h1><p class="mt-3 text-sm sm:text-base text-white/80 max-w-2xl">A united community platform for members, families, leadership, welfare, culture, development and responsible community service.</p><div class="mt-4 inline-flex px-4 py-2 rounded-full bg-white/10 border border-white/15 text-ribacom-gold font-extrabold">'+esc(cfg.motto||'TRUTH • UNITY • SERVICE')+'</div><div class="mt-6 flex flex-wrap justify-center md:justify-start gap-2"><button onclick="app.navigate(&quot;membership&quot;)" class="bg-ribacom-gold text-ribacom-navy px-5 py-3 rounded-xl font-extrabold text-sm">Join RIBACOM</button><button onclick="app.navigate(&quot;about&quot;)" class="bg-white text-ribacom-navy px-5 py-3 rounded-xl font-bold text-sm">Discover RIBACOM</button><button onclick="app.navigate(&quot;constitution&quot;)" class="bg-white/10 border border-white/20 px-5 py-3 rounded-xl font-bold text-sm">Read Constitution</button></div></div></div></section>'+
+                    '<section class="relative overflow-hidden bg-ribacom-navy text-white rounded-[2rem] p-7 sm:p-10 border-b-4 border-ribacom-gold"><div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-ribacom-green/20"></div><div class="relative flex flex-col md:flex-row items-center md:items-start gap-6"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-white p-1 object-contain border-2 border-ribacom-gold shadow-xl"><div class="text-center md:text-left flex-1"><span class="text-ribacom-gold text-xs font-black uppercase tracking-[.2em]">Official Community Portal</span><h1 class="text-3xl sm:text-5xl font-black mt-2 leading-tight">Rivers Bayelsa Community<br class="hidden sm:block"> in Diaspora – The Gambia</h1><p class="mt-3 text-sm sm:text-base text-white/80 max-w-2xl">A united community platform for members, families, leadership, welfare, culture, development and responsible community service.</p><div class="mt-4 inline-flex px-4 py-2 rounded-full bg-white/10 border border-white/15 text-ribacom-gold font-extrabold">'+esc(cfg.motto||'TRUTH • UNITY • SERVICE')+'</div><div class="mt-6 flex flex-wrap justify-center md:justify-start gap-2"><button onclick="app.navigate(&quot;membership&quot;)" class="bg-ribacom-gold text-ribacom-navy px-5 py-3 rounded-xl font-extrabold text-sm">Join RIBACOM</button><button onclick="app.navigate(&quot;about&quot;)" class="bg-white text-ribacom-navy px-5 py-3 rounded-xl font-bold text-sm">Discover RIBACOM</button></div></div></div></section>'+
                     '<section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3"><button onclick="app.navigate(&quot;about&quot;)" class="bg-white border rounded-2xl p-5 text-left hover:shadow-md transition"><div class="text-2xl">🌿</div><h3 class="font-extrabold text-ribacom-navy mt-2">Vision & Mission</h3><p class="text-xs text-gray-500 mt-1">Understand the purpose and direction of RIBACOM.</p></button><button onclick="app.navigate(&quot;leadership&quot;)" class="bg-white border rounded-2xl p-5 text-left hover:shadow-md transition"><div class="text-2xl">👥</div><h3 class="font-extrabold text-ribacom-navy mt-2">Leadership & Elders</h3><p class="text-xs text-gray-500 mt-1">Meet the Executive Committee, advisers and Council of Elders.</p></button><button onclick="app.navigate(&quot;welfare&quot;)" class="bg-white border rounded-2xl p-5 text-left hover:shadow-md transition"><div class="text-2xl">❤️</div><h3 class="font-extrabold text-ribacom-navy mt-2">Welfare Centre</h3><p class="text-xs text-gray-500 mt-1">Learn about member welfare support and access.</p></button><button onclick="app.navigate(&quot;activities&quot;)" class="bg-white border rounded-2xl p-5 text-left hover:shadow-md transition"><div class="text-2xl">🤝</div><h3 class="font-extrabold text-ribacom-navy mt-2">Community Activities</h3><p class="text-xs text-gray-500 mt-1">Explore approved community programmes and activities.</p></button></section>'+
                     '<section class="grid lg:grid-cols-2 gap-5"><article class="bg-white rounded-3xl border p-6"><span class="text-[10px] uppercase font-black text-ribacom-green">Our Vision</span><h2 class="text-2xl font-extrabold text-ribacom-navy mt-1">A United & Respected Community</h2><p class="text-sm text-gray-600 leading-relaxed mt-3">'+esc(visionText)+'</p></article><article class="bg-ribacom-navy rounded-3xl p-6 text-white"><span class="text-[10px] uppercase font-black text-ribacom-gold">Our Mission</span><h2 class="text-2xl font-extrabold mt-1">What We Stand For</h2><p class="text-sm text-gray-200 leading-relaxed mt-3">'+esc(missionText)+'</p></article></section>'+
                     '<section class="bg-white rounded-3xl border p-6"><div class="flex items-end justify-between gap-3"><div><span class="text-[10px] uppercase font-black text-ribacom-green">Our Objectives</span><h2 class="text-2xl font-extrabold text-ribacom-navy mt-1">What RIBACOM Seeks to Achieve</h2></div><button onclick="app.navigate(&quot;about&quot;)" class="text-xs font-bold text-ribacom-green">View full profile →</button></div><div class="grid md:grid-cols-2 gap-3 mt-5">'+(objectives.length?objectives.slice(0,8).map((x,i)=>'<div class="flex gap-3 border rounded-2xl p-4"><span class="w-7 h-7 shrink-0 rounded-full bg-ribacom-green text-white flex items-center justify-center text-xs font-black">'+(i+1)+'</span><p class="text-sm text-gray-700">'+esc(x)+'</p></div>').join(''):'<p class="text-sm text-gray-500">Objectives will appear here.</p>')+'</div></section>'+
@@ -482,10 +481,10 @@
                 }
                 this.isNavigatingBack = false;
                 try { localStorage.setItem('ribacom_last_view',this.currentView); } catch (_) {}
-                const protectedViews=['member-dashboard','digital-id','welfare','notifications','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-constitution','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
+                const protectedViews=['member-dashboard','digital-id','welfare','notifications','treasurer-dashboard','finance','finance-reports','executive-work','approval-center','admin-dashboard','admin-members','admin-digital-ids','admin-gallery','admin-welfare','admin-leadership','admin-advisers','admin-announcements','admin-events','admin-publications','admin-youth','admin-payments','admin-about','admin-system'];
                 const roleRoutes={
                     'admin-dashboard':['admin','super_admin'],'admin-members':['admin','super_admin'],'admin-digital-ids':['admin','super_admin'],
-                    'admin-constitution':['admin','super_admin'],'admin-gallery':['admin','super_admin'],'admin-leadership':['admin','super_admin'],
+                    'admin-gallery':['admin','super_admin'],'admin-leadership':['admin','super_admin'],
                     'admin-advisers':['admin','super_admin'],'admin-announcements':['admin','super_admin'],'admin-events':['admin','super_admin'],
                     'admin-publications':['admin','super_admin'],'admin-youth':['admin','super_admin'],'admin-payments':['admin','super_admin'],
                     'admin-about':['admin','super_admin'],'admin-system':['admin','super_admin'],
@@ -511,7 +510,7 @@
                     'admin-dashboard':['admin','super_admin'],
                     'admin-members':['admin','super_admin'],
                     'admin-digital-ids':['admin','super_admin'],
-                    'admin-constitution':['admin','super_admin'],
+                    
                     'admin-gallery':['admin','super_admin'],
                     'admin-welfare':['admin','super_admin'],
                     'admin-leadership':['admin','super_admin'],
@@ -544,7 +543,7 @@
                     else if(this.currentView==='admin-dashboard') html=this.renderAdminDashboardView?.();
                     else if(this.currentView==='admin-digital-ids') html=this.renderAdminDigitalIdsView?.();
                     else if(this.currentView==='admin-members') html=this.renderMembershipReviewD7?.();
-                    else if(this.currentView==='admin-constitution') html=this.renderAdminConstitutionD5?.();
+                    
                     else if(this.currentView==='admin-gallery') html=this.renderAdminGalleryD5?.();
                     else if(this.currentView==='admin-system') html=this.renderD7Page?.(this.currentView);
                     else if(this.currentView==='treasurer-dashboard') html=this.renderTreasurerDashboardView?.();
