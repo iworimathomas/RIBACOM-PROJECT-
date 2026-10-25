@@ -1,4 +1,4 @@
-/* D5 Admin Control extensions: About, Constitution, Gallery and full content navigation. */
+/* RIBACOM admin extensions: About, Gallery and full content navigation. */
 (function(){
  const isAdmin=a=>String(a?.currentUser?.email||'').toLowerCase()==='iworimathomas@ymail.com' && a?.currentUser?.roleKey==='super_admin';
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -7,11 +7,11 @@
  RibacomApp.prototype.renderAdminDashboardView=function(){
    const base=oldRender.call(this);
    if(!isAdmin(this))return base;
-   return base+`<div class="bg-white rounded-3xl p-5 card-shadow"><div class="flex flex-wrap gap-2"><button onclick="app.openAboutEditor()" class="bg-ribacom-navy text-white px-3 py-2 rounded-xl text-xs font-bold">About RIBACOM</button><button onclick="app.navigate('admin-constitution')" class="bg-ribacom-green text-white px-3 py-2 rounded-xl text-xs font-bold">Constitution</button><button onclick="app.navigate('admin-gallery')" class="bg-ribacom-gold text-ribacom-navy px-3 py-2 rounded-xl text-xs font-bold">Gallery</button><button onclick="app.navigate('admin-digital-ids')" class="bg-slate-800 text-white px-3 py-2 rounded-xl text-xs font-bold">Digital IDs</button></div></div>`;
+   return base+`<div class="bg-white rounded-3xl p-5 card-shadow"><div class="flex flex-wrap gap-2"><button onclick="app.openAboutEditor()" class="bg-ribacom-navy text-white px-3 py-2 rounded-xl text-xs font-bold">About RIBACOM</button><button onclick="app.navigate('admin-gallery')" class="bg-ribacom-gold text-ribacom-navy px-3 py-2 rounded-xl text-xs font-bold">Gallery</button><button onclick="app.navigate('admin-digital-ids')" class="bg-slate-800 text-white px-3 py-2 rounded-xl text-xs font-bold">Digital IDs</button></div></div>`;
  };
  const oldNav=RibacomApp.prototype.navigate;
  RibacomApp.prototype.navigate=function(viewId,params=null){
-   if(viewId==='admin-constitution'){this.currentView=viewId;document.getElementById('appViewport').innerHTML=this.renderAdminConstitutionD5();this.updateAuthHeaderUI();return;}
+   
    if(viewId==='admin-gallery'){this.currentView=viewId;document.getElementById('appViewport').innerHTML=this.renderAdminGalleryD5();this.updateAuthHeaderUI();return;}
    return oldNav.call(this,viewId,params);
  };
