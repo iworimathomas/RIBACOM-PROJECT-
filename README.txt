@@ -1,12 +1,12 @@
-RIBACOM FINAL MODULAR RELEASE — D9
+RIBACOM SYSTEM REPAIR RELEASE — OCTOBER 2026
 
 Official identity:
 Rivers Bayelsa Community The Gambia (RIBACOM)
 Display name: RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM)
 Motto: TRUTH • UNITY • SERVICE
 
-D9 FINAL RELEASE
-This package is the final modular release candidate produced from the verified D8 build.
+SYSTEM REPAIR RELEASE
+The application branding and public navigation have been aligned with the official name Rivers Bayelsa Community – The Gambia. Public constitution navigation and references have been removed; database records are retained.
 Supabase is the authoritative backend and Supabase Auth is the authentication/session authority.
 Only the browser-safe Supabase publishable key is included. No service-role or secret key is included.
 
@@ -20,7 +20,6 @@ MODULES
 - js/members.js — membership workflow
 - js/digital-id.js — Digital ID lifecycle
 - js/leadership.js — leadership extension hook
-- js/constitution.js — constitution management
 - js/content.js — content extension hook
 - js/welfare.js — welfare workflow
 - js/admin.js — administration helpers
@@ -40,7 +39,6 @@ IMPORTANT
 - There is no demo database.
 - There is no LocalStorage database fallback.
 - The small in-memory object in app.js is only a UI cache/default shape; cloud data is loaded from Supabase.
-- Do not publish unverified constitution text over the authoritative 13-Chapter/97-Article source.
 - Do not add a fixed registered office address unless the community formally supplies one.
 - The approved official RIBACOM crest is stored as `ribacom-official-logo.jpg` and is used by the main application branding.
 
