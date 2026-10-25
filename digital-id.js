@@ -147,7 +147,7 @@
           <div class="ribacom-id-back-left"><img src="/ribacom-official-logo.svg" alt="Official RIBACOM Crest" class="ribacom-id-back-crest"><strong>RIBACOM</strong><span>RIVERS BAYELSA COMMUNITY<br>IN DIASPORA — THE GAMBIA</span><em>TRUTH • UNITY • SERVICE</em></div>
           <div class="ribacom-id-back-main">
             <div class="ribacom-id-back-title">THIS CARD CERTIFIES THAT</div>
-            <p>The bearer identified on the front of this card is a registered member of Rivers Bayelsa Community in Diaspora – The Gambia (RIBACOM), subject to the community constitution, rules and regulations.</p>
+            <p>The bearer identified on the front of this card is a registered member of Rivers Bayelsa Community in Diaspora – The Gambia (RIBACOM), in accordance with RIBACOM membership rules and applicable policies.</p>
             <ol><li>This card is non-transferable.</li><li>It remains the property of RIBACOM.</li><li>It must be presented upon request by an authorised officer.</li><li>If found, please return it to the RIBACOM Secretariat.</li></ol>
             <div class="ribacom-id-contact-title">OFFICIAL CONTACT</div>
             <div class="ribacom-id-contact"><span><i class="fa-solid fa-envelope"></i> ribacomgambia@gmail.com</span><span><i class="fa-solid fa-phone"></i> +220 77 991 1397</span><span><i class="fa-solid fa-globe"></i> ribacomgambia.vercel.app</span></div>
