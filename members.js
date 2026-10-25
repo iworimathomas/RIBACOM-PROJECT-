@@ -114,8 +114,31 @@
         medical_emergency_information:val('m_medicalEmergency')||null,national_id_number:details.passport_or_id||null,
         proof_of_nigerian_origin_url:val('m_proofOfOrigin')||null
       };
-      const {error:applicationError}=await this.supabaseClient.from('membership_applications').insert(applicationPayload);
-      if(applicationError) return fail('Application could not be saved: '+applicationError.message);
+      let applicationSaved=false;
+      if(authData.session){
+        const {data:latestApplication,error:lookupApplicationError}=await this.supabaseClient
+          .from('membership_applications').select('id,status').eq('user_id',user.id)
+          .order('created_at',{ascending:false}).limit(1).maybeSingle();
+        if(lookupApplicationError) return fail('We could not check your previous application. Please refresh and try again: '+lookupApplicationError.message);
+        const latestStatus=String(latestApplication?.status||'').toLowerCase();
+        if(latestStatus==='approved'){
+          this.toast('Your membership application is already approved. Please open your Member Dashboard.','success');
+          await this.hydrateCurrentUser(user);
+          await this.loadCloudData();
+          this.navigate('member-dashboard');
+          return;
+        }
+        if(latestApplication && ['pending','under_review'].includes(latestStatus)){
+          const {error:applicationError}=await this.supabaseClient.from('membership_applications')
+            .update({...applicationPayload,updated_at:new Date().toISOString()}).eq('id',latestApplication.id);
+          if(applicationError) return fail('Your application could not be updated: '+applicationError.message);
+          applicationSaved=true;
+        }
+      }
+      if(!applicationSaved){
+        const {error:applicationError}=await this.supabaseClient.from('membership_applications').insert(applicationPayload);
+        if(applicationError) return fail('Application could not be saved: '+applicationError.message);
+      }
 
       // Only create the protected member/profile records when a real authenticated
       // session is already available. Email verification may leave session null.
