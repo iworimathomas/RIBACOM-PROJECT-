@@ -36,7 +36,7 @@
       const password=val('m_password'), confirm=val('m_passwordConfirm');
       const stateRaw=val('m_state'), lga=val('m_lga'), address=val('m_address'), photo=val('m_photo');
       const photoFile=document.getElementById('m_photo_file')?.files?.[0];
-      if(!fullName||!phone||!email||!address) return fail('Please complete all required fields.','warning');
+      if(!fullName||!phone||!email||!stateRaw||!lga||!address) return fail('Please complete your name, email, phone, state of origin, LGA and current address.','warning');
       const {data:sessionData}=await this.supabaseClient.auth.getSession();
       const activeUser=sessionData?.session?.user||null;
       const submittingForExistingAccount=!!activeUser && String(activeUser.email||'').toLowerCase()===email;
@@ -52,12 +52,12 @@
       const state=stateRaw==='Rivers State'?'Rivers':stateRaw==='Bayelsa State'?'Bayelsa':'Other';
       const category=normalizeCategory(val('m_category'));
       const details={
-        previous_name:val('m_otherName'),date_of_birth:val('m_dob'),gender:val('m_gender'),
+        previous_name:val('m_otherName'),date_of_birth:val('m_dob'),place_of_birth:val('m_placeOfBirth'),gender:val('m_gender'),marital_status:val('m_maritalStatus'),
         nationality:val('m_nationality')||'Nigerian',passport_or_id:val('m_idNumber'),
         origin_community:val('m_originCommunity'),clan_ward:val('m_clanWard'),
         previous_association:val('m_previousAssociation'),emergency_contact_name:val('m_emergencyName'),
         emergency_contact_phone:val('m_emergencyPhone'),spouse_name:val('m_spouse'),
-        children_count:Number(val('m_children')||0),next_of_kin:val('m_nextOfKin'),
+        children_count:Number(val('m_children')||0),next_of_kin:val('m_nextOfKin'),next_of_kin_relationship:val('m_nextOfKinRelationship'),clan_ward:val('m_clanWard'),father_name:val('m_fatherName'),mother_name:val('m_motherName'),place_of_birth:val('m_placeOfBirth'),marital_status:val('m_maritalStatus'),gambian_residence_permit_number:val('m_gambianPermit'),work_address:val('m_workAddress'),
         next_of_kin_phone:val('m_nextOfKinPhone'),occupation:val('m_occupation'),
         employer_business:val('m_employer'),work_address:val('m_workAddress'),skills:val('m_skills'),
         interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
@@ -104,7 +104,7 @@
         nationality:details.nationality,place_of_birth:val('m_placeOfBirth')||null,state_of_origin:state,lga:lga||null,
         town_village:val('m_townVillage')||null,community_clan:details.origin_community||null,phone,whatsapp:phone,email,
         current_address:address,area_location:val('m_areaLocation')||null,occupation:details.occupation||null,
-        employer_business:details.employer_business||null,nigerian_passport_number:details.passport_or_id||null,
+        employer_business:details.employer_business||null,work_address:details.work_address||null,skills:details.skills||null,previous_association:details.previous_association||null,children_count:details.children_count,clan_ward:details.clan_ward||null,interests:details.interests,nigerian_passport_number:details.passport_or_id||null,gambian_residence_permit_number:details.gambian_residence_permit_number||null,marital_status:details.marital_status||null,
         membership_category:category,rivers_bayelsa_connection:state,father_name:val('m_fatherName')||null,mother_name:val('m_motherName')||null,
         spouse_name:details.spouse_name||null,date_of_arrival_gambia:val('m_arrivalGambia')||null,
         next_of_kin_name:details.next_of_kin||null,next_of_kin_relationship:val('m_nextOfKinRelationship')||null,
@@ -406,7 +406,7 @@
             <label class="text-xs font-bold">Membership Category *<select id="m_category" required class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="regular">Regular Member</option><option value="associate">Associate Member</option></select></label>
             <label class="text-xs font-bold">Date of Birth<input id="m_dob" type="date" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
             <label class="text-xs font-bold">Gender<select id="m_gender" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select</option><option>Male</option><option>Female</option></select></label>
-            <label class="text-xs font-bold">Nationality<input id="m_nationality" value="Nigerian" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Nationality<input id="m_nationality" value="Nigerian" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>\n            <label class="text-xs font-bold">Place of Birth<input id="m_placeOfBirth" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>\n            <label class="text-xs font-bold">Marital Status<select id="m_maritalStatus" class="mt-1 w-full border rounded-xl px-3 py-2.5"><option value="">Select</option><option>Single</option><option>Married</option><option>Separated</option><option>Divorced</option><option>Widowed</option></select></label>
             <label class="text-xs font-bold">Other / Previous Name<input id="m_otherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
           </div></section>
           <section><h3 class="font-extrabold text-ribacom-navy text-lg">2. Rivers / Bayelsa Connection</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
@@ -417,7 +417,7 @@
             <label class="text-xs font-bold">Clan / Ward<input id="m_clanWard" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
             <label class="text-xs font-bold">Father's Name<input id="m_fatherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
             <label class="text-xs font-bold">Mother's Name<input id="m_motherName" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
-            <label class="text-xs font-bold">Passport / National ID No.<input id="m_idNumber" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
+            <label class="text-xs font-bold">Passport / National ID No.<input id="m_idNumber" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>\n            <label class="text-xs font-bold">Gambian Residence Permit No. (optional)<input id="m_gambianPermit" class="mt-1 w-full border rounded-xl px-3 py-2.5"></label>
           </div></section>
           <section><h3 class="font-extrabold text-ribacom-navy text-lg">3. Residence & Contact</h3><div class="grid sm:grid-cols-2 gap-4 mt-4">
             <label class="text-xs font-bold sm:col-span-2">Current Address in The Gambia *<textarea id="m_address" required rows="2" class="mt-1 w-full border rounded-xl px-3 py-2.5"></textarea></label>
