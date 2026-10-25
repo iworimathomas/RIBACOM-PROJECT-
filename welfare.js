@@ -1,4 +1,4 @@
-/* RIBACOM D6 — welfare workflow. Amounts follow the Master Constitution settings. */
+/* RIBACOM D6 — welfare workflow. Amounts follow approved RIBACOM welfare settings. */
 (function(){
   const fallbackAmounts={wedding:1000,birth:500,loss_parent:1500,loss_spouse:1500,loss_child:1500,other:0};
   const getAmounts=()=>({wedding:Number(app?.db?.welfareSettings?.wedding?.amount||fallbackAmounts.wedding),birth:Number(app?.db?.welfareSettings?.birth?.amount||fallbackAmounts.birth),loss_parent:Number(app?.db?.welfareSettings?.loss_parent?.amount||fallbackAmounts.loss_parent),loss_spouse:Number(app?.db?.welfareSettings?.loss_spouse?.amount||fallbackAmounts.loss_spouse),loss_child:Number(app?.db?.welfareSettings?.loss_child?.amount||fallbackAmounts.loss_child),other:0});
