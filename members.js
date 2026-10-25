@@ -42,7 +42,7 @@
       const submittingForExistingAccount=!!activeUser && String(activeUser.email||'').toLowerCase()===email;
       if(!submittingForExistingAccount && password.length<8) return fail('Please create a password of at least 8 characters.','warning');
       if(!submittingForExistingAccount && password!==confirm) return fail('Passwords do not match.','warning');
-      if(!checked('m_constitutionConsent')||!checked('m_declaration')) return fail('Please accept the Constitution consent and declaration before submitting.','warning');
+      if(!checked('m_declaration')) return fail('Please accept the declaration before submitting.','warning');
       if(photoFile){
         if(!photoFile.type.startsWith('image/')) return fail('Please select a valid image file.','warning');
         if(photoFile.size>5*1024*1024) return fail('Photo must be 5 MB or smaller.','warning');
@@ -61,7 +61,7 @@
         next_of_kin_phone:val('m_nextOfKinPhone'),occupation:val('m_occupation'),
         employer_business:val('m_employer'),work_address:val('m_workAddress'),skills:val('m_skills'),
         interests:{welfare:checked('m_welfareInterest'),youth:checked('m_youthInterest'),cultural:checked('m_culturalInterest'),volunteer:checked('m_volunteer')},
-        constitution_consent:true,information_declaration:true,application_status:'pending',monthly_dues:'D50'
+        information_declaration:true,application_status:'pending',monthly_dues:'D50'
       };
 
       let uploadedPhotoUrl=photo||null;
