@@ -1,7 +1,7 @@
 RIBACOM FINAL MODULAR RELEASE — D9
 
 Official identity:
-Rivers Bayelsa Community in Diaspora The Gambia (RIBACOM)
+Rivers Bayelsa Community The Gambia (RIBACOM)
 Display name: RIVERS BAYELSA COMMUNITY THE GAMBIA (RIBACOM)
 Motto: TRUTH • UNITY • SERVICE
 
